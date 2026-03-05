@@ -101,11 +101,11 @@ Category: ${category}. ${guidance}
 
 Be genuinely FUNNY. Make it so brutal people screenshot it and share it. Don't be cruel about things people can't change, but GO HARD on choices and execution.
 
-Score 1-10 (1=catastrophic, 5=mid, 10=immaculate). Be harsh — most things should land 3-7.
+IMPORTANT SCORING: Give a decimal score from 0.0 to 10.0 with ONE decimal place (like 3.2, 6.7, 4.1). NEVER round to whole numbers. Be harsh — most things should land between 2.5 and 7.0. Vary your scores widely based on what you actually see. A messy room might get 2.3 while a decent one gets 5.8.
 
 Respond ONLY with this JSON:
 {
-  "score": <number>,
+  "score": <decimal number like 4.7>,
   "commentary": "<${sentenceCount} sentences of savage, specific, hilarious roasting>",${detailedField}
   "vibe": "<one word: catastrophic/yikes/rough/mid/decent/solid/great/immaculate>"
 }`,
@@ -119,11 +119,11 @@ Category: ${category}. ${guidance}
 
 Be genuinely enthusiastic and FUNNY through positivity. Make people feel so good they screenshot and share it. Reference specific things you notice.
 
-Score 1-10 (1=has potential, 5=pretty solid, 10=absolutely iconic). Be generous but not always a 10 — keep it believable.
+IMPORTANT SCORING: Give a decimal score from 0.0 to 10.0 with ONE decimal place (like 7.3, 8.6, 9.1). NEVER round to whole numbers. Be generous but varied — most things should land between 6.5 and 9.5. A cute pet might get 9.4 while a basic outfit gets 7.2.
 
 Respond ONLY with this JSON:
 {
-  "score": <number>,
+  "score": <decimal number like 8.3>,
   "commentary": "<${sentenceCount} sentences of genuine, specific, hilarious hyping>",${detailedField}
   "vibe": "<one word: potential/cool/solid/fire/excellent/immaculate/iconic>"
 }`,
@@ -137,11 +137,11 @@ Category: ${category}. ${guidance}
 
 Tell it EXACTLY like it is. If it's amazing, say so plainly. If it's trash, say so plainly. No hedging. People come here because they want the truth nobody else will give them. Be specific and direct.
 
-Score 1-10 (1=absolutely not, 5=it is what it is, 10=genuinely excellent). Score honestly — don't be harsh OR generous, just accurate.
+IMPORTANT SCORING: Give a decimal score from 0.0 to 10.0 with ONE decimal place (like 4.3, 6.1, 7.8). NEVER round to whole numbers. Score honestly — use the FULL range. Don't cluster around 5-7. Something truly bad should get a 1.4, something truly great should get a 9.6.
 
 Respond ONLY with this JSON:
 {
-  "score": <number>,
+  "score": <decimal number like 5.4>,
   "commentary": "<${sentenceCount} sentences of brutally honest, specific, no-filter assessment>",${detailedField}
   "vibe": "<one word: nope/rough/meh/fine/decent/solid/good/excellent>"
 }`,
@@ -155,11 +155,11 @@ Category: ${category}. ${guidance}
 
 Go FULL CHAOS. Compare things to random objects, historical events, conspiracy theories. Make up fake statistics. Be the most entertaining, absurd, quotable thing anyone has ever read. People should screenshot this out of sheer confusion and delight.
 
-Score 1-10 (the score should feel random and unjustifiable, but commit to it with full confidence).
+IMPORTANT SCORING: Give a decimal score from 0.0 to 10.0 with ONE decimal place. The score should feel random and unjustifiable — like 3.7 or 8.4 or 0.2 — but commit to it with full confidence. Use weird specific numbers like 6.9, 4.2, or 0.3. Never round to whole numbers.
 
 Respond ONLY with this JSON:
 {
-  "score": <number>,
+  "score": <decimal number like 6.9>,
   "commentary": "<${sentenceCount} sentences of completely unhinged, chaotic, absurd, hilarious commentary>",${detailedField}
   "vibe": "<one word: cursed/chaotic/feral/unhinged/transcendent/eldritch/cosmic/interdimensional>"
 }`,
@@ -173,11 +173,11 @@ Category: ${category}. ${guidance}
 
 Evaluate the RIZZ POTENTIAL. How much does this radiate confidence, attractiveness, or charm? Would this get likes? Would this make someone's head turn? Be funny, be specific, and speak in modern slang where it fits naturally.
 
-Score 1-10 (1=no rizz detected, 5=mid rizz, 10=unspoken rizz god). Be real but entertaining.
+IMPORTANT SCORING: Give a decimal score from 0.0 to 10.0 with ONE decimal place (like 5.8, 7.3, 3.1). NEVER round to whole numbers. Use the full range — no rizz at all might be 1.2, mid rizz is 5.4, unspoken rizz god is 9.7.
 
 Respond ONLY with this JSON:
 {
-  "score": <number>,
+  "score": <decimal number like 7.1>,
   "commentary": "<${sentenceCount} sentences evaluating the rizz factor with specific, funny observations>",${detailedField}
   "vibe": "<one word: invisible/struggling/developing/mid/decent/smooth/charming/magnetic/legendary>"
 }`

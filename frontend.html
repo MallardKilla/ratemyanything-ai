@@ -737,8 +737,9 @@
                 imageContainer.innerHTML = '';
             }
 
-            document.getElementById('scoreNumber').textContent = rating.score;
-            document.getElementById('scoreGaugeFill').style.setProperty('--score-percent', (rating.score / 10 * 100) + '%');
+            var displayScore = parseFloat(rating.score);
+            document.getElementById('scoreNumber').textContent = Number.isInteger(displayScore) ? displayScore.toFixed(1) : displayScore;
+            document.getElementById('scoreGaugeFill').style.setProperty('--score-percent', (displayScore / 10 * 100) + '%');
             document.getElementById('scoreCategoryLabel').textContent = rating.category;
             const modeLabels = { roast: '🔥 Roast Mode', hype: '✨ Hype Mode', honest: '😐 Brutally Honest', unhinged: '🤪 Unhinged', rizz: '💀 Rizz Check' };
             document.getElementById('modeBadge').textContent = modeLabels[rating.mode] || rating.mode;
@@ -823,7 +824,7 @@
                     imageThumbnail +
                     '<div class="history-item-info">' +
                     '<div class="history-item-title">' + item.category + '</div>' +
-                    '<div class="history-item-score">' + item.score + '/10 ' + (item.mode === 'roast' ? '🔥' : '✨') + '</div>' +
+                    '<div class="history-item-score">' + item.score + '/10 ' + ({roast:'🔥',hype:'✨',honest:'😐',unhinged:'🤪',rizz:'💀'}[item.mode] || '⚡') + '</div>' +
                     '</div></div>';
             }).join('');
         }
