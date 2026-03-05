@@ -743,16 +743,30 @@
 
         // ===== PAYMENTS =====
         async function buyMoreRatings() {
+            var btn = event.target;
+            var origText = btn.textContent;
+            btn.textContent = 'Loading...';
+            btn.disabled = true;
             try {
-                showToast('Redirecting to checkout...');
-                const response = await fetch('/api/create-checkout', {
+                var response = await fetch('/api/create-checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' }
                 });
-                const data = await response.json();
-                if (data.url) { window.location.href = data.url; }
-                else { showToast('Checkout error: ' + (data.error || 'Try again')); }
-            } catch (err) { showToast('Something went wrong. Try again!'); }
+                var data = await response.json();
+                console.log('Checkout response:', data);
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    alert('Checkout error: ' + (data.error || 'Unknown error'));
+                    btn.textContent = origText;
+                    btn.disabled = false;
+                }
+            } catch (err) {
+                console.error('Checkout failed:', err);
+                alert('Checkout failed: ' + err.message);
+                btn.textContent = origText;
+                btn.disabled = false;
+            }
         }
 
         // ===== HISTORY =====
@@ -804,6 +818,14 @@
             updateRateButtonStyle();
 
             var params = new URLSearchParams(window.location.search);
+            if (params.get('reset') === 'true') {
+                localStorage.removeItem('ratingsUsed');
+                localStorage.removeItem('paidRatings');
+                localStorage.removeItem('ratingHistory');
+                ratingHistory = [];
+                window.history.replaceState({}, '', '/');
+                showToast('Ratings reset!');
+            }
             if (params.get('payment') === 'success') {
                 setPaidRatings(getPaidRatings() + PAID_RATINGS);
                 showToast('Payment successful! 5 more ratings unlocked');
