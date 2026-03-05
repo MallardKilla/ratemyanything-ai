@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RateMyAnything.ai - Get AI ratings for literally anything. Upload a photo or describe it and get a brutal/funny score.">
+    <meta name="theme-color" content="#0a0a0a">
+
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="RateMyAnything.ai - Rate Anything">
+    <meta property="og:description" content="Upload a photo or describe anything and get an AI rating. Roast mode vs Hype mode. Try it now!">
+    <meta property="og:image" content="https://ratemyanything.ai/og-image.png">
+    <meta property="og:url" content="https://ratemyanything.ai">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <title>RateMyAnything.ai - Get Rated</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-card: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0b0;
+            --gradient-roast: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
+            --gradient-hype: linear-gradient(135deg, #00d9ff 0%, #00ff88 100%);
+            --border-radius: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 20px;
+            background: var(--gradient-roast);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .counter {
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .counter-number {
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            max-width: 600px;
+            width: 100%;
+            margin: 0 auto;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .container::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+
+        /* ===== LANDING PAGE ===== */
+        .landing-page {
+            padding: 40px 20px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .headline {
+            font-size: 44px;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #ff006e, #8338ec, #00d9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: slideDown 0.6s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .subheadline {
+            font-size: 18px;
+            color: var(--text-secondary);
+            margin-bottom: 32px;
+            line-height: 1.5;
+            animation: slideDown 0.6s ease-out 0.1s both;
+        }
+
+        .cta-button {
+            background: var(--gradient-roast);
+            color: white;
+            border: none;
+            padding: 16px 48px;
+            font-size: 16px;
+            font-weight: 700;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            animation: slideDown 0.6s ease-out 0.2s both;
+            box-shadow: 0 8px 32px rgba(255, 0, 110, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 48px rgba(255, 0, 110, 0.5);
+        }
+
+        .cta-button:active {
+            transform: translateY(-2px);
+        }
+
+        /* ===== MODE TOGGLE ===== */
+        .mode-section {
+            padding: 20px;
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        .toggle-button {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .toggle-button.active {
+            color: white;
+            border-color: transparent;
+        }
+
+        .toggle-button.active.roast {
+            background: var(--gradient-roast);
+            box-shadow: 0 8px 24px rgba(255, 0, 110, 0.3);
+        }
+
+        .toggle-button.active.hype {
+            background: var(--gradient-hype);
+            box-shadow: 0 8px 24px rgba(0, 217, 255, 0.3);
+        }
+
+        .toggle-button:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== INPUT SECTION ===== */
+        .input-section {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .input-card {
+            background: var(--bg-card);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--border-radius);
+            padding: 24px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .input-card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .input-card.active {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* ===== UPLOAD AREA ===== */
+        .upload-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            text-align: center;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        .upload-text strong {
+            color: var(--text-primary);
+        }
+
+        #photoInput {
+            display: none;
+        }
+
+        .image-preview {
+            width: 100%;
+            max-height: 300px;
+            border-radius: 12px;
+            object-fit: cover;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .image-preview-container {
+            width: 100%;
+            position: relative;
+        }
+
+        .remove-image-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .remove-image-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        /* ===== TEXT INPUT ===== */
+        .text-input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .input-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-align: left;
+        }
+
+        #descriptionInput {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        #descriptionInput:focus {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        #descriptionInput::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* ===== CATEGORY SELECTOR ===== */
+        .category-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .category-btn {
+            padding: 10px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: var(--transition);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .category-btn:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .category-btn.selected {
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* ===== RATE BUTTON ===== */
+        .rate-button-container {
+            padding: 20px;
+            position: sticky;
+            bottom: 0;
+            background: linear-gradient(to top, var(--bg-dark), rgba(10, 10, 10, 0.8));
+        }
+
+        .rate-button {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rate-button.roast {
+            background: var(--gradient-roast);
+            color: white;
+            box-shadow: 0 8px 32px rgba(255, 0, 110, 0.3);
+        }
+
+        .rate-button.hype {
+            background: var(--gradient-hype);
+            color: #000;
+            box-shadow: 0 8px 32px rgba(0, 217, 255, 0.3);
+        }
+
+        .rate-button:hover:not(:disabled) {
+            transform: translateY(-4px);
+        }
+
+        .rate-button:active:not(:disabled) {
+            transform: translateY(-2px);
+        }
+
+        .rate-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* ===== LOADING STATE ===== */
+        .loading-state {
+            display: none;
+            padding: 60px 20px;
+            text-align: center;
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        .loading-state.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .loading-animation {
+            width: 80px;
+            height: 80px;
+            position: relative;
+        }
+
+        .loading-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 3px solid transparent;
+            border-top-color: #ff006e;
+            border-radius: 50%;
+            animation: spin 1.5s linear infinite;
+        }
+
+        .loading-circle:nth-child(2) {
+            border-top-color: #8338ec;
+            animation: spin 2s linear infinite reverse;
+            animation-delay: -0.5s;
+        }
+
+        .loading-circle:nth-child(3) {
+            border-top-color: #00d9ff;
+            animation: spin 2.5s linear infinite;
+            animation-delay: -1s;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .loading-subtext {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* ===== RESULTS PAGE ===== */
+        .results-page {
+            display: none;
+            padding: 20px;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .results-page.active {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .score-card {
+            background: var(--bg-card);
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: var(--border-radius);
+            padding: 32px 24px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .score-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+            animation: shimmer 4s linear infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .result-image-thumbnail {
+            width: 60px;
+            height: 60px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin: 0 auto 16px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .score-number {
+            font-size: 72px;
+            font-weight: 900;
+            line-height: 1;
+            margin: 16px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .roast .score-number {
+            background: var(--gradient-roast);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hype .score-number {
+            background: var(--gradient-hype);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .score-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .score-gauge {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            overflow: hidden;
+            margin: 20px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .score-gauge-fill {
+            height: 100%;
+            border-radius: 6px;
+            width: 0%;
+            animation: fillGauge 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .score-card.roast .score-gauge-fill {
+            background: var(--gradient-roast);
+            box-shadow: 0 0 16px rgba(255, 0, 110, 0.5);
+        }
+
+        .score-card.hype .score-gauge-fill {
+            background: var(--gradient-hype);
+            box-shadow: 0 0 16px rgba(0, 217, 255, 0.5);
+        }
+
+        @keyframes fillGauge {
+            from { width: 0%; }
+            to { width: var(--score-percent); }
+        }
+
+        .mode-badge {
+            display: inline-block;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 20px;
+            margin: 12px 0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .score-card.roast .mode-badge {
+            background: rgba(255, 0, 110, 0.2);
+            color: #ff006e;
+            border: 1px solid rgba(255, 0, 110, 0.3);
+        }
+
+        .score-card.hype .mode-badge {
+            background: rgba(0, 217, 255, 0.2);
+            color: #00d9ff;
+            border: 1px solid rgba(0, 217, 255, 0.3);
+        }
+
+        .commentary {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin: 24px 0;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        .commentary strong {
+            color: var(--text-primary);
+        }
+
+        /* ===== ACTION BUTTONS ===== */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .action-btn {
+            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .action-btn:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.primary {
+            grid-column: 1 / -1;
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* ===== UPSELL BUTTON ===== */
+        .upsell-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2));
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 14px;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .upsell-btn:hover {
+            border-color: rgba(255, 215, 0, 0.5);
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.3));
+            transform: translateY(-2px);
+        }
+
+        /* ===== HISTORY SECTION ===== */
+        .history-section {
+            display: none;
+            margin-top: 24px;
+        }
+
+        .history-section.show {
+            display: block;
+        }
+
+        .history-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .history-items {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            gap: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .history-item-image {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .history-item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .history-item-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-item-score {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            .header {
+                padding: 12px 16px;
+            }
+
+            .logo {
+                font-size: 18px;
+            }
+
+            .headline {
+                font-size: 36px;
+            }
+
+            .subheadline {
+                font-size: 16px;
+            }
+
+            .landing-page {
+                padding: 32px 16px;
+            }
+
+            .input-section {
+                padding: 16px;
+            }
+
+            .input-card {
+                padding: 16px;
+            }
+
+            .score-number {
+                font-size: 56px;
+            }
+
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+
+            .rate-button-container {
+                padding: 16px;
+            }
+        }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            font-size: 14px;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            animation: slideUp 0.4s ease-out;
+            pointer-events: none;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        /* ===== UTILITY ===== */
+        .hidden {
+            display: none !important;
+        }
+
+        .cursor-pointer {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo">⚡ RateMyAnything.ai</div>
+        <div class="counter">
+            <span>🔥</span>
+            <span class="counter-number" id="ratingCounter">2,847</span>
+        </div>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <div class="container">
+        <!-- LANDING PAGE -->
+        <div class="landing-page" id="landingPage">
+            <h1 class="headline">Rate Literally Anything</h1>
+            <p class="subheadline">Upload a photo or describe it, and let AI judge you (nicely or brutally)</p>
+            <button class="cta-button" onclick="startRating()">Get Started</button>
+        </div>
+
+        <!-- RATING INTERFACE -->
+        <div id="ratingInterface" class="hidden">
+            <!-- MODE TOGGLE -->
+            <div class="mode-section">
+                <button class="toggle-button roast active" onclick="setMode('roast')" id="roastModeBtn">
+                    🔥 Roast Mode
+                </button>
+                <button class="toggle-button hype" onclick="setMode('hype')" id="hypeModeBtn">
+                    ✨ Hype Mode
+                </button>
+            </div>
+
+            <!-- INPUT SECTION -->
+            <div class="input-section">
+                <!-- PHOTO UPLOAD -->
+                <div class="input-card active" id="photoCard" onclick="document.getElementById('photoInput').click()">
+                    <div class="upload-area">
+                        <div class="upload-icon">📸</div>
+                        <div class="upload-text">
+                            <strong>Tap to upload</strong> or drag & drop<br>
+                            PNG, JPG, GIF up to 10MB
+                        </div>
+                    </div>
+                    <div id="imagePreviewContainer" class="hidden">
+                        <div class="image-preview-container">
+                            <img id="imagePreview" class="image-preview" alt="Preview">
+                            <button class="remove-image-btn" onclick="removeImage(event)">✕</button>
+                        </div>
+                        <div style="text-align: center; font-size: 13px; color: var(--text-secondary); margin-top: 8px;">
+                            Image selected ✓
+                        </div>
+                    </div>
+                </div>
+                <input type="file" id="photoInput" accept="image/*" onchange="handleImageUpload(event)">
+
+                <!-- TEXT INPUT -->
+                <div class="input-card">
+                    <div class="text-input-wrapper">
+                        <label class="input-label">Or describe it</label>
+                        <textarea id="descriptionInput" placeholder="E.g., 'my dorm room has posters everywhere and the floor is...'" onchange="clearImagePreview()"></textarea>
+                    </div>
+                </div>
+
+                <!-- CATEGORY SELECTOR -->
+                <div class="input-card">
+                    <div class="category-section">
+                        <label class="input-label">What are we rating?</label>
+                        <div class="category-grid">
+                            <button class="category-btn" onclick="selectCategory(event, 'Room')">🏠 Room</button>
+                            <button class="category-btn" onclick="selectCategory(event, 'Bar')">🍹 Bar</button>
+                            <button class="category-btn" onclick="selectCategory(event, 'Outfit')">👕 Outfit</button>
+                            <button class="category-btn" onclick="selectCategory(event, 'Food')">🍔 Food</button>
+                            <button class="category-btn" onclick="selectCategory(event, 'Car')">🚗 Car</button>
+                            <button class="category-btn" onclick="selectCategory(event, 'Campus')">🏫 Campus</button>
+                            <button class="category-btn" onclick="selectCategory(event, 'Pet')">🐕 Pet</button>
+                            <button class="category-btn" onclick="selectCategory(event, 'Date Spot')">💕 Date Spot</button>
+                            <button class="category-btn" onclick="selectCategory(event, 'Other')">❓ Other</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- HISTORY (Optional) -->
+            <div class="history-section" id="historySection">
+                <div class="history-title">Recent Ratings</div>
+                <div class="history-items" id="historyItems"></div>
+            </div>
+        </div>
+
+        <!-- LOADING STATE -->
+        <div class="loading-state" id="loadingState">
+            <div class="loading-animation">
+                <div class="loading-circle"></div>
+                <div class="loading-circle"></div>
+                <div class="loading-circle"></div>
+            </div>
+            <div class="loading-text">AI is judging you...</div>
+            <div class="loading-subtext">This may take a few seconds</div>
+        </div>
+
+        <!-- RESULTS PAGE -->
+        <div class="results-page" id="resultsPage">
+            <div class="score-card" id="scoreCard">
+                <div id="resultImageThumbnail"></div>
+                <div class="score-label" id="scoreCategoryLabel"></div>
+                <div class="score-number" id="scoreNumber">0</div>
+                <div class="score-gauge">
+                    <div class="score-gauge-fill" id="scoreGaugeFill" style="--score-percent: 0%"></div>
+                </div>
+                <div class="mode-badge" id="modeBadge"></div>
+                <div class="commentary" id="commentary"></div>
+            </div>
+
+            <!-- ACTION BUTTONS -->
+            <div class="action-buttons">
+                <button class="action-btn" onclick="shareToClipboard()">📋 Copy</button>
+                <button class="action-btn" onclick="shareToTwitter()">𝕏 Share</button>
+                <button class="action-btn" onclick="shareToInstagram()">📸 IG</button>
+                <button class="action-btn primary" onclick="goBack()">➕ Rate Something Else</button>
+            </div>
+
+            <!-- UPSELL -->
+            <button class="upsell-btn" onclick="openDetailedAnalysis()">
+                🔓 Get Detailed Analysis — $1.99
+            </button>
+        </div>
+    </div>
+
+    <!-- RATE BUTTON (Fixed at bottom) -->
+    <div class="rate-button-container" id="rateButtonContainer" style="display: none;">
+        <button class="rate-button roast" id="rateBtn" onclick="submitRating()">
+            Rate It
+        </button>
+    </div>
+
+    <script>
+        // ===== STATE =====
+        let currentMode = 'roast';
+        let currentCategory = 'Other';
+        let uploadedImage = null;
+        let currentRating = null;
+        let ratingHistory = [];
+        let currentRatingCount = 2847;
+
+        // ===== MODE SWITCHING =====
+        function setMode(mode) {
+            currentMode = mode;
+            const roastBtn = document.getElementById('roastModeBtn');
+            const hypeBtn = document.getElementById('hypeModeBtn');
+
+            if (mode === 'roast') {
+                roastBtn.classList.add('active');
+                hypeBtn.classList.remove('active');
+            } else {
+                hypeBtn.classList.add('active');
+                roastBtn.classList.remove('active');
+            }
+
+            updateRateButtonStyle();
+        }
+
+        // ===== IMAGE HANDLING =====
+        function handleImageUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            if (file.size > 10 * 1024 * 1024) {
+                showToast('Image must be under 10MB');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                uploadedImage = e.target.result;
+                displayImagePreview();
+                document.getElementById('descriptionInput').value = '';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function displayImagePreview() {
+            const preview = document.getElementById('imagePreview');
+            const container = document.getElementById('imagePreviewContainer');
+            preview.src = uploadedImage;
+            container.classList.remove('hidden');
+        }
+
+        function removeImage(e) {
+            e.stopPropagation();
+            uploadedImage = null;
+            document.getElementById('imagePreviewContainer').classList.add('hidden');
+            document.getElementById('photoInput').value = '';
+        }
+
+        function clearImagePreview() {
+            if (document.getElementById('descriptionInput').value.trim()) {
+                uploadedImage = null;
+                document.getElementById('imagePreviewContainer').classList.add('hidden');
+                document.getElementById('photoInput').value = '';
+            }
+        }
+
+        // ===== CATEGORY SELECTION =====
+        function selectCategory(event, category) {
+            event.target.classList.toggle('selected');
+            currentCategory = category;
+
+            // Deselect all other buttons in the same grid
+            const buttons = event.target.parentElement.querySelectorAll('.category-btn');
+            buttons.forEach(btn => {
+                if (btn !== event.target) {
+                    btn.classList.remove('selected');
+                }
+            });
+        }
+
+        // ===== NAVIGATION =====
+        function startRating() {
+            document.getElementById('landingPage').classList.add('hidden');
+            document.getElementById('ratingInterface').classList.remove('hidden');
+            document.getElementById('rateButtonContainer').style.display = 'block';
+            document.getElementById('resultsPage').classList.remove('active');
+            updateRateButtonStyle();
+            loadHistory();
+        }
+
+        function goBack() {
+            document.getElementById('resultsPage').classList.remove('active');
+            document.getElementById('ratingInterface').classList.remove('hidden');
+            document.getElementById('loadingState').classList.remove('active');
+            clearForm();
+        }
+
+        function clearForm() {
+            uploadedImage = null;
+            document.getElementById('descriptionInput').value = '';
+            document.getElementById('photoInput').value = '';
+            document.getElementById('imagePreviewContainer').classList.add('hidden');
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('selected'));
+            currentCategory = 'Other';
+        }
+
+        // ===== RATING SUBMISSION =====
+        async function submitRating() {
+            const description = document.getElementById('descriptionInput').value.trim();
+            if (!uploadedImage && !description) {
+                showToast('Please upload a photo or write a description');
+                return;
+            }
+
+            // Show loading state
+            document.getElementById('ratingInterface').classList.add('hidden');
+            document.getElementById('loadingState').classList.add('active');
+            document.getElementById('rateButtonContainer').style.display = 'none';
+
+            try {
+                const response = await fetch('/api/rate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image: uploadedImage || null,
+                        text: description || null,
+                        mode: currentMode,
+                        category: currentCategory.toLowerCase()
+                    })
+                });
+
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.error || 'Rating failed');
+                }
+
+                const data = await response.json();
+                displayResults({
+                    score: data.score,
+                    category: currentCategory,
+                    commentary: data.commentary,
+                    vibe: data.vibe,
+                    mode: currentMode,
+                    image: uploadedImage
+                });
+            } catch (error) {
+                console.error('Rating error:', error);
+                showToast('Something went wrong. Try again!');
+                document.getElementById('loadingState').classList.remove('active');
+                document.getElementById('ratingInterface').classList.remove('hidden');
+                document.getElementById('rateButtonContainer').style.display = 'block';
+            }
+        }
+
+        function displayResults(rating) {
+            currentRating = rating;
+
+            // Update score card
+            const scoreCard = document.getElementById('scoreCard');
+            scoreCard.className = `score-card ${rating.mode}`;
+
+            // Update result image thumbnail
+            const imageContainer = document.getElementById('resultImageThumbnail');
+            if (rating.image) {
+                imageContainer.innerHTML = `<img src="${rating.image}" class="result-image-thumbnail" alt="Rated item">`;
+            } else {
+                imageContainer.innerHTML = '';
+            }
+
+            // Update score
+            const scoreNumber = document.getElementById('scoreNumber');
+            scoreNumber.textContent = rating.score;
+            document.getElementById('scoreGaugeFill').style.setProperty('--score-percent', `${(rating.score / 10) * 100}%`);
+
+            // Update labels
+            document.getElementById('scoreCategoryLabel').textContent = rating.category;
+            const modeBadge = document.getElementById('modeBadge');
+            modeBadge.textContent = rating.mode === 'roast' ? '🔥 Roast Mode' : '✨ Hype Mode';
+
+            // Update commentary
+            document.getElementById('commentary').innerHTML = rating.commentary.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+
+            // Hide loading, show results
+            document.getElementById('loadingState').classList.remove('active');
+            document.getElementById('resultsPage').classList.add('active');
+
+            // Increment counter
+            currentRatingCount++;
+            document.getElementById('ratingCounter').textContent = currentRatingCount.toLocaleString();
+
+            // Add to history
+            addToHistory(rating);
+        }
+
+        // ===== SHARING =====
+        function shareToClipboard() {
+            const text = `I got a ${currentRating.score}/10 in ${currentRating.mode === 'roast' ? '🔥 Roast' : '✨ Hype'} Mode on RateMyAnything.ai!\n\n"${currentRating.commentary}"\n\nTry it: ratemyanything.ai`;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard! 📋');
+            });
+        }
+
+        function shareToTwitter() {
+            const text = `I got a ${currentRating.score}/10 in ${currentRating.mode === 'roast' ? '🔥 Roast' : '✨ Hype'} Mode on RateMyAnything.ai!\n\nTry rating anything: `;
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=https://ratemyanything.ai`;
+            window.open(url, '_blank', 'width=550,height=420');
+        }
+
+        function shareToInstagram() {
+            showToast('Instagram sharing coming soon! For now, copy to clipboard and paste in your story 📸');
+        }
+
+        // ===== UPSELL =====
+        function openDetailedAnalysis() {
+            showToast('Detailed Analysis feature coming soon! 🚀');
+        }
+
+        // ===== HISTORY =====
+        function addToHistory(rating) {
+            const historyItem = {
+                score: rating.score,
+                category: rating.category,
+                mode: rating.mode,
+                image: rating.image,
+                timestamp: new Date()
+            };
+            ratingHistory.unshift(historyItem);
+            if (ratingHistory.length > 10) ratingHistory.pop();
+            saveHistory();
+            loadHistory();
+        }
+
+        function loadHistory() {
+            const historySection = document.getElementById('historySection');
+            const historyItems = document.getElementById('historyItems');
+
+            if (ratingHistory.length === 0) {
+                historySection.classList.remove('show');
+                return;
+            }
+
+            historySection.classList.add('show');
+            historyItems.innerHTML = ratingHistory.map((item, index) => {
+                const imageThumbnail = item.image ? `<img src="${item.image}" class="history-item-image" alt="Rating">` : '<div class="history-item-image" style="background: rgba(255,255,255,0.1);"></div>';
+                return `
+                    <div class="history-item" onclick="openHistoryItem(${index})">
+                        ${imageThumbnail}
+                        <div class="history-item-info">
+                            <div class="history-item-title">${item.category}</div>
+                            <div class="history-item-score">${item.score}/10 ${item.mode === 'roast' ? '🔥' : '✨'}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openHistoryItem(index) {
+            const rating = ratingHistory[index];
+            displayResults({
+                score: rating.score,
+                category: rating.category,
+                commentary: `Previously rated: ${rating.category} - Score: ${rating.score}/10`,
+                mode: rating.mode,
+                image: rating.image
+            });
+        }
+
+        function saveHistory() {
+            try {
+                localStorage.setItem('ratingHistory', JSON.stringify(ratingHistory));
+            } catch (e) {
+                console.log('LocalStorage not available');
+            }
+        }
+
+        function loadHistoryFromStorage() {
+            try {
+                const stored = localStorage.getItem('ratingHistory');
+                if (stored) {
+                    ratingHistory = JSON.parse(stored);
+                }
+            } catch (e) {
+                console.log('LocalStorage not available');
+            }
+        }
+
+        // ===== UI HELPERS =====
+        function updateRateButtonStyle() {
+            const btn = document.getElementById('rateBtn');
+            btn.className = `rate-button ${currentMode}`;
+        }
+
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // ===== DRAG & DROP =====
+        const photoCard = document.getElementById('photoCard');
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            photoCard.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            photoCard.addEventListener(eventName, () => {
+                photoCard.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+                photoCard.style.background = 'rgba(255, 255, 255, 0.05)';
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            photoCard.addEventListener(eventName, () => {
+                photoCard.style.borderColor = 'rgba(255, 255, 255, 0.08)';
+                photoCard.style.background = 'var(--bg-card)';
+            });
+        });
+
+        photoCard.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            document.getElementById('photoInput').files = files;
+            handleImageUpload({ target: { files: files } });
+        });
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHistoryFromStorage();
+            updateRateButtonStyle();
+        });
+    </script>
+</body>
+</html>

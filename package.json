@@ -1,0 +1,13 @@
+{
+  "name": "ratemyanything-ai",
+  "version": "1.0.0",
+  "description": "AI rates literally anything - roast mode or hype mode",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
