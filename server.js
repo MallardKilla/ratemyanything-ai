@@ -37,7 +37,7 @@ async function callClaude(prompt, imageBase64, mediaType = 'image/jpeg') {
   content.push({ type: 'text', text: prompt });
 
   const body = JSON.stringify({
-    model: 'claude-3-5-sonnet-20241022',
+    model: 'claude-3-5-sonnet-latest',
     max_tokens: 1024,
     messages: [{ role: 'user', content }]
   });
