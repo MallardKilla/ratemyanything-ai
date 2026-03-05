@@ -1036,11 +1036,26 @@
                 return;
             }
 
+            // Compress image before sending to keep payload small
             const reader = new FileReader();
             reader.onload = (e) => {
-                uploadedImage = e.target.result;
-                displayImagePreview();
-                document.getElementById('descriptionInput').value = '';
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const maxDim = 800;
+                    let w = img.width, h = img.height;
+                    if (w > maxDim || h > maxDim) {
+                        if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                        else { w = Math.round(w * maxDim / h); h = maxDim; }
+                    }
+                    canvas.width = w;
+                    canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    uploadedImage = canvas.toDataURL('image/jpeg', 0.7);
+                    displayImagePreview();
+                    document.getElementById('descriptionInput').value = '';
+                };
+                img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
