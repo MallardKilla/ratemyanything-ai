@@ -158,13 +158,13 @@
         .cta-button:active { transform: translateY(-2px); }
 
         /* ===== MODE TOGGLE ===== */
-        .mode-section { padding: 20px; display: flex; gap: 12px; margin-bottom: 24px; }
+        .mode-section { padding: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 24px; }
 
         .toggle-button {
-            flex: 1; padding: 12px 16px; border: 2px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 8px; border: 2px solid rgba(255, 255, 255, 0.1);
             background: var(--bg-card); color: var(--text-secondary); border-radius: 12px;
-            cursor: pointer; font-weight: 600; font-size: 14px; transition: var(--transition);
-            position: relative; overflow: hidden;
+            cursor: pointer; font-weight: 600; font-size: 13px; transition: var(--transition);
+            position: relative; overflow: hidden; text-align: center; white-space: nowrap;
         }
         .toggle-button.active { color: white; border-color: transparent; }
         .toggle-button.active.roast { background: var(--gradient-roast); box-shadow: 0 8px 24px rgba(255, 0, 110, 0.3); }
@@ -296,6 +296,9 @@
         }
         .score-card.roast .mode-badge { background: rgba(255, 0, 110, 0.2); color: #ff006e; border: 1px solid rgba(255, 0, 110, 0.3); }
         .score-card.hype .mode-badge { background: rgba(0, 217, 255, 0.2); color: #00d9ff; border: 1px solid rgba(0, 217, 255, 0.3); }
+        .score-card.honest .mode-badge { background: rgba(255, 149, 0, 0.2); color: #ff9500; border: 1px solid rgba(255, 149, 0, 0.3); }
+        .score-card.unhinged .mode-badge { background: rgba(255, 0, 255, 0.2); color: #ff00ff; border: 1px solid rgba(255, 0, 255, 0.3); }
+        .score-card.rizz .mode-badge { background: rgba(255, 190, 11, 0.2); color: #ffbe0b; border: 1px solid rgba(255, 190, 11, 0.3); }
 
         .commentary { font-size: 16px; line-height: 1.6; color: var(--text-secondary); margin: 24px 0; font-weight: 500; position: relative; z-index: 1; }
         .commentary strong { color: var(--text-primary); }
@@ -320,6 +323,21 @@
         }
         .upsell-btn:hover { border-color: rgba(255, 215, 0, 0.5); background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.3)); transform: translateY(-2px); }
 
+        /* ===== HISTORY ===== */
+        .history-section { display: none; padding: 0 20px 20px; }
+        .history-section.show { display: block; }
+        .history-title { font-size: 14px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+        .history-item {
+            display: flex; align-items: center; gap: 12px; padding: 12px;
+            background: var(--bg-card); border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px; margin-bottom: 8px; cursor: pointer; transition: var(--transition);
+        }
+        .history-item:hover { border-color: rgba(255, 255, 255, 0.15); }
+        .history-item-image { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+        .history-item-info { flex: 1; min-width: 0; }
+        .history-item-title { font-size: 14px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .history-item-score { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 600px) {
             .header { padding: 12px 16px; }
@@ -330,9 +348,11 @@
             .input-section { padding: 16px; }
             .input-card { padding: 16px; }
             .score-number { font-size: 56px; }
-            .category-grid { grid-template-columns: repeat(2, 1fr); }
+            .category-grid { grid-template-columns: repeat(3, 1fr); }
             .action-buttons { grid-template-columns: 1fr; }
             .rate-button-container { padding: 16px; }
+            .mode-section { grid-template-columns: repeat(3, 1fr); padding: 16px; }
+            .toggle-button { padding: 10px 6px; font-size: 12px; }
         }
 
         /* ===== TOAST NOTIFICATION ===== */
@@ -372,7 +392,7 @@
         <!-- RATING INTERFACE -->
         <div id="ratingInterface" class="hidden">
             <!-- MODE TOGGLE -->
-            <div class="mode-section" style="flex-wrap: wrap; gap: 8px;">
+            <div class="mode-section">
                 <button class="toggle-button roast active" onclick="setMode('roast')" id="mode-roast">
                     🔥 Roast
                 </button>

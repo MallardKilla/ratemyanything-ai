@@ -220,8 +220,9 @@ const server = http.createServer(async (req, res) => {
     return res.end();
   }
 
-  // Serve frontend
-  if (req.method === 'GET' && (req.url === '/' || req.url === '/index.html')) {
+  // Serve frontend (handle /, /index.html, and /?payment=success/cancel)
+  const urlPath = req.url.split('?')[0];
+  if (req.method === 'GET' && (urlPath === '/' || urlPath === '/index.html')) {
     const html = fs.readFileSync(path.join(__dirname, 'frontend.html'), 'utf-8');
     res.writeHead(200, { 'Content-Type': 'text/html' });
     return res.end(html);
@@ -276,7 +277,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     try {
-      const origin = req.headers.origin || req.headers.referer?.replace(/\/$/, '') || `http://localhost:${PORT}`;
+      const origin = req.headers.origin || (req.headers.referer ? new URL(req.headers.referer).origin : null) || `http://localhost:${PORT}`;
       const stripeBody = new URLSearchParams({
         'payment_method_types[]': 'card',
         'line_items[0][price]': STRIPE_PRICE_ID,
