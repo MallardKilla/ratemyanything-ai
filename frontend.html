@@ -169,6 +169,9 @@
         .toggle-button.active { color: white; border-color: transparent; }
         .toggle-button.active.roast { background: var(--gradient-roast); box-shadow: 0 8px 24px rgba(255, 0, 110, 0.3); }
         .toggle-button.active.hype { background: var(--gradient-hype); box-shadow: 0 8px 24px rgba(0, 217, 255, 0.3); }
+        .toggle-button.active.honest { background: linear-gradient(135deg, #ff9500 0%, #ff5e00 100%); box-shadow: 0 8px 24px rgba(255, 149, 0, 0.3); }
+        .toggle-button.active.unhinged { background: linear-gradient(135deg, #ff00ff 0%, #00ff00 100%); box-shadow: 0 8px 24px rgba(255, 0, 255, 0.3); }
+        .toggle-button.active.rizz { background: linear-gradient(135deg, #ff006e 0%, #ffbe0b 100%); box-shadow: 0 8px 24px rgba(255, 190, 11, 0.3); }
         .toggle-button:hover { border-color: rgba(255, 255, 255, 0.2); }
 
         /* ===== INPUT SECTION ===== */
@@ -235,6 +238,9 @@
         }
         .rate-button.roast { background: var(--gradient-roast); color: white; box-shadow: 0 8px 32px rgba(255, 0, 110, 0.3); }
         .rate-button.hype { background: var(--gradient-hype); color: #000; box-shadow: 0 8px 32px rgba(0, 217, 255, 0.3); }
+        .rate-button.honest { background: linear-gradient(135deg, #ff9500 0%, #ff5e00 100%); color: white; box-shadow: 0 8px 32px rgba(255, 149, 0, 0.3); }
+        .rate-button.unhinged { background: linear-gradient(135deg, #ff00ff 0%, #00ff00 100%); color: white; box-shadow: 0 8px 32px rgba(255, 0, 255, 0.3); }
+        .rate-button.rizz { background: linear-gradient(135deg, #ff006e 0%, #ffbe0b 100%); color: white; box-shadow: 0 8px 32px rgba(255, 190, 11, 0.3); }
         .rate-button:hover { transform: translateY(-4px); }
 
         /* ===== LOADING STATE ===== */
@@ -271,11 +277,17 @@
         .score-number { font-size: 72px; font-weight: 900; line-height: 1; margin: 16px 0; position: relative; z-index: 1; }
         .roast .score-number { background: var(--gradient-roast); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .hype .score-number { background: var(--gradient-hype); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .honest .score-number { background: linear-gradient(135deg, #ff9500 0%, #ff5e00 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .unhinged .score-number { background: linear-gradient(135deg, #ff00ff 0%, #00ff00 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .rizz .score-number { background: linear-gradient(135deg, #ff006e 0%, #ffbe0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .score-label { font-size: 14px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; position: relative; z-index: 1; }
         .score-gauge { width: 100%; height: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 6px; overflow: hidden; margin: 20px 0; position: relative; z-index: 1; }
         .score-gauge-fill { height: 100%; border-radius: 6px; width: 0%; animation: fillGauge 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
         .score-card.roast .score-gauge-fill { background: var(--gradient-roast); box-shadow: 0 0 16px rgba(255, 0, 110, 0.5); }
         .score-card.hype .score-gauge-fill { background: var(--gradient-hype); box-shadow: 0 0 16px rgba(0, 217, 255, 0.5); }
+        .score-card.honest .score-gauge-fill { background: linear-gradient(135deg, #ff9500 0%, #ff5e00 100%); box-shadow: 0 0 16px rgba(255, 149, 0, 0.5); }
+        .score-card.unhinged .score-gauge-fill { background: linear-gradient(135deg, #ff00ff 0%, #00ff00 100%); box-shadow: 0 0 16px rgba(255, 0, 255, 0.5); }
+        .score-card.rizz .score-gauge-fill { background: linear-gradient(135deg, #ff006e 0%, #ffbe0b 100%); box-shadow: 0 0 16px rgba(255, 190, 11, 0.5); }
         @keyframes fillGauge { from { width: 0%; } to { width: var(--score-percent); } }
 
         .mode-badge {
@@ -360,12 +372,21 @@
         <!-- RATING INTERFACE -->
         <div id="ratingInterface" class="hidden">
             <!-- MODE TOGGLE -->
-            <div class="mode-section">
-                <button class="toggle-button roast active" onclick="setMode('roast')" id="roastModeBtn">
-                    🔥 Roast Mode
+            <div class="mode-section" style="flex-wrap: wrap; gap: 8px;">
+                <button class="toggle-button roast active" onclick="setMode('roast')" id="mode-roast">
+                    🔥 Roast
                 </button>
-                <button class="toggle-button hype" onclick="setMode('hype')" id="hypeModeBtn">
-                    ✨ Hype Mode
+                <button class="toggle-button hype" onclick="setMode('hype')" id="mode-hype">
+                    ✨ Hype
+                </button>
+                <button class="toggle-button honest" onclick="setMode('honest')" id="mode-honest">
+                    😐 Honest
+                </button>
+                <button class="toggle-button unhinged" onclick="setMode('unhinged')" id="mode-unhinged">
+                    🤪 Unhinged
+                </button>
+                <button class="toggle-button rizz" onclick="setMode('rizz')" id="mode-rizz">
+                    💀 Rizz Check
                 </button>
             </div>
 
@@ -497,7 +518,7 @@
         let currentRating = null;
         let ratingHistory = [];
         let currentRatingCount = 2847;
-        const FREE_RATINGS = 3;
+        const FREE_RATINGS = 100;
         const PAID_RATINGS = 5;
 
         // ===== PAYWALL HELPERS =====
@@ -528,17 +549,8 @@
         // ===== MODE SWITCHING =====
         function setMode(mode) {
             currentMode = mode;
-            const roastBtn = document.getElementById('roastModeBtn');
-            const hypeBtn = document.getElementById('hypeModeBtn');
-
-            if (mode === 'roast') {
-                roastBtn.classList.add('active');
-                hypeBtn.classList.remove('active');
-            } else {
-                hypeBtn.classList.add('active');
-                roastBtn.classList.remove('active');
-            }
-
+            document.querySelectorAll('.toggle-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('mode-' + mode).classList.add('active');
             updateRateButtonStyle();
         }
 
@@ -728,7 +740,8 @@
             document.getElementById('scoreNumber').textContent = rating.score;
             document.getElementById('scoreGaugeFill').style.setProperty('--score-percent', (rating.score / 10 * 100) + '%');
             document.getElementById('scoreCategoryLabel').textContent = rating.category;
-            document.getElementById('modeBadge').textContent = rating.mode === 'roast' ? '🔥 Roast Mode' : '✨ Hype Mode';
+            const modeLabels = { roast: '🔥 Roast Mode', hype: '✨ Hype Mode', honest: '😐 Brutally Honest', unhinged: '🤪 Unhinged', rizz: '💀 Rizz Check' };
+            document.getElementById('modeBadge').textContent = modeLabels[rating.mode] || rating.mode;
             document.getElementById('commentary').innerHTML = rating.commentary.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 
             document.getElementById('loadingState').classList.remove('active');
@@ -742,14 +755,16 @@
 
         // ===== SHARING =====
         function shareToClipboard() {
-            const text = 'I got a ' + currentRating.score + '/10 in ' + (currentRating.mode === 'roast' ? '🔥 Roast' : '✨ Hype') + ' Mode on RateMyAnything.ai!\n\n"' + currentRating.commentary + '"\n\nTry it: ratemyanything.ai';
+            const modeNames = { roast: '🔥 Roast', hype: '✨ Hype', honest: '😐 Brutally Honest', unhinged: '🤪 Unhinged', rizz: '💀 Rizz Check' };
+            const text = 'I got a ' + currentRating.score + '/10 in ' + (modeNames[currentRating.mode] || currentRating.mode) + ' Mode on RateMyAnything.ai!\n\n"' + currentRating.commentary + '"\n\nTry it: ratemyanything.ai';
             navigator.clipboard.writeText(text).then(() => {
                 showToast('Copied to clipboard! 📋');
             });
         }
 
         function shareToTwitter() {
-            const text = 'I got a ' + currentRating.score + '/10 in ' + (currentRating.mode === 'roast' ? '🔥 Roast' : '✨ Hype') + ' Mode on RateMyAnything.ai!\n\nTry rating anything: ';
+            const modeNames2 = { roast: '🔥 Roast', hype: '✨ Hype', honest: '😐 Brutally Honest', unhinged: '🤪 Unhinged', rizz: '💀 Rizz Check' };
+            const text = 'I got a ' + currentRating.score + '/10 in ' + (modeNames2[currentRating.mode] || currentRating.mode) + ' Mode on RateMyAnything.ai!\n\nTry rating anything: ';
             const url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=https://ratemyanything.ai';
             window.open(url, '_blank', 'width=550,height=420');
         }
