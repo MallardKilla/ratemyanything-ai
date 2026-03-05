@@ -987,9 +987,26 @@
             </div>
 
             <!-- UPSELL -->
-            <button class="upsell-btn" onclick="openDetailedAnalysis()">
-                🔓 Get Detailed Analysis — $0.99
+            <button class="upsell-btn" onclick="buyMoreRatings()">
+                🔓 Get 5 More Ratings — $0.99
             </button>
+        </div>
+
+        <!-- PAYWALL SCREEN -->
+        <div class="results-page" id="paywallScreen">
+            <div class="score-card roast" style="text-align: center;">
+                <div style="font-size: 48px; margin-bottom: 16px;">🔒</div>
+                <div style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">You're Out of Free Ratings!</div>
+                <div style="font-size: 16px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5;">
+                    You used all 3 free ratings.<br>Get 5 more for just $0.99
+                </div>
+                <button class="upsell-btn" onclick="buyMoreRatings()" style="font-size: 16px; padding: 18px;">
+                    🔓 Unlock 5 More Ratings — $0.99
+                </button>
+                <div style="margin-top: 16px; font-size: 12px; color: var(--text-secondary);">
+                    Instant access. Rate anything.
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1008,6 +1025,32 @@
         let currentRating = null;
         let ratingHistory = [];
         let currentRatingCount = 2847;
+        const FREE_RATINGS = 3;
+        const PAID_RATINGS = 5;
+
+        function getRatingsUsed() {
+            try { return parseInt(localStorage.getItem('ratingsUsed') || '0'); } catch(e) { return 0; }
+        }
+        function setRatingsUsed(n) {
+            try { localStorage.setItem('ratingsUsed', n.toString()); } catch(e) {}
+        }
+        function getPaidRatings() {
+            try { return parseInt(localStorage.getItem('paidRatings') || '0'); } catch(e) { return 0; }
+        }
+        function setPaidRatings(n) {
+            try { localStorage.setItem('paidRatings', n.toString()); } catch(e) {}
+        }
+        function canRate() {
+            return getRatingsUsed() < FREE_RATINGS + getPaidRatings();
+        }
+        function getRatingsRemaining() {
+            return Math.max(0, (FREE_RATINGS + getPaidRatings()) - getRatingsUsed());
+        }
+        function showPaywall() {
+            document.getElementById('ratingInterface').classList.add('hidden');
+            document.getElementById('rateButtonContainer').style.display = 'none';
+            document.getElementById('paywallScreen').classList.add('active');
+        }
 
         // ===== MODE SWITCHING =====
         function setMode(mode) {
@@ -1099,17 +1142,34 @@
         // ===== NAVIGATION =====
         function startRating() {
             document.getElementById('landingPage').classList.add('hidden');
-            document.getElementById('ratingInterface').classList.remove('hidden');
-            document.getElementById('rateButtonContainer').style.display = 'block';
             document.getElementById('resultsPage').classList.remove('active');
-            updateRateButtonStyle();
+            if (canRate()) {
+                document.getElementById('ratingInterface').classList.remove('hidden');
+                document.getElementById('rateButtonContainer').style.display = 'block';
+                updateRateButtonStyle();
+                updateRateButtonText();
+            } else {
+                showPaywall();
+            }
             loadHistory();
+        }
+
+        function updateRateButtonText() {
+            const remaining = getRatingsRemaining();
+            const btn = document.getElementById('rateBtn');
+            btn.textContent = remaining <= 3 ? `Rate It (${remaining} left)` : 'Rate It';
         }
 
         function goBack() {
             document.getElementById('resultsPage').classList.remove('active');
-            document.getElementById('ratingInterface').classList.remove('hidden');
+            document.getElementById('paywallScreen').classList.remove('active');
             document.getElementById('loadingState').classList.remove('active');
+            if (canRate()) {
+                document.getElementById('ratingInterface').classList.remove('hidden');
+                document.getElementById('rateButtonContainer').style.display = 'block';
+            } else {
+                showPaywall();
+            }
             clearForm();
         }
 
@@ -1124,6 +1184,12 @@
 
         // ===== RATING SUBMISSION =====
         async function submitRating() {
+            // Check paywall
+            if (!canRate()) {
+                showPaywall();
+                return;
+            }
+
             const description = document.getElementById('descriptionInput').value.trim();
             if (!uploadedImage && !description) {
                 showToast('Please upload a photo or write a description');
@@ -1153,6 +1219,8 @@
                 }
 
                 const data = await response.json();
+                // Track usage
+                setRatingsUsed(getRatingsUsed() + 1);
                 displayResults({
                     score: data.score,
                     category: currentCategory,
@@ -1228,9 +1296,16 @@
             showToast('Instagram sharing coming soon! For now, copy to clipboard and paste in your story 📸');
         }
 
-        // ===== UPSELL =====
-        function openDetailedAnalysis() {
-            showToast('Detailed Analysis feature coming soon! 🚀');
+        // ===== PAYMENTS =====
+        function buyMoreRatings() {
+            // TODO: Replace with Stripe Checkout URL once set up
+            // For now, simulate purchase for testing
+            // window.location.href = 'YOUR_STRIPE_CHECKOUT_URL';
+            showToast('Payment coming soon! Here are 5 free ratings for now 🎉');
+            setPaidRatings(getPaidRatings() + PAID_RATINGS);
+            document.getElementById('paywallScreen').classList.remove('active');
+            document.getElementById('ratingInterface').classList.remove('hidden');
+            document.getElementById('rateButtonContainer').style.display = 'block';
         }
 
         // ===== HISTORY =====

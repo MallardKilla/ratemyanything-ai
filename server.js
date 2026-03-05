@@ -37,7 +37,7 @@ async function callClaude(prompt, imageBase64, mediaType = 'image/jpeg') {
   content.push({ type: 'text', text: prompt });
 
   const body = JSON.stringify({
-    model: 'claude-sonnet-4-5-20250514',
+    model: 'claude-3-5-sonnet-20241022',
     max_tokens: 1024,
     messages: [{ role: 'user', content }]
   });
@@ -54,13 +54,18 @@ async function callClaude(prompt, imageBase64, mediaType = 'image/jpeg') {
 
   if (!response.ok) {
     const err = await response.text();
+    console.error('Anthropic API error:', response.status, err);
     throw new Error(`Anthropic API error ${response.status}: ${err}`);
   }
 
   const data = await response.json();
+  console.log('Claude response received');
   const text = data.content[0]?.text || '';
   const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('No JSON in response');
+  if (!jsonMatch) {
+    console.error('No JSON found in response:', text);
+    throw new Error('No JSON in response');
+  }
   return JSON.parse(jsonMatch[0]);
 }
 
