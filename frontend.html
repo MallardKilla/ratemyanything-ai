@@ -101,6 +101,7 @@
         .landing p {
             font-size: 16px; color: var(--text-dim); line-height: 1.5; max-width: 320px;
         }
+        .landing-buttons { display: flex; flex-direction: column; gap: 10px; align-items: center; width: 100%; }
         .cta-btn {
             margin-top: 8px; padding: 16px 56px;
             background: var(--grad-roast); color: white;
@@ -110,6 +111,15 @@
             box-shadow: 0 4px 24px rgba(255,45,85,0.25);
         }
         .cta-btn:active { transform: scale(0.97); }
+        .battle-cta {
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #ffd60a, #ff9f0a); color: #000;
+            border: none; border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 700; letter-spacing: 0.3px;
+            cursor: pointer; transition: all 0.2s var(--ease);
+            box-shadow: 0 4px 24px rgba(255,214,10,0.2);
+        }
+        .battle-cta:active { transform: scale(0.97); }
         .social-proof {
             display: flex; align-items: center; gap: 8px;
             font-size: 12px; color: var(--text-muted); margin-top: 4px;
@@ -375,6 +385,114 @@
         .paywall-cta:active { transform: scale(0.97); }
         .paywall-fine { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
 
+        /* ===== BATTLE MODE ===== */
+        .battle-interface { padding: 8px 16px 0; animation: fadeUp 0.4s var(--ease) both; }
+        .battle-title {
+            font-size: 22px; font-weight: 900; text-align: center; margin: 16px 0;
+            background: linear-gradient(135deg, #ffd60a, #ff9f0a);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .battle-uploads {
+            display: flex; gap: 12px; margin-bottom: 12px;
+        }
+        .battle-upload {
+            flex: 1; background: var(--bg-card); border: 1.5px dashed var(--border-hover);
+            border-radius: var(--radius); padding: 20px 8px; text-align: center;
+            cursor: pointer; transition: all 0.25s var(--ease); position: relative;
+            min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .battle-upload:active { transform: scale(0.98); }
+        .battle-upload .icon { font-size: 28px; margin-bottom: 8px; }
+        .battle-upload .label { font-size: 13px; font-weight: 600; color: var(--text); }
+        .battle-upload .hint { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .battle-upload .vs-badge {
+            position: absolute; right: -18px; top: 50%; transform: translateY(-50%);
+            width: 28px; height: 28px; border-radius: 50%;
+            background: linear-gradient(135deg, #ffd60a, #ff9f0a);
+            color: #000; font-size: 10px; font-weight: 900;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 2; border: 2px solid var(--bg);
+        }
+        .battle-preview {
+            width: 100%; height: 100px; object-fit: cover; border-radius: var(--radius-sm);
+        }
+        .battle-remove {
+            position: absolute; top: 6px; right: 6px; width: 24px; height: 24px;
+            border-radius: 50%; background: rgba(0,0,0,0.7); border: none;
+            color: white; font-size: 12px; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; z-index: 3;
+        }
+        #battleInput1, #battleInput2 { display: none; }
+
+        /* BATTLE RESULTS */
+        .battle-results { display: none; padding: 16px; animation: fadeUp 0.5s var(--ease) both; }
+        .battle-results.active { display: flex; flex-direction: column; gap: 16px; }
+        .battle-vs-header {
+            text-align: center; font-size: 28px; font-weight: 900;
+            background: linear-gradient(135deg, #ffd60a, #ff9f0a);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 4px;
+        }
+        .battle-cards { display: flex; gap: 12px; }
+        .battle-card {
+            flex: 1; background: var(--bg-card); border: 1.5px solid var(--border);
+            border-radius: var(--radius); padding: 16px; text-align: center;
+            position: relative; transition: all 0.5s var(--ease);
+        }
+        .battle-card.winner {
+            border-color: #ffd60a;
+            box-shadow: 0 0 30px rgba(255,214,10,0.15);
+        }
+        .battle-card .winner-crown {
+            position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+            font-size: 24px; display: none;
+        }
+        .battle-card.winner .winner-crown { display: block; animation: crownBounce 0.5s var(--spring); }
+        @keyframes crownBounce { from { transform: translateX(-50%) scale(0); } to { transform: translateX(-50%) scale(1); } }
+        .battle-card-img {
+            width: 100%; height: 80px; object-fit: cover; border-radius: 10px; margin-bottom: 10px;
+        }
+        .battle-card-score {
+            font-size: 36px; font-weight: 900; line-height: 1; margin: 4px 0;
+        }
+        .battle-card-vibe {
+            font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+            padding: 3px 8px; border-radius: 100px; display: inline-block; margin-top: 6px;
+        }
+        .battle-card-commentary {
+            font-size: 12px; color: var(--text-dim); margin-top: 8px; line-height: 1.5;
+        }
+        .battle-verdict {
+            background: var(--bg-card); border: 1.5px solid rgba(255,214,10,0.3);
+            border-radius: var(--radius); padding: 20px; text-align: center;
+        }
+        .battle-verdict-text {
+            font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.5;
+        }
+
+        /* ===== SCORE CARD (shareable) ===== */
+        .share-card-container {
+            display: none; position: relative;
+        }
+        .share-card-container.active { display: block; }
+        .share-card {
+            background: linear-gradient(145deg, #111113 0%, #1a1a1e 100%);
+            border-radius: 20px; padding: 32px 24px; text-align: center;
+            position: relative; overflow: hidden;
+        }
+        .share-card .watermark {
+            font-size: 11px; font-weight: 700; color: var(--text-muted);
+            letter-spacing: 1px; margin-top: 16px;
+        }
+        .save-card-btn {
+            width: 100%; padding: 14px; margin-top: 12px;
+            background: linear-gradient(135deg, #30d5c8, #34c759); color: #000;
+            border: none; border-radius: var(--radius-sm);
+            font-size: 14px; font-weight: 700; font-family: inherit;
+            cursor: pointer; transition: all 0.2s var(--ease);
+        }
+        .save-card-btn:active { transform: scale(0.97); }
+
         /* ===== HISTORY ===== */
         .history { display: none; padding: 0 16px 16px; }
         .history.show { display: block; }
@@ -412,6 +530,7 @@
             .landing h1 { font-size: 34px; }
             .score-num { font-size: 64px; }
             .mode-btn { padding: 9px 14px; font-size: 12px; }
+            .battle-card-score { font-size: 28px; }
         }
     </style>
 </head>
@@ -431,7 +550,10 @@
             <div class="landing-emoji">🎯</div>
             <h1>Rate Literally<br>Anything</h1>
             <p>Upload a photo or describe anything. AI judges you — brutally, honestly, or chaotically.</p>
-            <button class="cta-btn" onclick="startRating()">Start Rating</button>
+            <div class="landing-buttons">
+                <button class="cta-btn" onclick="startRating()">Start Rating</button>
+                <button class="battle-cta" onclick="startBattle()">⚔️ Head-to-Head Battle</button>
+            </div>
             <div class="social-proof">
                 <div class="avatars">
                     <span>😎</span><span>🤣</span><span>🔥</span><span>💀</span>
@@ -498,6 +620,66 @@
             </div>
         </div>
 
+        <!-- BATTLE INTERFACE -->
+        <div id="battleInterface" class="hidden">
+            <div class="battle-interface">
+                <div class="battle-title">⚔️ HEAD-TO-HEAD</div>
+
+                <div class="modes">
+                    <button class="mode-btn roast active" onclick="setMode('roast')" id="bmode-roast">🔥 Roast</button>
+                    <button class="mode-btn hype" onclick="setMode('hype')" id="bmode-hype">✨ Hype</button>
+                    <button class="mode-btn honest" onclick="setMode('honest')" id="bmode-honest">😐 Honest</button>
+                    <button class="mode-btn unhinged" onclick="setMode('unhinged')" id="bmode-unhinged">🤪 Unhinged</button>
+                    <button class="mode-btn rizz" onclick="setMode('rizz')" id="bmode-rizz">💀 Rizz Check</button>
+                </div>
+
+                <div class="battle-uploads">
+                    <div class="battle-upload" id="battleCard1" onclick="document.getElementById('battleInput1').click()">
+                        <div id="battleUpload1">
+                            <div class="icon">📸</div>
+                            <div class="label">Item 1</div>
+                            <div class="hint">Tap to upload</div>
+                        </div>
+                        <div id="battlePreview1" class="hidden" style="width:100%">
+                            <img id="battleImg1" class="battle-preview" alt="">
+                            <button class="battle-remove" onclick="removeBattleImage(event,1)">✕</button>
+                        </div>
+                        <div class="vs-badge">VS</div>
+                    </div>
+                    <div class="battle-upload" id="battleCard2" onclick="document.getElementById('battleInput2').click()">
+                        <div id="battleUpload2">
+                            <div class="icon">📸</div>
+                            <div class="label">Item 2</div>
+                            <div class="hint">Tap to upload</div>
+                        </div>
+                        <div id="battlePreview2" class="hidden" style="width:100%">
+                            <img id="battleImg2" class="battle-preview" alt="">
+                            <button class="battle-remove" onclick="removeBattleImage(event,2)">✕</button>
+                        </div>
+                    </div>
+                </div>
+                <input type="file" id="battleInput1" accept="image/*" onchange="handleBattleUpload(event,1)">
+                <input type="file" id="battleInput2" accept="image/*" onchange="handleBattleUpload(event,2)">
+
+                <div class="cat-card">
+                    <label>What are we comparing?</label>
+                    <div class="cat-grid">
+                        <button class="cat-btn" onclick="selectCategory(event,'Room')">🏠 Room</button>
+                        <button class="cat-btn" onclick="selectCategory(event,'Outfit')">👕 Outfit</button>
+                        <button class="cat-btn" onclick="selectCategory(event,'Food')">🍔 Food</button>
+                        <button class="cat-btn" onclick="selectCategory(event,'Car')">🚗 Car</button>
+                        <button class="cat-btn" onclick="selectCategory(event,'Pet')">🐕 Pet</button>
+                        <button class="cat-btn" onclick="selectCategory(event,'Other')">❓ Other</button>
+                    </div>
+                </div>
+
+                <div class="text-card">
+                    <label>Add context (optional)</label>
+                    <textarea id="battleDescInput" placeholder="Which outfit should I wear tonight?"></textarea>
+                </div>
+            </div>
+        </div>
+
         <!-- LOADING -->
         <div class="loading" id="loadingState">
             <div class="loading-ring">
@@ -522,13 +704,51 @@
                 <div class="commentary" id="commentary"></div>
             </div>
 
+            <!-- Shareable Score Card -->
+            <div class="share-card-container" id="shareCardContainer">
+                <canvas id="shareCanvas" style="display:none"></canvas>
+                <img id="shareCardImage" style="width:100%; border-radius:16px; border: 1px solid var(--border);" alt="Share card">
+            </div>
+
             <div class="actions">
                 <button class="act-btn" onclick="shareToClipboard()">📋 Copy</button>
                 <button class="act-btn" onclick="shareToTwitter()">𝕏 Share</button>
-                <button class="act-btn" onclick="shareToInstagram()">📸 Story</button>
+                <button class="act-btn" onclick="saveShareCard()">💾 Save Card</button>
             </div>
 
             <button class="again-btn" onclick="goBack()">Rate Something Else</button>
+            <button class="upsell" onclick="buyMoreRatings()">🔓 Get 5 More Ratings — $0.99</button>
+        </div>
+
+        <!-- BATTLE RESULTS -->
+        <div class="battle-results" id="battleResultsPage">
+            <div class="battle-vs-header">⚔️ BATTLE RESULTS</div>
+            <div class="battle-cards">
+                <div class="battle-card" id="battleResult1">
+                    <div class="winner-crown">👑</div>
+                    <img id="battleResultImg1" class="battle-card-img" alt="">
+                    <div class="battle-card-score" id="battleScore1">0</div>
+                    <div class="score-out-of" style="font-size:12px">/10</div>
+                    <div class="battle-card-vibe" id="battleVibe1"></div>
+                    <div class="battle-card-commentary" id="battleComm1"></div>
+                </div>
+                <div class="battle-card" id="battleResult2">
+                    <div class="winner-crown">👑</div>
+                    <img id="battleResultImg2" class="battle-card-img" alt="">
+                    <div class="battle-card-score" id="battleScore2">0</div>
+                    <div class="score-out-of" style="font-size:12px">/10</div>
+                    <div class="battle-card-vibe" id="battleVibe2"></div>
+                    <div class="battle-card-commentary" id="battleComm2"></div>
+                </div>
+            </div>
+            <div class="battle-verdict">
+                <div class="battle-verdict-text" id="battleVerdict"></div>
+            </div>
+            <div class="actions">
+                <button class="act-btn" onclick="shareBattleToClipboard()">📋 Copy</button>
+                <button class="act-btn" onclick="shareBattleToTwitter()">𝕏 Share</button>
+            </div>
+            <button class="again-btn" onclick="goBack()">Battle Again</button>
             <button class="upsell" onclick="buyMoreRatings()">🔓 Get 5 More Ratings — $0.99</button>
         </div>
 
@@ -556,6 +776,11 @@
         <button class="rate-btn roast" id="rateBtn" onclick="submitRating()">Rate It</button>
     </div>
 
+    <!-- BATTLE BUTTON -->
+    <div class="rate-btn-wrap" id="battleButtonContainer" style="display: none;">
+        <button class="rate-btn" id="battleBtn" style="background: linear-gradient(135deg, #ffd60a, #ff9f0a); color: #000;" onclick="submitBattle()">⚔️ BATTLE!</button>
+    </div>
+
     <script>
         // ===== STATE =====
         let currentMode = 'roast';
@@ -564,8 +789,138 @@
         let currentRating = null;
         let ratingHistory = [];
         let currentRatingCount = 2847;
+        let isBattleMode = false;
+        let battleImage1 = null;
+        let battleImage2 = null;
+        let currentBattleResult = null;
         const FREE_RATINGS = 3;
         const PAID_RATINGS = 5;
+
+        // ===== CANVAS POLYFILL =====
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+                if (typeof r === 'number') r = [r,r,r,r];
+                this.beginPath();
+                this.moveTo(x + r[0], y);
+                this.lineTo(x + w - r[1], y);
+                this.quadraticCurveTo(x + w, y, x + w, y + r[1]);
+                this.lineTo(x + w, y + h - r[2]);
+                this.quadraticCurveTo(x + w, y + h, x + w - r[2], y + h);
+                this.lineTo(x + r[3], y + h);
+                this.quadraticCurveTo(x, y + h, x, y + h - r[3]);
+                this.lineTo(x, y + r[0]);
+                this.quadraticCurveTo(x, y, x + r[0], y);
+                this.closePath();
+                return this;
+            };
+        }
+
+        // ===== SOUND EFFECTS (Web Audio API) =====
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        let audioCtx = null;
+
+        function getAudioCtx() {
+            if (!audioCtx) audioCtx = new AudioCtx();
+            return audioCtx;
+        }
+
+        function playScoreSound(score) {
+            try {
+                const ctx = getAudioCtx();
+                if (ctx.state === 'suspended') ctx.resume();
+
+                if (score >= 8) {
+                    // AIRHORN / HYPE - rising triumphant chord
+                    playHypeSound(ctx);
+                } else if (score >= 5) {
+                    // MID - neutral ding
+                    playMidSound(ctx);
+                } else {
+                    // LOW - sad descending trombone
+                    playSadSound(ctx);
+                }
+            } catch(e) { console.log('Audio not available'); }
+        }
+
+        function playHypeSound(ctx) {
+            const now = ctx.currentTime;
+            // Triumphant rising chord
+            [523.25, 659.25, 783.99, 1046.5].forEach(function(freq, i) {
+                var osc = ctx.createOscillator();
+                var gain = ctx.createGain();
+                osc.type = 'square';
+                osc.frequency.value = freq;
+                gain.gain.setValueAtTime(0, now + i * 0.08);
+                gain.gain.linearRampToValueAtTime(0.15, now + i * 0.08 + 0.05);
+                gain.gain.linearRampToValueAtTime(0.08, now + i * 0.08 + 0.3);
+                gain.gain.linearRampToValueAtTime(0, now + 0.8);
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.start(now + i * 0.08);
+                osc.stop(now + 0.9);
+            });
+            // Extra sparkle
+            var osc2 = ctx.createOscillator();
+            var gain2 = ctx.createGain();
+            osc2.type = 'sine';
+            osc2.frequency.setValueAtTime(1200, now + 0.3);
+            osc2.frequency.linearRampToValueAtTime(2000, now + 0.6);
+            gain2.gain.setValueAtTime(0.1, now + 0.3);
+            gain2.gain.linearRampToValueAtTime(0, now + 0.7);
+            osc2.connect(gain2); gain2.connect(ctx.destination);
+            osc2.start(now + 0.3); osc2.stop(now + 0.8);
+        }
+
+        function playMidSound(ctx) {
+            var now = ctx.currentTime;
+            var osc = ctx.createOscillator();
+            var gain = ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = 440;
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.linearRampToValueAtTime(0, now + 0.4);
+            osc.connect(gain); gain.connect(ctx.destination);
+            osc.start(now); osc.stop(now + 0.5);
+        }
+
+        function playSadSound(ctx) {
+            var now = ctx.currentTime;
+            // Descending sad trombone: wah wah wah wahhh
+            var notes = [392, 370, 349, 233];
+            notes.forEach(function(freq, i) {
+                var osc = ctx.createOscillator();
+                var gain = ctx.createGain();
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(freq, now + i * 0.25);
+                osc.frequency.linearRampToValueAtTime(freq * 0.97, now + i * 0.25 + 0.2);
+                gain.gain.setValueAtTime(0, now + i * 0.25);
+                gain.gain.linearRampToValueAtTime(0.12, now + i * 0.25 + 0.03);
+                gain.gain.linearRampToValueAtTime(i === 3 ? 0.12 : 0.02, now + i * 0.25 + 0.22);
+                if (i === 3) gain.gain.linearRampToValueAtTime(0, now + 1.4);
+                osc.connect(gain); gain.connect(ctx.destination);
+                osc.start(now + i * 0.25);
+                osc.stop(now + 1.5);
+            });
+        }
+
+        function playBattleSound() {
+            try {
+                var ctx = getAudioCtx();
+                if (ctx.state === 'suspended') ctx.resume();
+                var now = ctx.currentTime;
+                // Epic battle reveal
+                [261.63, 329.63, 392, 523.25, 659.25].forEach(function(freq, i) {
+                    var osc = ctx.createOscillator();
+                    var gain = ctx.createGain();
+                    osc.type = 'square';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0, now + i * 0.06);
+                    gain.gain.linearRampToValueAtTime(0.12, now + i * 0.06 + 0.03);
+                    gain.gain.linearRampToValueAtTime(0, now + 0.6);
+                    osc.connect(gain); gain.connect(ctx.destination);
+                    osc.start(now + i * 0.06); osc.stop(now + 0.7);
+                });
+            } catch(e) {}
+        }
 
         // ===== PAYWALL HELPERS =====
         function getRatingsUsed() {
@@ -588,44 +943,55 @@
         }
         function showPaywall() {
             document.getElementById('ratingInterface').classList.add('hidden');
+            document.getElementById('battleInterface').classList.add('hidden');
             document.getElementById('rateButtonContainer').style.display = 'none';
+            document.getElementById('battleButtonContainer').style.display = 'none';
             document.getElementById('paywallScreen').classList.add('active');
         }
 
         // ===== MODE SWITCHING =====
         function setMode(mode) {
             currentMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('mode-' + mode).classList.add('active');
+            // Update both normal and battle mode selectors
+            document.querySelectorAll('.mode-btn').forEach(function(btn) { btn.classList.remove('active'); });
+            var el = document.getElementById('mode-' + mode);
+            if (el) el.classList.add('active');
+            var bel = document.getElementById('bmode-' + mode);
+            if (bel) bel.classList.add('active');
             updateRateButtonStyle();
         }
 
         // ===== IMAGE HANDLING =====
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            if (file.size > 10 * 1024 * 1024) { showToast('Image must be under 10MB'); return; }
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const maxDim = 800;
-                    let w = img.width, h = img.height;
+        function compressImage(file, callback) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    var canvas = document.createElement('canvas');
+                    var maxDim = 800;
+                    var w = img.width, h = img.height;
                     if (w > maxDim || h > maxDim) {
                         if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
                         else { w = Math.round(w * maxDim / h); h = maxDim; }
                     }
                     canvas.width = w; canvas.height = h;
                     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    uploadedImage = canvas.toDataURL('image/jpeg', 0.7);
-                    displayImagePreview();
-                    document.getElementById('descriptionInput').value = '';
+                    callback(canvas.toDataURL('image/jpeg', 0.7));
                 };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
+        }
+
+        function handleImageUpload(event) {
+            var file = event.target.files[0];
+            if (!file) return;
+            if (file.size > 10 * 1024 * 1024) { showToast('Image must be under 10MB'); return; }
+            compressImage(file, function(dataUrl) {
+                uploadedImage = dataUrl;
+                displayImagePreview();
+                document.getElementById('descriptionInput').value = '';
+            });
         }
 
         function displayImagePreview() {
@@ -642,17 +1008,44 @@
             document.getElementById('photoInput').value = '';
         }
 
+        // ===== BATTLE IMAGE HANDLING =====
+        function handleBattleUpload(event, num) {
+            var file = event.target.files[0];
+            if (!file) return;
+            if (file.size > 10 * 1024 * 1024) { showToast('Image must be under 10MB'); return; }
+            compressImage(file, function(dataUrl) {
+                if (num === 1) battleImage1 = dataUrl;
+                else battleImage2 = dataUrl;
+                document.getElementById('battleImg' + num).src = dataUrl;
+                document.getElementById('battlePreview' + num).classList.remove('hidden');
+                document.getElementById('battleUpload' + num).classList.add('hidden');
+            });
+        }
+
+        function removeBattleImage(e, num) {
+            e.stopPropagation();
+            if (num === 1) battleImage1 = null;
+            else battleImage2 = null;
+            document.getElementById('battlePreview' + num).classList.add('hidden');
+            document.getElementById('battleUpload' + num).classList.remove('hidden');
+            document.getElementById('battleInput' + num).value = '';
+        }
+
         // ===== CATEGORY SELECTION =====
         function selectCategory(event, category) {
             currentCategory = category;
-            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('selected'));
+            document.querySelectorAll('.cat-btn').forEach(function(btn) { btn.classList.remove('selected'); });
             event.target.classList.add('selected');
         }
 
         // ===== NAVIGATION =====
         function startRating() {
+            isBattleMode = false;
             document.getElementById('landingPage').classList.add('hidden');
             document.getElementById('resultsPage').classList.remove('active');
+            document.getElementById('battleResultsPage').classList.remove('active');
+            document.getElementById('battleInterface').classList.add('hidden');
+            document.getElementById('battleButtonContainer').style.display = 'none';
             if (canRate()) {
                 document.getElementById('ratingInterface').classList.remove('hidden');
                 document.getElementById('rateButtonContainer').style.display = 'block';
@@ -664,24 +1057,48 @@
             loadHistory();
         }
 
+        function startBattle() {
+            isBattleMode = true;
+            document.getElementById('landingPage').classList.add('hidden');
+            document.getElementById('resultsPage').classList.remove('active');
+            document.getElementById('battleResultsPage').classList.remove('active');
+            document.getElementById('ratingInterface').classList.add('hidden');
+            document.getElementById('rateButtonContainer').style.display = 'none';
+            if (canRate()) {
+                document.getElementById('battleInterface').classList.remove('hidden');
+                document.getElementById('battleButtonContainer').style.display = 'block';
+            } else {
+                showPaywall();
+            }
+        }
+
         function updateRateButtonText() {
-            const remaining = getRatingsRemaining();
-            const btn = document.getElementById('rateBtn');
+            var remaining = getRatingsRemaining();
+            var btn = document.getElementById('rateBtn');
             btn.textContent = remaining <= 3 ? 'Rate It (' + remaining + ' left)' : 'Rate It';
         }
 
         function goBack() {
             document.getElementById('resultsPage').classList.remove('active');
+            document.getElementById('battleResultsPage').classList.remove('active');
             document.getElementById('paywallScreen').classList.remove('active');
             document.getElementById('loadingState').classList.remove('active');
-            if (canRate()) {
-                document.getElementById('ratingInterface').classList.remove('hidden');
-                document.getElementById('rateButtonContainer').style.display = 'block';
-                updateRateButtonText();
+            document.getElementById('shareCardContainer').classList.remove('active');
+
+            if (isBattleMode) {
+                if (canRate()) {
+                    document.getElementById('battleInterface').classList.remove('hidden');
+                    document.getElementById('battleButtonContainer').style.display = 'block';
+                } else { showPaywall(); }
+                clearBattleForm();
             } else {
-                showPaywall();
+                if (canRate()) {
+                    document.getElementById('ratingInterface').classList.remove('hidden');
+                    document.getElementById('rateButtonContainer').style.display = 'block';
+                    updateRateButtonText();
+                } else { showPaywall(); }
+                clearForm();
             }
-            clearForm();
         }
 
         function clearForm() {
@@ -690,7 +1107,19 @@
             document.getElementById('photoInput').value = '';
             document.getElementById('imagePreviewContainer').classList.add('hidden');
             document.getElementById('uploadArea').classList.remove('hidden');
-            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('selected'));
+            document.querySelectorAll('.cat-btn').forEach(function(btn) { btn.classList.remove('selected'); });
+            currentCategory = 'Other';
+        }
+
+        function clearBattleForm() {
+            battleImage1 = null; battleImage2 = null;
+            ['1','2'].forEach(function(n) {
+                document.getElementById('battlePreview' + n).classList.add('hidden');
+                document.getElementById('battleUpload' + n).classList.remove('hidden');
+                document.getElementById('battleInput' + n).value = '';
+            });
+            document.getElementById('battleDescInput').value = '';
+            document.querySelectorAll('.cat-btn').forEach(function(btn) { btn.classList.remove('selected'); });
             currentCategory = 'Other';
         }
 
@@ -698,7 +1127,7 @@
         async function submitRating() {
             if (!canRate()) { showPaywall(); return; }
 
-            const description = document.getElementById('descriptionInput').value.trim();
+            var description = document.getElementById('descriptionInput').value.trim();
             if (!uploadedImage && !description) { showToast('Upload a photo or write a description'); return; }
 
             document.getElementById('ratingInterface').classList.add('hidden');
@@ -707,7 +1136,7 @@
             startLoadingMessages();
 
             try {
-                const response = await fetch('/api/rate', {
+                var response = await fetch('/api/rate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -719,11 +1148,11 @@
                 });
 
                 if (!response.ok) {
-                    const err = await response.json().catch(() => ({}));
+                    var err = await response.json().catch(function() { return {}; });
                     throw new Error(err.error || 'Rating failed');
                 }
 
-                const data = await response.json();
+                var data = await response.json();
                 setRatingsUsed(getRatingsUsed() + 1);
 
                 displayResults({
@@ -742,6 +1171,110 @@
                 document.getElementById('ratingInterface').classList.remove('hidden');
                 document.getElementById('rateButtonContainer').style.display = 'block';
             }
+        }
+
+        // ===== BATTLE SUBMISSION =====
+        async function submitBattle() {
+            if (!canRate()) { showPaywall(); return; }
+            if (!battleImage1 || !battleImage2) { showToast('Upload both images for battle!'); return; }
+
+            document.getElementById('battleInterface').classList.add('hidden');
+            document.getElementById('battleButtonContainer').style.display = 'none';
+            document.getElementById('loadingState').classList.add('active');
+            startLoadingMessages();
+
+            try {
+                var response = await fetch('/api/battle', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        image1: battleImage1,
+                        image2: battleImage2,
+                        text: document.getElementById('battleDescInput').value.trim() || null,
+                        mode: currentMode,
+                        category: currentCategory.toLowerCase()
+                    })
+                });
+
+                if (!response.ok) {
+                    var err = await response.json().catch(function() { return {}; });
+                    throw new Error(err.error || 'Battle failed');
+                }
+
+                var data = await response.json();
+                setRatingsUsed(getRatingsUsed() + 1);
+                displayBattleResults(data);
+            } catch (error) {
+                console.error('Battle error:', error);
+                stopLoadingMessages();
+                showToast('Battle failed: ' + error.message);
+                document.getElementById('loadingState').classList.remove('active');
+                document.getElementById('battleInterface').classList.remove('hidden');
+                document.getElementById('battleButtonContainer').style.display = 'block';
+            }
+        }
+
+        // ===== BATTLE RESULTS DISPLAY =====
+        function displayBattleResults(data) {
+            currentBattleResult = data;
+            stopLoadingMessages();
+
+            var modeColors = {
+                roast: '#ff2d55', hype: '#30d5c8', honest: '#ff9f0a',
+                unhinged: '#bf5af2', rizz: '#ffd60a'
+            };
+            var color = modeColors[currentMode] || '#ff2d55';
+
+            // Images
+            document.getElementById('battleResultImg1').src = battleImage1;
+            document.getElementById('battleResultImg2').src = battleImage2;
+
+            // Scores
+            var s1 = parseFloat(data.score1);
+            var s2 = parseFloat(data.score2);
+            var el1 = document.getElementById('battleScore1');
+            var el2 = document.getElementById('battleScore2');
+            el1.textContent = '0.0'; el2.textContent = '0.0';
+            el1.style.color = color; el2.style.color = color;
+
+            // Vibes
+            var v1 = document.getElementById('battleVibe1');
+            var v2 = document.getElementById('battleVibe2');
+            v1.textContent = (data.vibe1 || '').toUpperCase();
+            v2.textContent = (data.vibe2 || '').toUpperCase();
+            v1.style.background = color + '22'; v1.style.color = color;
+            v2.style.background = color + '22'; v2.style.color = color;
+
+            // Commentary
+            document.getElementById('battleComm1').textContent = data.commentary1 || '';
+            document.getElementById('battleComm2').textContent = data.commentary2 || '';
+
+            // Winner
+            var winner = parseInt(data.winner);
+            var card1 = document.getElementById('battleResult1');
+            var card2 = document.getElementById('battleResult2');
+            card1.classList.remove('winner'); card2.classList.remove('winner');
+            if (winner === 1) card1.classList.add('winner');
+            else card2.classList.add('winner');
+
+            // Verdict
+            document.getElementById('battleVerdict').textContent = data.verdict || 'And the winner is...';
+
+            document.getElementById('loadingState').classList.remove('active');
+            document.getElementById('battleResultsPage').classList.add('active');
+
+            // Animate scores after delay
+            setTimeout(function() {
+                animateScore(s1, el1);
+                animateScore(s2, el2);
+                playBattleSound();
+            }, 200);
+
+            // Confetti for winner
+            setTimeout(launchConfetti, 700);
+
+            currentRatingCount++;
+            document.getElementById('ratingCounter').textContent = currentRatingCount.toLocaleString();
         }
 
         // Loading message rotation
@@ -768,7 +1301,7 @@
                 rizz: ['Scanning for rizz...', 'Evaluating the aura...', 'Detecting main character energy...']
             };
             var modeTitle = titles[currentMode] || titles.roast;
-            document.getElementById('loadingTitle').textContent = modeTitle[0];
+            document.getElementById('loadingTitle').textContent = isBattleMode ? 'Judging the battle...' : modeTitle[0];
             loadingInterval = setInterval(function() {
                 i = (i + 1) % loadingMessages.length;
                 el.style.opacity = '0';
@@ -777,7 +1310,7 @@
                     el.style.opacity = '1';
                     if (i % 3 === 0) {
                         var ti = Math.floor(Math.random() * modeTitle.length);
-                        document.getElementById('loadingTitle').textContent = modeTitle[ti];
+                        document.getElementById('loadingTitle').textContent = isBattleMode ? 'Comparing the contenders...' : modeTitle[ti];
                     }
                 }, 200);
             }, 2000);
@@ -815,7 +1348,7 @@
             function step(timestamp) {
                 if (!startTime) startTime = timestamp;
                 var progress = Math.min((timestamp - startTime) / duration, 1);
-                var eased = 1 - Math.pow(1 - progress, 3); // ease out cubic
+                var eased = 1 - Math.pow(1 - progress, 3);
                 var current = start + (target - start) * eased;
                 el.textContent = current.toFixed(1);
                 if (progress < 1) requestAnimationFrame(step);
@@ -827,10 +1360,10 @@
             currentRating = rating;
             stopLoadingMessages();
 
-            const scoreCard = document.getElementById('scoreCard');
+            var scoreCard = document.getElementById('scoreCard');
             scoreCard.className = 'score-card ' + rating.mode;
 
-            const imgContainer = document.getElementById('resultImageThumbnail');
+            var imgContainer = document.getElementById('resultImageThumbnail');
             imgContainer.innerHTML = rating.image
                 ? '<img src="' + rating.image + '" class="result-thumb" alt="Rated">'
                 : '';
@@ -841,7 +1374,7 @@
             document.getElementById('scoreGaugeFill').style.setProperty('--pct', (s / 10 * 100) + '%');
             document.getElementById('scoreCategoryLabel').textContent = rating.category;
 
-            const labels = { roast:'🔥 Roast Mode', hype:'✨ Hype Mode', honest:'😐 Brutally Honest', unhinged:'🤪 Unhinged', rizz:'💀 Rizz Check' };
+            var labels = { roast:'🔥 Roast Mode', hype:'✨ Hype Mode', honest:'😐 Brutally Honest', unhinged:'🤪 Unhinged', rizz:'💀 Rizz Check' };
             document.getElementById('modeBadge').textContent = labels[rating.mode] || rating.mode;
 
             // Vibe badge
@@ -854,33 +1387,168 @@
             document.getElementById('loadingState').classList.remove('active');
             document.getElementById('resultsPage').classList.add('active');
 
-            // Animate score counter after a tiny delay
-            setTimeout(function() { animateScore(s, scoreEl); }, 200);
+            // Animate score counter + play sound
+            setTimeout(function() {
+                animateScore(s, scoreEl);
+                playScoreSound(s);
+            }, 200);
 
             // Confetti for high scores (8+) or unhinged mode
             if (s >= 8 || rating.mode === 'unhinged') {
                 setTimeout(launchConfetti, 600);
             }
 
+            // Generate shareable card
+            setTimeout(function() { generateShareCard(rating, s); }, 1000);
+
             currentRatingCount++;
             document.getElementById('ratingCounter').textContent = currentRatingCount.toLocaleString();
             addToHistory(rating);
         }
 
+        // ===== SHAREABLE SCORE CARD (Canvas-based) =====
+        function generateShareCard(rating, score) {
+            var canvas = document.getElementById('shareCanvas');
+            var ctx = canvas.getContext('2d');
+            canvas.width = 600;
+            canvas.height = 400;
+
+            // Background gradient
+            var grad = ctx.createLinearGradient(0, 0, 600, 400);
+            grad.addColorStop(0, '#0a0a0a');
+            grad.addColorStop(1, '#1a1a2e');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, 600, 400);
+
+            // Mode accent colors
+            var modeColors = {
+                roast: ['#ff2d55', '#af52de'],
+                hype: ['#30d5c8', '#34c759'],
+                honest: ['#ff9f0a', '#ff6723'],
+                unhinged: ['#bf5af2', '#30d5c8'],
+                rizz: ['#ff2d55', '#ffd60a']
+            };
+            var colors = modeColors[rating.mode] || modeColors.roast;
+
+            // Accent glow
+            var glow = ctx.createRadialGradient(300, 160, 0, 300, 160, 250);
+            glow.addColorStop(0, colors[0] + '25');
+            glow.addColorStop(1, 'transparent');
+            ctx.fillStyle = glow;
+            ctx.fillRect(0, 0, 600, 400);
+
+            // Border
+            ctx.strokeStyle = colors[0] + '40';
+            ctx.lineWidth = 2;
+            ctx.roundRect(10, 10, 580, 380, 20);
+            ctx.stroke();
+
+            // Site name
+            ctx.fillStyle = '#8e8e93';
+            ctx.font = '600 12px Inter, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('RATEMYANYTHING.AI', 300, 45);
+
+            // Category
+            ctx.fillStyle = '#636366';
+            ctx.font = '700 11px Inter, sans-serif';
+            ctx.fillText(rating.category.toUpperCase(), 300, 70);
+
+            // Score
+            ctx.fillStyle = colors[0];
+            ctx.font = '900 96px Inter, sans-serif';
+            ctx.fillText(score.toFixed(1), 300, 175);
+
+            // /10
+            ctx.fillStyle = '#636366';
+            ctx.font = '600 20px Inter, sans-serif';
+            ctx.fillText('/ 10', 300, 205);
+
+            // Vibe badge
+            if (rating.vibe) {
+                ctx.fillStyle = colors[0] + '30';
+                var vibeText = rating.vibe.toUpperCase();
+                var vibeW = ctx.measureText(vibeText).width + 24;
+                ctx.beginPath();
+                ctx.roundRect(300 - vibeW/2, 220, vibeW, 30, 15);
+                ctx.fill();
+                ctx.fillStyle = colors[0];
+                ctx.font = '800 13px Inter, sans-serif';
+                ctx.fillText(vibeText, 300, 240);
+            }
+
+            // Mode label
+            var modeLabels = { roast:'🔥 ROAST MODE', hype:'✨ HYPE MODE', honest:'😐 BRUTALLY HONEST', unhinged:'🤪 UNHINGED', rizz:'💀 RIZZ CHECK' };
+            ctx.fillStyle = colors[0];
+            ctx.font = '700 11px Inter, sans-serif';
+            ctx.fillText(modeLabels[rating.mode] || '', 300, 275);
+
+            // Commentary (truncated)
+            ctx.fillStyle = '#8e8e93';
+            ctx.font = '500 13px Inter, sans-serif';
+            var comm = rating.commentary;
+            if (comm.length > 120) comm = comm.substring(0, 117) + '...';
+            // Word wrap
+            var words = comm.split(' ');
+            var lines = []; var line = '';
+            words.forEach(function(word) {
+                var test = line + word + ' ';
+                if (ctx.measureText(test).width > 480) {
+                    lines.push(line.trim());
+                    line = word + ' ';
+                } else { line = test; }
+            });
+            lines.push(line.trim());
+            lines.slice(0, 3).forEach(function(l, i) {
+                ctx.fillText(l, 300, 305 + i * 20);
+            });
+
+            // Watermark
+            ctx.fillStyle = '#3a3a3c';
+            ctx.font = '600 10px Inter, sans-serif';
+            ctx.fillText('ratemyanything.net', 300, 380);
+
+            // Convert to image
+            var imgEl = document.getElementById('shareCardImage');
+            imgEl.src = canvas.toDataURL('image/png');
+            document.getElementById('shareCardContainer').classList.add('active');
+        }
+
+        function saveShareCard() {
+            var canvas = document.getElementById('shareCanvas');
+            var link = document.createElement('a');
+            link.download = 'ratemyanything-score.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            showToast('Score card saved! Share it on TikTok!');
+        }
+
         // ===== SHARING =====
         function shareToClipboard() {
-            const m = { roast:'🔥 Roast', hype:'✨ Hype', honest:'😐 Honest', unhinged:'🤪 Unhinged', rizz:'💀 Rizz' };
-            const text = 'I got ' + currentRating.score + '/10 in ' + (m[currentRating.mode]||currentRating.mode) + ' Mode on RateMyAnything.ai!\n\n"' + currentRating.commentary + '"\n\nTry it: ratemyanything.net';
-            navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
+            var m = { roast:'🔥 Roast', hype:'✨ Hype', honest:'😐 Honest', unhinged:'🤪 Unhinged', rizz:'💀 Rizz' };
+            var text = 'I got ' + currentRating.score + '/10 in ' + (m[currentRating.mode]||currentRating.mode) + ' Mode on RateMyAnything.ai!\n\n"' + currentRating.commentary + '"\n\nTry it: ratemyanything.net';
+            navigator.clipboard.writeText(text).then(function() { showToast('Copied to clipboard!'); });
         }
 
         function shareToTwitter() {
-            const m = { roast:'🔥 Roast', hype:'✨ Hype', honest:'😐 Honest', unhinged:'🤪 Unhinged', rizz:'💀 Rizz' };
-            const text = 'I got ' + currentRating.score + '/10 in ' + (m[currentRating.mode]||currentRating.mode) + ' Mode on RateMyAnything.ai! Try it: ';
+            var m = { roast:'🔥 Roast', hype:'✨ Hype', honest:'😐 Honest', unhinged:'🤪 Unhinged', rizz:'💀 Rizz' };
+            var text = 'I got ' + currentRating.score + '/10 in ' + (m[currentRating.mode]||currentRating.mode) + ' Mode on RateMyAnything.ai! Try it: ';
             window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=https://ratemyanything.net', '_blank');
         }
 
-        function shareToInstagram() { showToast('Screenshot your score and share to your story!'); }
+        function shareBattleToClipboard() {
+            if (!currentBattleResult) return;
+            var d = currentBattleResult;
+            var text = '⚔️ BATTLE RESULTS on RateMyAnything.ai!\n\nItem 1: ' + d.score1 + '/10\nItem 2: ' + d.score2 + '/10\n\n' + d.verdict + '\n\nTry it: ratemyanything.net';
+            navigator.clipboard.writeText(text).then(function() { showToast('Copied to clipboard!'); });
+        }
+
+        function shareBattleToTwitter() {
+            if (!currentBattleResult) return;
+            var d = currentBattleResult;
+            var text = '⚔️ Head-to-Head Battle on RateMyAnything.ai!\n\n' + d.score1 + ' vs ' + d.score2 + '\n\n' + d.verdict + '\n\nTry it: ';
+            window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=https://ratemyanything.net', '_blank');
+        }
 
         // ===== PAYMENTS =====
         async function buyMoreRatings() {
@@ -918,12 +1586,12 @@
         }
 
         function loadHistory() {
-            const section = document.getElementById('historySection');
-            const items = document.getElementById('historyItems');
+            var section = document.getElementById('historySection');
+            var items = document.getElementById('historyItems');
             if (ratingHistory.length === 0) { section.classList.remove('show'); return; }
 
             section.classList.add('show');
-            const emojis = {roast:'🔥',hype:'✨',honest:'😐',unhinged:'🤪',rizz:'💀'};
+            var emojis = {roast:'🔥',hype:'✨',honest:'😐',unhinged:'🤪',rizz:'💀'};
             items.innerHTML = ratingHistory.map(function(item, i) {
                 var thumb = item.image ? '<img src="'+item.image+'" class="hist-img" alt="">' : '<div class="hist-img" style="background:var(--bg-elevated);"></div>';
                 return '<div class="hist-item" onclick="openHistoryItem('+i+')">'+thumb+'<div class="hist-info"><div class="hist-cat">'+item.category+'</div><div class="hist-score">'+item.score+'/10 '+(emojis[item.mode]||'')+'</div></div></div>';
@@ -932,7 +1600,7 @@
 
         function openHistoryItem(index) {
             var r = ratingHistory[index];
-            displayResults({ score:r.score, category:r.category, commentary:'Previously rated: '+r.category+' — '+r.score+'/10', mode:r.mode, image:r.image });
+            displayResults({ score:r.score, category:r.category, commentary:'Previously rated: '+r.category+' — '+r.score+'/10', mode:r.mode, image:r.image, vibe: '' });
         }
 
         function saveHistory() { try { localStorage.setItem('ratingHistory', JSON.stringify(ratingHistory)); } catch(e) {} }

@@ -186,6 +186,38 @@ Respond ONLY with this JSON:
   return modePrompts[mode] || modePrompts.roast;
 }
 
+// ===== BATTLE PROMPT =====
+function createBattlePrompt(text, category, mode) {
+  const modeStyles = {
+    roast: 'Be SAVAGE and hilarious. Destroy both items but pick a winner.',
+    hype: 'Be SUPER positive about both but pick the one that slaps harder.',
+    honest: 'Be brutally honest about both. No sugarcoating.',
+    unhinged: 'Go COMPLETELY UNHINGED comparing these two. Absolute chaos.',
+    rizz: 'Evaluate the rizz/charm of both and crown the rizz champion.'
+  };
+  const style = modeStyles[mode] || modeStyles.roast;
+
+  return `You are the ULTIMATE head-to-head battle judge. Two items have been submitted for a showdown. ${style}
+
+The user submitted TWO images for a head-to-head battle.
+Category: ${category}
+${text ? `User says: "${text}"` : ''}
+
+IMPORTANT: Give each item a decimal score from 0.0 to 10.0 with ONE decimal place. Pick a clear WINNER. Be specific about what you see in EACH image. Make it dramatic and entertaining — this should be screenshot-worthy.
+
+Respond ONLY with this JSON:
+{
+  "score1": <decimal score for first item>,
+  "score2": <decimal score for second item>,
+  "commentary1": "<2-3 sentences about item 1>",
+  "commentary2": "<2-3 sentences about item 2>",
+  "winner": <1 or 2>,
+  "verdict": "<one dramatic sentence declaring the winner and why>",
+  "vibe1": "<one word vibe for item 1>",
+  "vibe2": "<one word vibe for item 2>"
+}`;
+}
+
 // ===== REQUEST HANDLER =====
 function parseBody(req) {
   return new Promise((resolve, reject) => {
@@ -267,6 +299,82 @@ const server = http.createServer(async (req, res) => {
     } catch (err) {
       console.error('Error:', err.message);
       return sendJSON(res, 500, { error: err.message || 'Something went wrong' });
+    }
+  }
+
+  // Battle endpoint - two images head-to-head
+  if (req.method === 'POST' && req.url === '/api/battle') {
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    if (!checkRateLimit(ip)) {
+      return sendJSON(res, 429, { error: 'Rate limit exceeded. Try again in an hour.' });
+    }
+    if (!ANTHROPIC_API_KEY) {
+      return sendJSON(res, 500, { error: 'API key not configured' });
+    }
+
+    try {
+      const body = await parseBody(req);
+      const { image1, image2, text, mode, category } = body;
+      if (!image1 || !image2) return sendJSON(res, 400, { error: 'Two images required for battle mode' });
+      if (!['roast', 'hype', 'honest', 'unhinged', 'rizz'].includes(mode)) return sendJSON(res, 400, { error: 'Invalid mode' });
+
+      // Parse both images
+      let img1Base64 = image1, img2Base64 = image2;
+      let media1 = 'image/jpeg', media2 = 'image/jpeg';
+      if (image1.includes(',')) {
+        const parts = image1.split(',');
+        img1Base64 = parts[1];
+        const mime = parts[0].match(/data:([^;]+)/);
+        if (mime) media1 = mime[1];
+      }
+      if (image2.includes(',')) {
+        const parts = image2.split(',');
+        img2Base64 = parts[1];
+        const mime = parts[0].match(/data:([^;]+)/);
+        if (mime) media2 = mime[1];
+      }
+
+      const prompt = createBattlePrompt(text, category || 'other', mode);
+
+      // Send both images to Claude
+      const content = [
+        { type: 'text', text: 'ITEM 1 (first image):' },
+        { type: 'image', source: { type: 'base64', media_type: media1, data: img1Base64 } },
+        { type: 'text', text: 'ITEM 2 (second image):' },
+        { type: 'image', source: { type: 'base64', media_type: media2, data: img2Base64 } },
+        { type: 'text', text: prompt }
+      ];
+
+      const apiBody = JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        messages: [{ role: 'user', content }]
+      });
+
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': ANTHROPIC_API_KEY,
+          'anthropic-version': '2023-06-01'
+        },
+        body: apiBody
+      });
+
+      if (!response.ok) {
+        const err = await response.text();
+        console.error('Anthropic API error:', response.status, err);
+        throw new Error(`Anthropic API error ${response.status}: ${err}`);
+      }
+
+      const data = await response.json();
+      const textResp = data.content[0]?.text || '';
+      const jsonMatch = textResp.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) throw new Error('No JSON in response');
+      return sendJSON(res, 200, JSON.parse(jsonMatch[0]));
+    } catch (err) {
+      console.error('Battle error:', err.message);
+      return sendJSON(res, 500, { error: err.message || 'Battle failed' });
     }
   }
 
