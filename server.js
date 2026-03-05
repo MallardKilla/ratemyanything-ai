@@ -8,6 +8,8 @@ const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 3000;
 const ANTHROPIC_API_KEY = (process.env.ANTHROPIC_API_KEY || '').trim().replace(/,+$/, '');
+const STRIPE_SECRET_KEY = (process.env.STRIPE_SECRET_KEY || '').trim();
+const STRIPE_PRICE_ID = (process.env.STRIPE_PRICE_ID || '').trim();
 
 // ===== RATE LIMITING =====
 const rateLimitStore = new Map();
@@ -264,6 +266,45 @@ const server = http.createServer(async (req, res) => {
     } catch (err) {
       console.error('Error:', err.message);
       return sendJSON(res, 500, { error: err.message || 'Something went wrong' });
+    }
+  }
+
+  // Stripe Checkout - create session
+  if (req.method === 'POST' && req.url === '/api/create-checkout') {
+    if (!STRIPE_SECRET_KEY || !STRIPE_PRICE_ID) {
+      return sendJSON(res, 500, { error: 'Payments not configured' });
+    }
+
+    try {
+      const origin = req.headers.origin || req.headers.referer?.replace(/\/$/, '') || `http://localhost:${PORT}`;
+      const stripeBody = new URLSearchParams({
+        'payment_method_types[]': 'card',
+        'line_items[0][price]': STRIPE_PRICE_ID,
+        'line_items[0][quantity]': '1',
+        'mode': 'payment',
+        'success_url': origin + '/?payment=success',
+        'cancel_url': origin + '/?payment=cancel'
+      }).toString();
+
+      const stripeRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + STRIPE_SECRET_KEY,
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: stripeBody
+      });
+
+      const session = await stripeRes.json();
+      if (!stripeRes.ok) {
+        console.error('Stripe error:', session);
+        return sendJSON(res, 500, { error: session.error?.message || 'Stripe error' });
+      }
+
+      return sendJSON(res, 200, { url: session.url });
+    } catch (err) {
+      console.error('Checkout error:', err.message);
+      return sendJSON(res, 500, { error: 'Checkout failed' });
     }
   }
 

@@ -518,7 +518,7 @@
         let currentRating = null;
         let ratingHistory = [];
         let currentRatingCount = 2847;
-        const FREE_RATINGS = 100;
+        const FREE_RATINGS = 3;
         const PAID_RATINGS = 5;
 
         // ===== PAYWALL HELPERS =====
@@ -774,14 +774,22 @@
         }
 
         // ===== PAYMENTS =====
-        function buyMoreRatings() {
-            // TODO: Wire to Stripe Checkout URL
-            showToast('Payment coming soon! Here are 5 free ratings 🎉');
-            setPaidRatings(getPaidRatings() + PAID_RATINGS);
-            document.getElementById('paywallScreen').classList.remove('active');
-            document.getElementById('ratingInterface').classList.remove('hidden');
-            document.getElementById('rateButtonContainer').style.display = 'block';
-            updateRateButtonText();
+        async function buyMoreRatings() {
+            try {
+                showToast('Redirecting to checkout...');
+                const response = await fetch('/api/create-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                if (data.url) {
+                    window.location.href = data.url;
+                } else {
+                    showToast('Checkout error: ' + (data.error || 'Try again'));
+                }
+            } catch (err) {
+                showToast('Something went wrong. Try again!');
+            }
         }
 
         // ===== HISTORY =====
@@ -887,6 +895,18 @@
         document.addEventListener('DOMContentLoaded', function() {
             loadHistoryFromStorage();
             updateRateButtonStyle();
+
+            // Handle Stripe redirect
+            const params = new URLSearchParams(window.location.search);
+            if (params.get('payment') === 'success') {
+                setPaidRatings(getPaidRatings() + PAID_RATINGS);
+                showToast('Payment successful! You got 5 more ratings 🎉');
+                window.history.replaceState({}, '', '/');
+                startRating();
+            } else if (params.get('payment') === 'cancel') {
+                showToast('Payment cancelled');
+                window.history.replaceState({}, '', '/');
+            }
         });
     </script>
 </body>
