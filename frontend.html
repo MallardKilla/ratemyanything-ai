@@ -2,532 +2,515 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="description" content="RateMyAnything.ai - Get AI ratings for literally anything. Upload a photo or describe it and get a brutal/funny score.">
     <meta name="theme-color" content="#0a0a0a">
-
-    <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="RateMyAnything.ai - Rate Anything">
-    <meta property="og:description" content="Upload a photo or describe anything and get an AI rating. Roast mode vs Hype mode. Try it now!">
-    <meta property="og:image" content="https://ratemyanything.ai/og-image.png">
+    <meta property="og:description" content="Upload a photo or describe anything and get an AI rating. 5 modes. Try it now!">
     <meta property="og:url" content="https://ratemyanything.ai">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
-
-    <title>RateMyAnything.ai - Get Rated</title>
+    <title>RateMyAnything.ai</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg-dark: #0a0a0a;
-            --bg-card: #1a1a1a;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0b0;
-            --gradient-roast: linear-gradient(135deg, #ff006e 0%, #8338ec 100%);
-            --gradient-hype: linear-gradient(135deg, #00d9ff 0%, #00ff88 100%);
-            --border-radius: 16px;
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --bg: #050505;
+            --bg-card: #111113;
+            --bg-elevated: #1a1a1e;
+            --border: rgba(255,255,255,0.06);
+            --border-hover: rgba(255,255,255,0.12);
+            --text: #f5f5f7;
+            --text-dim: #8e8e93;
+            --text-muted: #636366;
+            --radius: 16px;
+            --radius-sm: 12px;
+            --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --grad-roast: linear-gradient(135deg, #ff2d55, #af52de);
+            --grad-hype: linear-gradient(135deg, #30d5c8, #34c759);
+            --grad-honest: linear-gradient(135deg, #ff9f0a, #ff6723);
+            --grad-unhinged: linear-gradient(135deg, #bf5af2, #30d5c8);
+            --grad-rizz: linear-gradient(135deg, #ff2d55, #ffd60a);
         }
 
         html, body {
-            width: 100%;
-            height: 100%;
-            background: var(--bg-dark);
-            color: var(--text-primary);
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            width: 100%; height: 100%;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
             overflow-x: hidden;
         }
 
-        body {
-            display: flex;
-            flex-direction: column;
-        }
+        body { display: flex; flex-direction: column; }
 
         /* ===== HEADER ===== */
         .header {
-            padding: 16px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(10px);
+            padding: 14px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(5,5,5,0.85);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
         }
-
         .logo {
-            font-weight: 800;
-            font-size: 20px;
-            background: var(--gradient-roast);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.5px;
+            font-weight: 900; font-size: 18px; letter-spacing: -0.5px;
+            background: var(--grad-roast);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
-
-        .counter {
-            font-size: 12px;
-            color: var(--text-secondary);
-            background: rgba(255, 255, 255, 0.05);
-            padding: 6px 12px;
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .live-badge {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 11px; font-weight: 600; color: var(--text-dim);
+            background: var(--bg-elevated); padding: 5px 10px; border-radius: 20px;
+            border: 1px solid var(--border);
         }
-
-        .counter-number {
-            font-weight: 700;
-            color: var(--text-primary);
+        .live-dot {
+            width: 6px; height: 6px; border-radius: 50%; background: #34c759;
+            animation: pulse 2s ease-in-out infinite;
         }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 
-        /* ===== MAIN CONTAINER ===== */
+        /* ===== CONTAINER ===== */
         .container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            padding: 0;
-            max-width: 600px;
-            width: 100%;
-            margin: 0 auto;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
+            flex: 1; display: flex; flex-direction: column;
+            max-width: 500px; width: 100%; margin: 0 auto;
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
         }
+        .container::-webkit-scrollbar { display: none; }
 
-        .container::-webkit-scrollbar { width: 6px; }
-        .container::-webkit-scrollbar-track { background: transparent; }
-        .container::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
-
-        /* ===== LANDING PAGE ===== */
-        .landing-page {
-            padding: 40px 20px;
-            text-align: center;
-            animation: fadeIn 0.5s ease-in;
+        /* ===== LANDING ===== */
+        .landing {
+            padding: 60px 24px 40px; text-align: center;
+            display: flex; flex-direction: column; align-items: center; gap: 20px;
+            animation: fadeUp 0.6s var(--ease) both;
         }
-
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        .headline {
-            font-size: 44px;
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 16px;
-            background: linear-gradient(135deg, #ff006e, #8338ec, #00d9ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: slideDown 0.6s ease-out;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-20px); }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(16px); }
             to { opacity: 1; transform: translateY(0); }
         }
-
-        .subheadline {
-            font-size: 18px;
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-            line-height: 1.5;
-            animation: slideDown 0.6s ease-out 0.1s both;
+        .landing-emoji { font-size: 56px; animation: bounce 2s ease-in-out infinite; }
+        @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+        .landing h1 {
+            font-size: 40px; font-weight: 900; line-height: 1.05; letter-spacing: -1.5px;
+            background: linear-gradient(135deg, #ff2d55, #af52de, #30d5c8);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
-
-        .cta-button {
-            background: var(--gradient-roast);
-            color: white;
-            border: none;
-            padding: 16px 48px;
-            font-size: 16px;
-            font-weight: 700;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-            animation: slideDown 0.6s ease-out 0.2s both;
-            box-shadow: 0 8px 32px rgba(255, 0, 110, 0.3);
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .landing p {
+            font-size: 16px; color: var(--text-dim); line-height: 1.5; max-width: 320px;
         }
-
-        .cta-button:hover { transform: translateY(-4px); box-shadow: 0 12px 48px rgba(255, 0, 110, 0.5); }
-        .cta-button:active { transform: translateY(-2px); }
-
-        /* ===== MODE TOGGLE ===== */
-        .mode-section { padding: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 24px; }
-
-        .toggle-button {
-            padding: 10px 8px; border: 2px solid rgba(255, 255, 255, 0.1);
-            background: var(--bg-card); color: var(--text-secondary); border-radius: 12px;
-            cursor: pointer; font-weight: 600; font-size: 13px; transition: var(--transition);
-            position: relative; overflow: hidden; text-align: center; white-space: nowrap;
+        .cta-btn {
+            margin-top: 8px; padding: 16px 56px;
+            background: var(--grad-roast); color: white;
+            border: none; border-radius: var(--radius-sm);
+            font-size: 15px; font-weight: 700; letter-spacing: 0.3px;
+            cursor: pointer; transition: all 0.2s var(--ease);
+            box-shadow: 0 4px 24px rgba(255,45,85,0.25);
         }
-        .toggle-button.active { color: white; border-color: transparent; }
-        .toggle-button.active.roast { background: var(--gradient-roast); box-shadow: 0 8px 24px rgba(255, 0, 110, 0.3); }
-        .toggle-button.active.hype { background: var(--gradient-hype); box-shadow: 0 8px 24px rgba(0, 217, 255, 0.3); }
-        .toggle-button.active.honest { background: linear-gradient(135deg, #ff9500 0%, #ff5e00 100%); box-shadow: 0 8px 24px rgba(255, 149, 0, 0.3); }
-        .toggle-button.active.unhinged { background: linear-gradient(135deg, #ff00ff 0%, #00ff00 100%); box-shadow: 0 8px 24px rgba(255, 0, 255, 0.3); }
-        .toggle-button.active.rizz { background: linear-gradient(135deg, #ff006e 0%, #ffbe0b 100%); box-shadow: 0 8px 24px rgba(255, 190, 11, 0.3); }
-        .toggle-button:hover { border-color: rgba(255, 255, 255, 0.2); }
-
-        /* ===== INPUT SECTION ===== */
-        .input-section { padding: 20px; display: flex; flex-direction: column; gap: 20px; }
-
-        .input-card {
-            background: var(--bg-card); border: 2px solid rgba(255, 255, 255, 0.08);
-            border-radius: var(--border-radius); padding: 24px; transition: var(--transition); cursor: pointer;
+        .cta-btn:active { transform: scale(0.97); }
+        .social-proof {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 12px; color: var(--text-muted); margin-top: 4px;
         }
-        .input-card:hover { border-color: rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.02); }
-        .input-card.active { border-color: rgba(255, 255, 255, 0.3); }
+        .avatars { display: flex; }
+        .avatars span {
+            width: 24px; height: 24px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 12px; margin-left: -6px;
+            border: 2px solid var(--bg);
+        }
+        .avatars span:first-child { margin-left: 0; }
 
-        /* ===== UPLOAD AREA ===== */
-        .upload-area { display: flex; flex-direction: column; align-items: center; gap: 16px; text-align: center; }
-        .upload-icon { font-size: 48px; animation: float 3s ease-in-out infinite; }
-        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .upload-text { font-size: 14px; color: var(--text-secondary); line-height: 1.5; }
-        .upload-text strong { color: var(--text-primary); }
+        /* ===== RATING INTERFACE ===== */
+        .interface { padding: 8px 16px 0; animation: fadeUp 0.4s var(--ease) both; }
+
+        /* MODE SELECTOR — horizontal scroll */
+        .modes {
+            display: flex; gap: 8px; padding: 8px 0 16px;
+            overflow-x: auto; scroll-snap-type: x mandatory;
+            -ms-overflow-style: none; scrollbar-width: none;
+        }
+        .modes::-webkit-scrollbar { display: none; }
+        .mode-btn {
+            flex-shrink: 0; scroll-snap-align: start;
+            padding: 10px 16px; border-radius: 100px;
+            border: 1.5px solid var(--border);
+            background: transparent; color: var(--text-dim);
+            font-size: 13px; font-weight: 600; font-family: inherit;
+            cursor: pointer; transition: all 0.25s var(--ease);
+            white-space: nowrap;
+        }
+        .mode-btn:active { transform: scale(0.95); }
+        .mode-btn.active { color: white; border-color: transparent; }
+        .mode-btn.active.roast { background: var(--grad-roast); box-shadow: 0 2px 16px rgba(255,45,85,0.3); }
+        .mode-btn.active.hype { background: var(--grad-hype); box-shadow: 0 2px 16px rgba(48,213,200,0.3); }
+        .mode-btn.active.honest { background: var(--grad-honest); box-shadow: 0 2px 16px rgba(255,159,10,0.3); }
+        .mode-btn.active.unhinged { background: var(--grad-unhinged); box-shadow: 0 2px 16px rgba(191,90,242,0.3); }
+        .mode-btn.active.rizz { background: var(--grad-rizz); box-shadow: 0 2px 16px rgba(255,214,10,0.3); }
+
+        /* UPLOAD CARD */
+        .upload-card {
+            background: var(--bg-card); border: 1.5px dashed var(--border-hover);
+            border-radius: var(--radius); padding: 32px 20px;
+            text-align: center; cursor: pointer; transition: all 0.25s var(--ease);
+            margin-bottom: 12px;
+        }
+        .upload-card:active { transform: scale(0.98); border-color: rgba(255,255,255,0.2); }
+        .upload-card .icon { font-size: 36px; margin-bottom: 12px; }
+        .upload-card .label { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+        .upload-card .hint { font-size: 12px; color: var(--text-muted); }
         #photoInput { display: none; }
 
-        .image-preview {
-            width: 100%; max-height: 300px; border-radius: 12px; object-fit: cover;
-            margin-bottom: 12px; border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .image-preview-container { width: 100%; position: relative; }
-        .remove-image-btn {
-            position: absolute; top: 8px; right: 8px; background: rgba(0, 0, 0, 0.7);
-            color: white; border: none; width: 32px; height: 32px; border-radius: 50%;
-            cursor: pointer; font-size: 20px; display: flex; align-items: center; justify-content: center;
+        .image-preview { width: 100%; max-height: 280px; border-radius: var(--radius-sm); object-fit: cover; }
+        .preview-wrap { position: relative; margin-bottom: 12px; }
+        .preview-wrap .remove-btn {
+            position: absolute; top: 8px; right: 8px;
+            width: 28px; height: 28px; border-radius: 50%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
+            border: none; color: white; font-size: 14px;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
         }
 
-        /* ===== TEXT INPUT ===== */
-        .text-input-wrapper { display: flex; flex-direction: column; gap: 12px; }
-        .input-label { font-size: 14px; font-weight: 600; color: var(--text-primary); text-align: left; }
+        /* TEXT INPUT */
+        .text-card {
+            background: var(--bg-card); border: 1.5px solid var(--border);
+            border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+        }
+        .text-card label { display: block; font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 8px; }
+        .text-card textarea {
+            width: 100%; background: transparent; border: none; outline: none;
+            color: var(--text); font-size: 15px; font-family: inherit;
+            resize: none; min-height: 72px; line-height: 1.5;
+        }
+        .text-card textarea::placeholder { color: var(--text-muted); }
 
-        #descriptionInput {
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-primary); padding: 12px 14px; border-radius: 10px; font-size: 16px;
-            font-family: inherit; resize: vertical; min-height: 100px; transition: var(--transition); outline: none;
+        /* CATEGORIES */
+        .cat-card {
+            background: var(--bg-card); border: 1.5px solid var(--border);
+            border-radius: var(--radius); padding: 16px; margin-bottom: 16px;
         }
-        #descriptionInput:focus { border-color: rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.08); }
-        #descriptionInput::placeholder { color: var(--text-secondary); }
+        .cat-card label { display: block; font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 10px; }
+        .cat-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+        .cat-btn {
+            padding: 8px 14px; border-radius: 100px;
+            border: 1px solid var(--border); background: transparent;
+            color: var(--text-dim); font-size: 12px; font-weight: 600; font-family: inherit;
+            cursor: pointer; transition: all 0.2s var(--ease);
+        }
+        .cat-btn:active { transform: scale(0.95); }
+        .cat-btn.selected { background: rgba(255,255,255,0.08); color: var(--text); border-color: rgba(255,255,255,0.2); }
 
-        /* ===== CATEGORY SELECTOR ===== */
-        .category-section { display: flex; flex-direction: column; gap: 12px; }
-        .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-        .category-btn {
-            padding: 10px 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-secondary); border-radius: 10px; cursor: pointer; font-size: 12px;
-            font-weight: 600; transition: var(--transition); white-space: nowrap;
+        /* RATE BUTTON */
+        .rate-btn-wrap {
+            padding: 12px 16px 24px; position: sticky; bottom: 0;
+            background: linear-gradient(to top, var(--bg) 60%, transparent);
         }
-        .category-btn:hover { border-color: rgba(255, 255, 255, 0.2); background: rgba(255, 255, 255, 0.08); }
-        .category-btn.selected { color: white; border-color: rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.1); }
+        .rate-btn {
+            width: 100%; padding: 16px; border: none; border-radius: var(--radius-sm);
+            font-size: 15px; font-weight: 700; font-family: inherit;
+            cursor: pointer; transition: all 0.2s var(--ease);
+            letter-spacing: 0.3px; text-transform: uppercase;
+        }
+        .rate-btn:active { transform: scale(0.97); }
+        .rate-btn.roast { background: var(--grad-roast); color: white; box-shadow: 0 4px 24px rgba(255,45,85,0.2); }
+        .rate-btn.hype { background: var(--grad-hype); color: #000; box-shadow: 0 4px 24px rgba(48,213,200,0.2); }
+        .rate-btn.honest { background: var(--grad-honest); color: white; box-shadow: 0 4px 24px rgba(255,159,10,0.2); }
+        .rate-btn.unhinged { background: var(--grad-unhinged); color: white; box-shadow: 0 4px 24px rgba(191,90,242,0.2); }
+        .rate-btn.rizz { background: var(--grad-rizz); color: white; box-shadow: 0 4px 24px rgba(255,214,10,0.2); }
 
-        /* ===== RATE BUTTON ===== */
-        .rate-button-container {
-            padding: 20px; position: sticky; bottom: 0;
-            background: linear-gradient(to top, var(--bg-dark), rgba(10, 10, 10, 0.8));
+        /* ===== LOADING ===== */
+        .loading { display: none; padding: 80px 24px; text-align: center; }
+        .loading.active { display: flex; flex-direction: column; align-items: center; gap: 24px; }
+        .spinner {
+            width: 48px; height: 48px; border-radius: 50%;
+            border: 3px solid var(--border);
+            border-top-color: #ff2d55; animation: spin 0.8s linear infinite;
         }
-        .rate-button {
-            width: 100%; padding: 16px; font-size: 16px; font-weight: 700; border: none;
-            border-radius: 12px; cursor: pointer; transition: var(--transition);
-            text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .rate-button.roast { background: var(--gradient-roast); color: white; box-shadow: 0 8px 32px rgba(255, 0, 110, 0.3); }
-        .rate-button.hype { background: var(--gradient-hype); color: #000; box-shadow: 0 8px 32px rgba(0, 217, 255, 0.3); }
-        .rate-button.honest { background: linear-gradient(135deg, #ff9500 0%, #ff5e00 100%); color: white; box-shadow: 0 8px 32px rgba(255, 149, 0, 0.3); }
-        .rate-button.unhinged { background: linear-gradient(135deg, #ff00ff 0%, #00ff00 100%); color: white; box-shadow: 0 8px 32px rgba(255, 0, 255, 0.3); }
-        .rate-button.rizz { background: linear-gradient(135deg, #ff006e 0%, #ffbe0b 100%); color: white; box-shadow: 0 8px 32px rgba(255, 190, 11, 0.3); }
-        .rate-button:hover { transform: translateY(-4px); }
-
-        /* ===== LOADING STATE ===== */
-        .loading-state { display: none; padding: 60px 20px; text-align: center; }
-        .loading-state.active { display: flex; flex-direction: column; align-items: center; gap: 24px; }
-        .loading-animation { width: 80px; height: 80px; position: relative; }
-        .loading-circle {
-            position: absolute; width: 100%; height: 100%; border: 3px solid transparent;
-            border-top-color: #ff006e; border-radius: 50%; animation: spin 1.5s linear infinite;
-        }
-        .loading-circle:nth-child(2) { border-top-color: #8338ec; animation: spin 2s linear infinite reverse; }
-        .loading-circle:nth-child(3) { border-top-color: #00d9ff; animation: spin 2.5s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-text { font-size: 16px; font-weight: 600; color: var(--text-primary); }
-        .loading-subtext { font-size: 14px; color: var(--text-secondary); }
+        .loading h3 { font-size: 16px; font-weight: 700; }
+        .loading p { font-size: 13px; color: var(--text-muted); }
 
-        /* ===== RESULTS PAGE ===== */
-        .results-page { display: none; padding: 20px; animation: fadeIn 0.5s ease-in; }
-        .results-page.active { display: flex; flex-direction: column; gap: 20px; }
+        /* ===== RESULTS ===== */
+        .results { display: none; padding: 16px; animation: fadeUp 0.5s var(--ease) both; }
+        .results.active { display: flex; flex-direction: column; gap: 16px; }
 
         .score-card {
-            background: var(--bg-card); border: 2px solid rgba(255, 255, 255, 0.08);
-            border-radius: var(--border-radius); padding: 32px 24px; text-align: center;
+            background: var(--bg-card); border: 1.5px solid var(--border);
+            border-radius: 20px; padding: 36px 24px 28px; text-align: center;
             position: relative; overflow: hidden;
         }
-        .score-card::before {
-            content: ''; position: absolute; top: -50%; right: -50%; width: 200%; height: 200%;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+        .score-card::after {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.03) 0%, transparent 60%);
         }
-        .result-image-thumbnail {
-            width: 60px; height: 60px; border-radius: 8px; object-fit: cover;
-            margin: 0 auto 16px; border: 2px solid rgba(255, 255, 255, 0.1);
+        .result-thumb {
+            width: 56px; height: 56px; border-radius: 14px; object-fit: cover;
+            margin: 0 auto 16px; border: 2px solid var(--border);
         }
-        .score-number { font-size: 72px; font-weight: 900; line-height: 1; margin: 16px 0; position: relative; z-index: 1; }
-        .roast .score-number { background: var(--gradient-roast); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .hype .score-number { background: var(--gradient-hype); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .honest .score-number { background: linear-gradient(135deg, #ff9500 0%, #ff5e00 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .unhinged .score-number { background: linear-gradient(135deg, #ff00ff 0%, #00ff00 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .rizz .score-number { background: linear-gradient(135deg, #ff006e 0%, #ffbe0b 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .score-label { font-size: 14px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; position: relative; z-index: 1; }
-        .score-gauge { width: 100%; height: 12px; background: rgba(255, 255, 255, 0.05); border-radius: 6px; overflow: hidden; margin: 20px 0; position: relative; z-index: 1; }
-        .score-gauge-fill { height: 100%; border-radius: 6px; width: 0%; animation: fillGauge 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-        .score-card.roast .score-gauge-fill { background: var(--gradient-roast); box-shadow: 0 0 16px rgba(255, 0, 110, 0.5); }
-        .score-card.hype .score-gauge-fill { background: var(--gradient-hype); box-shadow: 0 0 16px rgba(0, 217, 255, 0.5); }
-        .score-card.honest .score-gauge-fill { background: linear-gradient(135deg, #ff9500 0%, #ff5e00 100%); box-shadow: 0 0 16px rgba(255, 149, 0, 0.5); }
-        .score-card.unhinged .score-gauge-fill { background: linear-gradient(135deg, #ff00ff 0%, #00ff00 100%); box-shadow: 0 0 16px rgba(255, 0, 255, 0.5); }
-        .score-card.rizz .score-gauge-fill { background: linear-gradient(135deg, #ff006e 0%, #ffbe0b 100%); box-shadow: 0 0 16px rgba(255, 190, 11, 0.5); }
-        @keyframes fillGauge { from { width: 0%; } to { width: var(--score-percent); } }
-
-        .mode-badge {
-            display: inline-block; font-size: 12px; font-weight: 700; padding: 6px 12px;
-            border-radius: 20px; margin: 12px 0; text-transform: uppercase; letter-spacing: 0.5px; position: relative; z-index: 1;
+        .score-label {
+            font-size: 11px; font-weight: 700; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px;
+            position: relative; z-index: 1;
         }
-        .score-card.roast .mode-badge { background: rgba(255, 0, 110, 0.2); color: #ff006e; border: 1px solid rgba(255, 0, 110, 0.3); }
-        .score-card.hype .mode-badge { background: rgba(0, 217, 255, 0.2); color: #00d9ff; border: 1px solid rgba(0, 217, 255, 0.3); }
-        .score-card.honest .mode-badge { background: rgba(255, 149, 0, 0.2); color: #ff9500; border: 1px solid rgba(255, 149, 0, 0.3); }
-        .score-card.unhinged .mode-badge { background: rgba(255, 0, 255, 0.2); color: #ff00ff; border: 1px solid rgba(255, 0, 255, 0.3); }
-        .score-card.rizz .mode-badge { background: rgba(255, 190, 11, 0.2); color: #ffbe0b; border: 1px solid rgba(255, 190, 11, 0.3); }
-
-        .commentary { font-size: 16px; line-height: 1.6; color: var(--text-secondary); margin: 24px 0; font-weight: 500; position: relative; z-index: 1; }
-        .commentary strong { color: var(--text-primary); }
-
-        /* ===== ACTION BUTTONS ===== */
-        .action-buttons { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-        .action-btn {
-            padding: 14px; border: 1px solid rgba(255, 255, 255, 0.15); background: rgba(255, 255, 255, 0.05);
-            color: var(--text-primary); border-radius: 10px; cursor: pointer; font-size: 13px; font-weight: 600;
-            transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 6px;
+        .score-num {
+            font-size: 80px; font-weight: 900; line-height: 1; letter-spacing: -3px;
+            position: relative; z-index: 1; margin: 8px 0;
         }
-        .action-btn:hover { border-color: rgba(255, 255, 255, 0.3); background: rgba(255, 255, 255, 0.08); transform: translateY(-2px); }
-        .action-btn.primary { grid-column: 1 / -1; background: rgba(255, 255, 255, 0.08); border-color: rgba(255, 255, 255, 0.2); }
+        .score-card.roast .score-num { background: var(--grad-roast); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .score-card.hype .score-num { background: var(--grad-hype); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .score-card.honest .score-num { background: var(--grad-honest); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .score-card.unhinged .score-num { background: var(--grad-unhinged); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .score-card.rizz .score-num { background: var(--grad-rizz); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 
-        /* ===== UPSELL BUTTON ===== */
-        .upsell-btn {
+        .score-out-of { font-size: 14px; color: var(--text-muted); font-weight: 600; margin-bottom: 16px; position: relative; z-index: 1; }
+        .gauge { width: 100%; height: 6px; background: rgba(255,255,255,0.04); border-radius: 3px; overflow: hidden; position: relative; z-index: 1; }
+        .gauge-fill { height: 100%; border-radius: 3px; width: 0%; animation: fill 0.8s var(--spring) forwards; }
+        @keyframes fill { from { width: 0%; } to { width: var(--pct); } }
+        .score-card.roast .gauge-fill { background: var(--grad-roast); }
+        .score-card.hype .gauge-fill { background: var(--grad-hype); }
+        .score-card.honest .gauge-fill { background: var(--grad-honest); }
+        .score-card.unhinged .gauge-fill { background: var(--grad-unhinged); }
+        .score-card.rizz .gauge-fill { background: var(--grad-rizz); }
+
+        .mode-pill {
+            display: inline-block; font-size: 11px; font-weight: 700; padding: 5px 12px;
+            border-radius: 100px; margin: 16px 0 0; text-transform: uppercase; letter-spacing: 0.5px;
+            position: relative; z-index: 1;
+        }
+        .score-card.roast .mode-pill { background: rgba(255,45,85,0.15); color: #ff2d55; }
+        .score-card.hype .mode-pill { background: rgba(48,213,200,0.15); color: #30d5c8; }
+        .score-card.honest .mode-pill { background: rgba(255,159,10,0.15); color: #ff9f0a; }
+        .score-card.unhinged .mode-pill { background: rgba(191,90,242,0.15); color: #bf5af2; }
+        .score-card.rizz .mode-pill { background: rgba(255,214,10,0.15); color: #ffd60a; }
+
+        .commentary {
+            font-size: 16px; line-height: 1.65; color: var(--text-dim);
+            margin: 20px 0 0; font-weight: 500; position: relative; z-index: 1;
+        }
+        .commentary strong { color: var(--text); }
+
+        /* ACTION BUTTONS */
+        .actions { display: flex; gap: 8px; }
+        .act-btn {
+            flex: 1; padding: 14px 8px;
+            background: var(--bg-card); border: 1.5px solid var(--border);
+            border-radius: var(--radius-sm); color: var(--text);
+            font-size: 13px; font-weight: 600; font-family: inherit;
+            cursor: pointer; transition: all 0.2s var(--ease);
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+        .act-btn:active { transform: scale(0.95); background: var(--bg-elevated); }
+        .act-btn.wide { flex: 2; }
+
+        .again-btn {
+            width: 100%; padding: 15px;
+            background: var(--bg-elevated); border: 1.5px solid var(--border-hover);
+            border-radius: var(--radius-sm); color: var(--text);
+            font-size: 14px; font-weight: 700; font-family: inherit;
+            cursor: pointer; transition: all 0.2s var(--ease);
+        }
+        .again-btn:active { transform: scale(0.97); }
+
+        .upsell {
+            width: 100%; padding: 15px;
+            background: linear-gradient(135deg, rgba(255,214,10,0.1), rgba(255,159,10,0.1));
+            border: 1.5px solid rgba(255,214,10,0.2); color: #ffd60a;
+            border-radius: var(--radius-sm); font-size: 13px; font-weight: 700;
+            font-family: inherit; cursor: pointer; transition: all 0.2s var(--ease);
+            letter-spacing: 0.3px;
+        }
+        .upsell:active { transform: scale(0.97); }
+
+        /* ===== PAYWALL ===== */
+        .paywall { display: none; padding: 24px 16px; animation: fadeUp 0.5s var(--ease) both; }
+        .paywall.active { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+        .paywall-card {
+            background: var(--bg-card); border: 1.5px solid var(--border);
+            border-radius: 20px; padding: 40px 24px; text-align: center; width: 100%;
+        }
+        .paywall-card .lock { font-size: 48px; margin-bottom: 16px; }
+        .paywall-card h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
+        .paywall-card p { font-size: 15px; color: var(--text-dim); line-height: 1.5; margin-bottom: 24px; }
+        .paywall-cta {
             width: 100%; padding: 16px;
-            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.2));
-            border: 2px solid rgba(255, 215, 0, 0.3); color: #ffd700; border-radius: 12px;
-            cursor: pointer; font-weight: 700; font-size: 14px; transition: var(--transition);
-            text-transform: uppercase; letter-spacing: 0.5px;
+            background: var(--grad-roast); color: white;
+            border: none; border-radius: var(--radius-sm);
+            font-size: 15px; font-weight: 700; font-family: inherit;
+            cursor: pointer; box-shadow: 0 4px 24px rgba(255,45,85,0.25);
+            transition: all 0.2s var(--ease);
         }
-        .upsell-btn:hover { border-color: rgba(255, 215, 0, 0.5); background: linear-gradient(135deg, rgba(255, 215, 0, 0.3), rgba(255, 165, 0, 0.3)); transform: translateY(-2px); }
+        .paywall-cta:active { transform: scale(0.97); }
+        .paywall-fine { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
 
         /* ===== HISTORY ===== */
-        .history-section { display: none; padding: 0 20px 20px; }
-        .history-section.show { display: block; }
-        .history-title { font-size: 14px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
-        .history-item {
-            display: flex; align-items: center; gap: 12px; padding: 12px;
-            background: var(--bg-card); border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 12px; margin-bottom: 8px; cursor: pointer; transition: var(--transition);
+        .history { display: none; padding: 0 16px 16px; }
+        .history.show { display: block; }
+        .history-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+        .hist-item {
+            display: flex; align-items: center; gap: 10px; padding: 10px;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); margin-bottom: 6px; cursor: pointer;
+            transition: all 0.2s var(--ease);
         }
-        .history-item:hover { border-color: rgba(255, 255, 255, 0.15); }
-        .history-item-image { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
-        .history-item-info { flex: 1; min-width: 0; }
-        .history-item-title { font-size: 14px; font-weight: 600; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .history-item-score { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+        .hist-item:active { background: var(--bg-elevated); }
+        .hist-img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
+        .hist-info { flex: 1; min-width: 0; }
+        .hist-cat { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .hist-score { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 600px) {
-            .header { padding: 12px 16px; }
-            .logo { font-size: 18px; }
-            .headline { font-size: 36px; }
-            .subheadline { font-size: 16px; }
-            .landing-page { padding: 32px 16px; }
-            .input-section { padding: 16px; }
-            .input-card { padding: 16px; }
-            .score-number { font-size: 56px; }
-            .category-grid { grid-template-columns: repeat(3, 1fr); }
-            .action-buttons { grid-template-columns: 1fr; }
-            .rate-button-container { padding: 16px; }
-            .mode-section { grid-template-columns: repeat(3, 1fr); padding: 16px; }
-            .toggle-button { padding: 10px 6px; font-size: 12px; }
-        }
-
-        /* ===== TOAST NOTIFICATION ===== */
+        /* ===== TOAST ===== */
         .toast {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.1); color: var(--text-primary); padding: 12px 20px;
-            border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.2); font-size: 14px;
-            backdrop-filter: blur(10px); z-index: 1000; animation: slideUp 0.4s ease-out; pointer-events: none;
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: var(--bg-elevated); color: var(--text); padding: 10px 20px;
+            border-radius: 100px; border: 1px solid var(--border-hover);
+            font-size: 13px; font-weight: 600;
+            backdrop-filter: blur(16px); z-index: 1000;
+            animation: toastIn 0.3s var(--ease); pointer-events: none;
         }
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(8px); }
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
         .hidden { display: none !important; }
+
+        /* ===== MOBILE TWEAKS ===== */
+        @media (max-width: 400px) {
+            .landing h1 { font-size: 34px; }
+            .score-num { font-size: 64px; }
+            .mode-btn { padding: 9px 14px; font-size: 12px; }
+        }
     </style>
 </head>
 <body>
     <!-- HEADER -->
     <div class="header">
-        <div class="logo">⚡ RateMyAnything.ai</div>
-        <div class="counter">
-            <span>🔥</span>
-            <span class="counter-number" id="ratingCounter">2,847</span>
+        <div class="logo">RateMyAnything.ai</div>
+        <div class="live-badge">
+            <div class="live-dot"></div>
+            <span id="ratingCounter">2,847</span> rated
         </div>
     </div>
 
-    <!-- MAIN CONTAINER -->
     <div class="container">
-        <!-- LANDING PAGE -->
-        <div class="landing-page" id="landingPage">
-            <h1 class="headline">Rate Literally Anything</h1>
-            <p class="subheadline">Upload a photo or describe it, and let AI judge you (nicely or brutally)</p>
-            <button class="cta-button" onclick="startRating()">Get Started</button>
+        <!-- LANDING -->
+        <div class="landing" id="landingPage">
+            <div class="landing-emoji">🎯</div>
+            <h1>Rate Literally<br>Anything</h1>
+            <p>Upload a photo or describe anything. AI judges you — brutally, honestly, or chaotically.</p>
+            <button class="cta-btn" onclick="startRating()">Start Rating</button>
+            <div class="social-proof">
+                <div class="avatars">
+                    <span>😎</span><span>🤣</span><span>🔥</span><span>💀</span>
+                </div>
+                2,847 ratings and counting
+            </div>
         </div>
 
         <!-- RATING INTERFACE -->
         <div id="ratingInterface" class="hidden">
-            <!-- MODE TOGGLE -->
-            <div class="mode-section">
-                <button class="toggle-button roast active" onclick="setMode('roast')" id="mode-roast">
-                    🔥 Roast
-                </button>
-                <button class="toggle-button hype" onclick="setMode('hype')" id="mode-hype">
-                    ✨ Hype
-                </button>
-                <button class="toggle-button honest" onclick="setMode('honest')" id="mode-honest">
-                    😐 Honest
-                </button>
-                <button class="toggle-button unhinged" onclick="setMode('unhinged')" id="mode-unhinged">
-                    🤪 Unhinged
-                </button>
-                <button class="toggle-button rizz" onclick="setMode('rizz')" id="mode-rizz">
-                    💀 Rizz Check
-                </button>
-            </div>
+            <div class="interface">
+                <!-- MODES -->
+                <div class="modes">
+                    <button class="mode-btn roast active" onclick="setMode('roast')" id="mode-roast">🔥 Roast</button>
+                    <button class="mode-btn hype" onclick="setMode('hype')" id="mode-hype">✨ Hype</button>
+                    <button class="mode-btn honest" onclick="setMode('honest')" id="mode-honest">😐 Honest</button>
+                    <button class="mode-btn unhinged" onclick="setMode('unhinged')" id="mode-unhinged">🤪 Unhinged</button>
+                    <button class="mode-btn rizz" onclick="setMode('rizz')" id="mode-rizz">💀 Rizz Check</button>
+                </div>
 
-            <!-- INPUT SECTION -->
-            <div class="input-section">
-                <!-- PHOTO UPLOAD -->
-                <div class="input-card active" id="photoCard" onclick="document.getElementById('photoInput').click()">
-                    <div class="upload-area" id="uploadArea">
-                        <div class="upload-icon">📸</div>
-                        <div class="upload-text">
-                            <strong>Tap to upload</strong> or drag & drop<br>
-                            PNG, JPG, GIF up to 10MB
-                        </div>
+                <!-- UPLOAD -->
+                <div class="upload-card" id="photoCard" onclick="document.getElementById('photoInput').click()">
+                    <div id="uploadArea">
+                        <div class="icon">📸</div>
+                        <div class="label">Tap to upload a photo</div>
+                        <div class="hint">JPG, PNG, GIF up to 10MB</div>
                     </div>
                     <div id="imagePreviewContainer" class="hidden">
-                        <div class="image-preview-container">
+                        <div class="preview-wrap">
                             <img id="imagePreview" class="image-preview" alt="Preview">
-                            <button class="remove-image-btn" onclick="removeImage(event)">✕</button>
-                        </div>
-                        <div style="text-align: center; font-size: 13px; color: var(--text-secondary); margin-top: 8px;">
-                            Image selected ✓
+                            <button class="remove-btn" onclick="removeImage(event)">✕</button>
                         </div>
                     </div>
                 </div>
                 <input type="file" id="photoInput" accept="image/*" onchange="handleImageUpload(event)">
 
-                <!-- TEXT INPUT -->
-                <div class="input-card">
-                    <div class="text-input-wrapper">
-                        <label class="input-label">Or describe it</label>
-                        <textarea id="descriptionInput" placeholder="E.g., 'my dorm room has posters everywhere and the floor is...'"></textarea>
-                    </div>
+                <!-- TEXT -->
+                <div class="text-card">
+                    <label>Or describe it</label>
+                    <textarea id="descriptionInput" placeholder="My dorm room has posters everywhere..."></textarea>
                 </div>
 
-                <!-- CATEGORY SELECTOR -->
-                <div class="input-card">
-                    <div class="category-section">
-                        <label class="input-label">What are we rating?</label>
-                        <div class="category-grid">
-                            <button class="category-btn" onclick="selectCategory(event, 'Room')">🏠 Room</button>
-                            <button class="category-btn" onclick="selectCategory(event, 'Bar')">🍹 Bar</button>
-                            <button class="category-btn" onclick="selectCategory(event, 'Outfit')">👕 Outfit</button>
-                            <button class="category-btn" onclick="selectCategory(event, 'Food')">🍔 Food</button>
-                            <button class="category-btn" onclick="selectCategory(event, 'Car')">🚗 Car</button>
-                            <button class="category-btn" onclick="selectCategory(event, 'Campus')">🏫 Campus</button>
-                            <button class="category-btn" onclick="selectCategory(event, 'Pet')">🐕 Pet</button>
-                            <button class="category-btn" onclick="selectCategory(event, 'Date Spot')">💕 Date Spot</button>
-                            <button class="category-btn" onclick="selectCategory(event, 'Other')">❓ Other</button>
-                        </div>
+                <!-- CATEGORIES -->
+                <div class="cat-card">
+                    <label>What are we rating?</label>
+                    <div class="cat-grid">
+                        <button class="cat-btn" onclick="selectCategory(event,'Room')">🏠 Room</button>
+                        <button class="cat-btn" onclick="selectCategory(event,'Bar')">🍹 Bar</button>
+                        <button class="cat-btn" onclick="selectCategory(event,'Outfit')">👕 Outfit</button>
+                        <button class="cat-btn" onclick="selectCategory(event,'Food')">🍔 Food</button>
+                        <button class="cat-btn" onclick="selectCategory(event,'Car')">🚗 Car</button>
+                        <button class="cat-btn" onclick="selectCategory(event,'Campus')">🏫 Campus</button>
+                        <button class="cat-btn" onclick="selectCategory(event,'Pet')">🐕 Pet</button>
+                        <button class="cat-btn" onclick="selectCategory(event,'Date Spot')">💕 Date Spot</button>
+                        <button class="cat-btn" onclick="selectCategory(event,'Other')">❓ Other</button>
                     </div>
                 </div>
             </div>
 
             <!-- HISTORY -->
-            <div class="history-section" id="historySection">
-                <div class="history-title">Recent Ratings</div>
-                <div class="history-items" id="historyItems"></div>
+            <div class="history" id="historySection">
+                <div class="history-label">Recent Ratings</div>
+                <div id="historyItems"></div>
             </div>
         </div>
 
-        <!-- LOADING STATE -->
-        <div class="loading-state" id="loadingState">
-            <div class="loading-animation">
-                <div class="loading-circle"></div>
-                <div class="loading-circle"></div>
-                <div class="loading-circle"></div>
-            </div>
-            <div class="loading-text">AI is judging you...</div>
-            <div class="loading-subtext">This may take a few seconds</div>
+        <!-- LOADING -->
+        <div class="loading" id="loadingState">
+            <div class="spinner"></div>
+            <h3>AI is judging you...</h3>
+            <p>This takes a few seconds</p>
         </div>
 
-        <!-- RESULTS PAGE -->
-        <div class="results-page" id="resultsPage">
+        <!-- RESULTS -->
+        <div class="results" id="resultsPage">
             <div class="score-card" id="scoreCard">
                 <div id="resultImageThumbnail"></div>
                 <div class="score-label" id="scoreCategoryLabel"></div>
-                <div class="score-number" id="scoreNumber">0</div>
-                <div class="score-gauge">
-                    <div class="score-gauge-fill" id="scoreGaugeFill" style="--score-percent: 0%"></div>
-                </div>
-                <div class="mode-badge" id="modeBadge"></div>
+                <div class="score-num" id="scoreNumber">0</div>
+                <div class="score-out-of">/ 10</div>
+                <div class="gauge"><div class="gauge-fill" id="scoreGaugeFill" style="--pct: 0%"></div></div>
+                <div class="mode-pill" id="modeBadge"></div>
                 <div class="commentary" id="commentary"></div>
             </div>
 
-            <!-- ACTION BUTTONS -->
-            <div class="action-buttons">
-                <button class="action-btn" onclick="shareToClipboard()">📋 Copy</button>
-                <button class="action-btn" onclick="shareToTwitter()">𝕏 Share</button>
-                <button class="action-btn" onclick="shareToInstagram()">📸 IG</button>
-                <button class="action-btn primary" onclick="goBack()">➕ Rate Something Else</button>
+            <div class="actions">
+                <button class="act-btn" onclick="shareToClipboard()">📋 Copy</button>
+                <button class="act-btn" onclick="shareToTwitter()">𝕏 Share</button>
+                <button class="act-btn" onclick="shareToInstagram()">📸 Story</button>
             </div>
 
-            <!-- UPSELL -->
-            <button class="upsell-btn" onclick="buyMoreRatings()">
-                🔓 Get 5 More Ratings — $0.99
-            </button>
+            <button class="again-btn" onclick="goBack()">Rate Something Else</button>
+            <button class="upsell" onclick="buyMoreRatings()">🔓 Get 5 More Ratings — $0.99</button>
         </div>
 
-        <!-- PAYWALL SCREEN -->
-        <div class="results-page" id="paywallScreen">
-            <div class="score-card roast" style="text-align: center;">
-                <div style="font-size: 48px; margin-bottom: 16px;">🔒</div>
-                <div style="font-size: 24px; font-weight: 800; margin-bottom: 8px;">You're Out of Free Ratings!</div>
-                <div style="font-size: 16px; color: var(--text-secondary); margin-bottom: 24px; line-height: 1.5;">
-                    You used all 3 free ratings.<br>Get 5 more for just $0.99
-                </div>
-                <button class="upsell-btn" onclick="buyMoreRatings()" style="font-size: 16px; padding: 18px;">
-                    🔓 Unlock 5 More Ratings — $0.99
-                </button>
-                <div style="margin-top: 16px; font-size: 12px; color: var(--text-secondary);">
-                    Instant access. Rate anything.
-                </div>
+        <!-- PAYWALL -->
+        <div class="paywall" id="paywallScreen">
+            <div class="paywall-card">
+                <div class="lock">🔒</div>
+                <h2>You're Out of Free Ratings</h2>
+                <p>You used all 3 free ratings.<br>Unlock 5 more for just $0.99</p>
+                <button class="paywall-cta" onclick="buyMoreRatings()">Unlock 5 More Ratings — $0.99</button>
+                <div class="paywall-fine">Instant access. Rate anything.</div>
             </div>
         </div>
     </div>
 
-    <!-- RATE BUTTON (Fixed at bottom) -->
-    <div class="rate-button-container" id="rateButtonContainer" style="display: none;">
-        <button class="rate-button roast" id="rateBtn" onclick="submitRating()">
-            Rate It
-        </button>
+    <!-- RATE BUTTON -->
+    <div class="rate-btn-wrap" id="rateButtonContainer" style="display: none;">
+        <button class="rate-btn roast" id="rateBtn" onclick="submitRating()">Rate It</button>
     </div>
 
     <script>
@@ -569,20 +552,16 @@
         // ===== MODE SWITCHING =====
         function setMode(mode) {
             currentMode = mode;
-            document.querySelectorAll('.toggle-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById('mode-' + mode).classList.add('active');
             updateRateButtonStyle();
         }
 
-        // ===== IMAGE HANDLING (WITH COMPRESSION) =====
+        // ===== IMAGE HANDLING =====
         function handleImageUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
-
-            if (file.size > 10 * 1024 * 1024) {
-                showToast('Image must be under 10MB');
-                return;
-            }
+            if (file.size > 10 * 1024 * 1024) { showToast('Image must be under 10MB'); return; }
 
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -595,8 +574,7 @@
                         if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
                         else { w = Math.round(w * maxDim / h); h = maxDim; }
                     }
-                    canvas.width = w;
-                    canvas.height = h;
+                    canvas.width = w; canvas.height = h;
                     canvas.getContext('2d').drawImage(img, 0, 0, w, h);
                     uploadedImage = canvas.toDataURL('image/jpeg', 0.7);
                     displayImagePreview();
@@ -608,12 +586,9 @@
         }
 
         function displayImagePreview() {
-            const preview = document.getElementById('imagePreview');
-            const container = document.getElementById('imagePreviewContainer');
-            const uploadArea = document.getElementById('uploadArea');
-            preview.src = uploadedImage;
-            container.classList.remove('hidden');
-            uploadArea.classList.add('hidden');
+            document.getElementById('imagePreview').src = uploadedImage;
+            document.getElementById('imagePreviewContainer').classList.remove('hidden');
+            document.getElementById('uploadArea').classList.add('hidden');
         }
 
         function removeImage(e) {
@@ -624,20 +599,10 @@
             document.getElementById('photoInput').value = '';
         }
 
-        function clearImagePreview() {
-            if (document.getElementById('descriptionInput').value.trim()) {
-                uploadedImage = null;
-                document.getElementById('imagePreviewContainer').classList.add('hidden');
-                document.getElementById('uploadArea').classList.remove('hidden');
-                document.getElementById('photoInput').value = '';
-            }
-        }
-
         // ===== CATEGORY SELECTION =====
         function selectCategory(event, category) {
             currentCategory = category;
-            const buttons = event.target.parentElement.querySelectorAll('.category-btn');
-            buttons.forEach(btn => btn.classList.remove('selected'));
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('selected'));
             event.target.classList.add('selected');
         }
 
@@ -682,25 +647,17 @@
             document.getElementById('photoInput').value = '';
             document.getElementById('imagePreviewContainer').classList.add('hidden');
             document.getElementById('uploadArea').classList.remove('hidden');
-            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('selected'));
+            document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('selected'));
             currentCategory = 'Other';
         }
 
         // ===== RATING SUBMISSION =====
         async function submitRating() {
-            // Check paywall first
-            if (!canRate()) {
-                showPaywall();
-                return;
-            }
+            if (!canRate()) { showPaywall(); return; }
 
             const description = document.getElementById('descriptionInput').value.trim();
-            if (!uploadedImage && !description) {
-                showToast('Please upload a photo or write a description');
-                return;
-            }
+            if (!uploadedImage && !description) { showToast('Upload a photo or write a description'); return; }
 
-            // Show loading state
             document.getElementById('ratingInterface').classList.add('hidden');
             document.getElementById('loadingState').classList.add('active');
             document.getElementById('rateButtonContainer').style.display = 'none';
@@ -723,8 +680,6 @@
                 }
 
                 const data = await response.json();
-
-                // Track usage for paywall
                 setRatingsUsed(getRatingsUsed() + 1);
 
                 displayResults({
@@ -746,23 +701,21 @@
 
         function displayResults(rating) {
             currentRating = rating;
-
             const scoreCard = document.getElementById('scoreCard');
             scoreCard.className = 'score-card ' + rating.mode;
 
-            const imageContainer = document.getElementById('resultImageThumbnail');
-            if (rating.image) {
-                imageContainer.innerHTML = '<img src="' + rating.image + '" class="result-image-thumbnail" alt="Rated item">';
-            } else {
-                imageContainer.innerHTML = '';
-            }
+            const imgContainer = document.getElementById('resultImageThumbnail');
+            imgContainer.innerHTML = rating.image
+                ? '<img src="' + rating.image + '" class="result-thumb" alt="Rated">'
+                : '';
 
-            var displayScore = parseFloat(rating.score);
-            document.getElementById('scoreNumber').textContent = Number.isInteger(displayScore) ? displayScore.toFixed(1) : displayScore;
-            document.getElementById('scoreGaugeFill').style.setProperty('--score-percent', (displayScore / 10 * 100) + '%');
+            var s = parseFloat(rating.score);
+            document.getElementById('scoreNumber').textContent = Number.isInteger(s) ? s.toFixed(1) : s;
+            document.getElementById('scoreGaugeFill').style.setProperty('--pct', (s / 10 * 100) + '%');
             document.getElementById('scoreCategoryLabel').textContent = rating.category;
-            const modeLabels = { roast: '🔥 Roast Mode', hype: '✨ Hype Mode', honest: '😐 Brutally Honest', unhinged: '🤪 Unhinged', rizz: '💀 Rizz Check' };
-            document.getElementById('modeBadge').textContent = modeLabels[rating.mode] || rating.mode;
+
+            const labels = { roast:'🔥 Roast Mode', hype:'✨ Hype Mode', honest:'😐 Brutally Honest', unhinged:'🤪 Unhinged', rizz:'💀 Rizz Check' };
+            document.getElementById('modeBadge').textContent = labels[rating.mode] || rating.mode;
             document.getElementById('commentary').innerHTML = rating.commentary.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 
             document.getElementById('loadingState').classList.remove('active');
@@ -770,29 +723,23 @@
 
             currentRatingCount++;
             document.getElementById('ratingCounter').textContent = currentRatingCount.toLocaleString();
-
             addToHistory(rating);
         }
 
         // ===== SHARING =====
         function shareToClipboard() {
-            const modeNames = { roast: '🔥 Roast', hype: '✨ Hype', honest: '😐 Brutally Honest', unhinged: '🤪 Unhinged', rizz: '💀 Rizz Check' };
-            const text = 'I got a ' + currentRating.score + '/10 in ' + (modeNames[currentRating.mode] || currentRating.mode) + ' Mode on RateMyAnything.ai!\n\n"' + currentRating.commentary + '"\n\nTry it: ratemyanything.ai';
-            navigator.clipboard.writeText(text).then(() => {
-                showToast('Copied to clipboard! 📋');
-            });
+            const m = { roast:'🔥 Roast', hype:'✨ Hype', honest:'😐 Honest', unhinged:'🤪 Unhinged', rizz:'💀 Rizz' };
+            const text = 'I got ' + currentRating.score + '/10 in ' + (m[currentRating.mode]||currentRating.mode) + ' Mode on RateMyAnything.ai!\n\n"' + currentRating.commentary + '"\n\nTry it: ratemyanything-ai-production.up.railway.app';
+            navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
         }
 
         function shareToTwitter() {
-            const modeNames2 = { roast: '🔥 Roast', hype: '✨ Hype', honest: '😐 Brutally Honest', unhinged: '🤪 Unhinged', rizz: '💀 Rizz Check' };
-            const text = 'I got a ' + currentRating.score + '/10 in ' + (modeNames2[currentRating.mode] || currentRating.mode) + ' Mode on RateMyAnything.ai!\n\nTry rating anything: ';
-            const url = 'https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=https://ratemyanything.ai';
-            window.open(url, '_blank', 'width=550,height=420');
+            const m = { roast:'🔥 Roast', hype:'✨ Hype', honest:'😐 Honest', unhinged:'🤪 Unhinged', rizz:'💀 Rizz' };
+            const text = 'I got ' + currentRating.score + '/10 in ' + (m[currentRating.mode]||currentRating.mode) + ' Mode on RateMyAnything.ai! Try it: ';
+            window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=https://ratemyanything-ai-production.up.railway.app', '_blank');
         }
 
-        function shareToInstagram() {
-            showToast('Screenshot your score card and share it to your story! 📸');
-        }
+        function shareToInstagram() { showToast('Screenshot your score and share to your story!'); }
 
         // ===== PAYMENTS =====
         async function buyMoreRatings() {
@@ -803,125 +750,63 @@
                     headers: { 'Content-Type': 'application/json' }
                 });
                 const data = await response.json();
-                if (data.url) {
-                    window.location.href = data.url;
-                } else {
-                    showToast('Checkout error: ' + (data.error || 'Try again'));
-                }
-            } catch (err) {
-                showToast('Something went wrong. Try again!');
-            }
+                if (data.url) { window.location.href = data.url; }
+                else { showToast('Checkout error: ' + (data.error || 'Try again')); }
+            } catch (err) { showToast('Something went wrong. Try again!'); }
         }
 
         // ===== HISTORY =====
         function addToHistory(rating) {
-            const historyItem = {
-                score: rating.score,
-                category: rating.category,
-                mode: rating.mode,
-                image: rating.image,
-                timestamp: new Date()
-            };
-            ratingHistory.unshift(historyItem);
+            ratingHistory.unshift({ score: rating.score, category: rating.category, mode: rating.mode, image: rating.image, timestamp: new Date() });
             if (ratingHistory.length > 10) ratingHistory.pop();
-            saveHistory();
-            loadHistory();
+            saveHistory(); loadHistory();
         }
 
         function loadHistory() {
-            const historySection = document.getElementById('historySection');
-            const historyItems = document.getElementById('historyItems');
+            const section = document.getElementById('historySection');
+            const items = document.getElementById('historyItems');
+            if (ratingHistory.length === 0) { section.classList.remove('show'); return; }
 
-            if (ratingHistory.length === 0) {
-                historySection.classList.remove('show');
-                return;
-            }
-
-            historySection.classList.add('show');
-            historyItems.innerHTML = ratingHistory.map(function(item, index) {
-                var imageThumbnail = item.image ? '<img src="' + item.image + '" class="history-item-image" alt="Rating">' : '<div class="history-item-image" style="background: rgba(255,255,255,0.1);"></div>';
-                return '<div class="history-item" onclick="openHistoryItem(' + index + ')">' +
-                    imageThumbnail +
-                    '<div class="history-item-info">' +
-                    '<div class="history-item-title">' + item.category + '</div>' +
-                    '<div class="history-item-score">' + item.score + '/10 ' + ({roast:'🔥',hype:'✨',honest:'😐',unhinged:'🤪',rizz:'💀'}[item.mode] || '⚡') + '</div>' +
-                    '</div></div>';
+            section.classList.add('show');
+            const emojis = {roast:'🔥',hype:'✨',honest:'😐',unhinged:'🤪',rizz:'💀'};
+            items.innerHTML = ratingHistory.map(function(item, i) {
+                var thumb = item.image ? '<img src="'+item.image+'" class="hist-img" alt="">' : '<div class="hist-img" style="background:var(--bg-elevated);"></div>';
+                return '<div class="hist-item" onclick="openHistoryItem('+i+')">'+thumb+'<div class="hist-info"><div class="hist-cat">'+item.category+'</div><div class="hist-score">'+item.score+'/10 '+(emojis[item.mode]||'')+'</div></div></div>';
             }).join('');
         }
 
         function openHistoryItem(index) {
-            var rating = ratingHistory[index];
-            displayResults({
-                score: rating.score,
-                category: rating.category,
-                commentary: 'Previously rated: ' + rating.category + ' - Score: ' + rating.score + '/10',
-                mode: rating.mode,
-                image: rating.image
-            });
+            var r = ratingHistory[index];
+            displayResults({ score:r.score, category:r.category, commentary:'Previously rated: '+r.category+' — '+r.score+'/10', mode:r.mode, image:r.image });
         }
 
-        function saveHistory() {
-            try { localStorage.setItem('ratingHistory', JSON.stringify(ratingHistory)); } catch (e) {}
-        }
-
-        function loadHistoryFromStorage() {
-            try {
-                var stored = localStorage.getItem('ratingHistory');
-                if (stored) ratingHistory = JSON.parse(stored);
-            } catch (e) {}
-        }
+        function saveHistory() { try { localStorage.setItem('ratingHistory', JSON.stringify(ratingHistory)); } catch(e) {} }
+        function loadHistoryFromStorage() { try { var s = localStorage.getItem('ratingHistory'); if (s) ratingHistory = JSON.parse(s); } catch(e) {} }
 
         // ===== UI HELPERS =====
-        function updateRateButtonStyle() {
-            var btn = document.getElementById('rateBtn');
-            btn.className = 'rate-button ' + currentMode;
-        }
+        function updateRateButtonStyle() { document.getElementById('rateBtn').className = 'rate-btn ' + currentMode; }
 
-        function showToast(message) {
-            var toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = message;
-            document.body.appendChild(toast);
-            setTimeout(function() { toast.remove(); }, 3000);
+        function showToast(msg) {
+            var t = document.createElement('div');
+            t.className = 'toast'; t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(function() { t.remove(); }, 3000);
         }
 
         // ===== DRAG & DROP =====
-        var photoCard = document.getElementById('photoCard');
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(function(eventName) {
-            photoCard.addEventListener(eventName, function(e) { e.preventDefault(); e.stopPropagation(); }, false);
-        });
-
-        ['dragenter', 'dragover'].forEach(function(eventName) {
-            photoCard.addEventListener(eventName, function() {
-                photoCard.style.borderColor = 'rgba(255, 255, 255, 0.3)';
-                photoCard.style.background = 'rgba(255, 255, 255, 0.05)';
-            });
-        });
-
-        ['dragleave', 'drop'].forEach(function(eventName) {
-            photoCard.addEventListener(eventName, function() {
-                photoCard.style.borderColor = 'rgba(255, 255, 255, 0.08)';
-                photoCard.style.background = 'var(--bg-card)';
-            });
-        });
-
-        photoCard.addEventListener('drop', function(e) {
-            var dt = e.dataTransfer;
-            var files = dt.files;
-            document.getElementById('photoInput').files = files;
-            handleImageUpload({ target: { files: files } });
-        });
+        var pc = document.getElementById('photoCard');
+        ['dragenter','dragover','dragleave','drop'].forEach(function(e) { pc.addEventListener(e, function(ev) { ev.preventDefault(); ev.stopPropagation(); }); });
+        pc.addEventListener('drop', function(e) { document.getElementById('photoInput').files = e.dataTransfer.files; handleImageUpload({ target: { files: e.dataTransfer.files } }); });
 
         // ===== INIT =====
         document.addEventListener('DOMContentLoaded', function() {
             loadHistoryFromStorage();
             updateRateButtonStyle();
 
-            // Handle Stripe redirect
-            const params = new URLSearchParams(window.location.search);
+            var params = new URLSearchParams(window.location.search);
             if (params.get('payment') === 'success') {
                 setPaidRatings(getPaidRatings() + PAID_RATINGS);
-                showToast('Payment successful! You got 5 more ratings 🎉');
+                showToast('Payment successful! 5 more ratings unlocked');
                 window.history.replaceState({}, '', '/');
                 startRating();
             } else if (params.get('payment') === 'cancel') {
