@@ -25,6 +25,75 @@ function checkRateLimit(ip) {
   return true;
 }
 
+// ===== DATABASE (JSON file-based) =====
+const DB_PATH = path.join(__dirname, 'db.json');
+let db = { users: {}, dailyChallenge: null, dailyChallengeDate: null };
+
+function loadDB() {
+  try {
+    if (fs.existsSync(DB_PATH)) {
+      db = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+      if (!db.users) db.users = {};
+      console.log(`Database loaded: ${Object.keys(db.users).length} users`);
+    }
+  } catch (e) {
+    console.error('Failed to load DB:', e.message);
+    db = { users: {}, dailyChallenge: null, dailyChallengeDate: null };
+  }
+}
+
+function saveDB() {
+  try { fs.writeFileSync(DB_PATH, JSON.stringify(db), 'utf-8'); }
+  catch (e) { console.error('Failed to save DB:', e.message); }
+}
+
+loadDB();
+
+// Generate a short friend code
+function generateFriendCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let code = '';
+  for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+  return code;
+}
+
+// Get today's date as string
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
+// ===== DAILY CHALLENGE =====
+const dailyChallenges = [
+  { emoji: '🛏️', title: 'Rate Your Bed Setup', prompt: 'Show us your bed/sleeping setup right now', category: 'room' },
+  { emoji: '👟', title: 'Rate Your Shoes', prompt: 'Show us what you got on your feet today', category: 'outfit' },
+  { emoji: '🍳', title: 'Rate Your Breakfast', prompt: 'Show us what you ate (or are eating) for breakfast', category: 'food' },
+  { emoji: '📱', title: 'Rate Your Home Screen', prompt: 'Screenshot your phone home screen', category: 'other' },
+  { emoji: '🎒', title: 'Rate Your Bag', prompt: 'Show us your backpack, purse, or daily carry', category: 'outfit' },
+  { emoji: '🪴', title: 'Rate Your View', prompt: 'Show us the view from your window right now', category: 'other' },
+  { emoji: '🚗', title: 'Rate Your Ride', prompt: 'Show us your car, bike, or whatever you drive', category: 'car' },
+  { emoji: '🐾', title: 'Rate Your Pet', prompt: 'Show us your pet (or your dream pet)', category: 'pet' },
+  { emoji: '🍔', title: 'Rate Your Lunch', prompt: 'Show us what you had for lunch today', category: 'food' },
+  { emoji: '💇', title: 'Rate Your Hair', prompt: 'Show us your hair today — no filter', category: 'other' },
+  { emoji: '🏠', title: 'Rate Your Room', prompt: 'Full room tour — show us the vibes', category: 'room' },
+  { emoji: '👕', title: 'Rate Your Fit', prompt: 'Show us your outfit right now', category: 'outfit' },
+  { emoji: '☕', title: 'Rate Your Coffee Order', prompt: 'Show us your go-to drink', category: 'food' },
+  { emoji: '🎮', title: 'Rate Your Setup', prompt: 'Show us your gaming/desk setup', category: 'room' },
+];
+
+function getDailyChallenge() {
+  const today = todayStr();
+  if (db.dailyChallengeDate === today && db.dailyChallenge) {
+    return db.dailyChallenge;
+  }
+  // Pick based on day of year for consistency
+  const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+  const challenge = dailyChallenges[dayOfYear % dailyChallenges.length];
+  db.dailyChallenge = challenge;
+  db.dailyChallengeDate = today;
+  saveDB();
+  return challenge;
+}
+
 // ===== ANTHROPIC API CALL =====
 async function callClaude(prompt, imageBase64, mediaType = 'image/jpeg') {
   const content = [];
@@ -252,7 +321,7 @@ const server = http.createServer(async (req, res) => {
     return res.end();
   }
 
-  // Serve frontend (handle /, /index.html, and /?payment=success/cancel)
+  // Serve frontend
   const urlPath = req.url.split('?')[0];
   if (req.method === 'GET' && (urlPath === '/' || urlPath === '/index.html')) {
     const html = fs.readFileSync(path.join(__dirname, 'frontend.html'), 'utf-8');
@@ -263,6 +332,204 @@ const server = http.createServer(async (req, res) => {
   // Health check
   if (req.method === 'GET' && req.url === '/api/health') {
     return sendJSON(res, 200, { status: 'ok' });
+  }
+
+  // ===== USER SIGNUP =====
+  if (req.method === 'POST' && urlPath === '/api/signup') {
+    try {
+      const body = await parseBody(req);
+      const username = (body.username || '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+      if (!username || username.length < 2 || username.length > 20) {
+        return sendJSON(res, 400, { error: 'Username must be 2-20 chars (letters, numbers, underscores)' });
+      }
+      // Check if taken
+      const existing = Object.values(db.users).find(u => u.username === username);
+      if (existing) {
+        // Return existing user (no password, just claim your name)
+        return sendJSON(res, 200, { userId: existing.id, username: existing.username, friendCode: existing.friendCode });
+      }
+      // Create new user
+      const userId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      const friendCode = generateFriendCode();
+      db.users[userId] = {
+        id: userId,
+        username: username,
+        friendCode: friendCode,
+        friends: [],
+        ratings: [],
+        dailyRatings: {},
+        avgScore: 0,
+        totalRatings: 0,
+        createdAt: Date.now()
+      };
+      saveDB();
+      return sendJSON(res, 200, { userId, username, friendCode });
+    } catch (err) {
+      return sendJSON(res, 500, { error: 'Signup failed' });
+    }
+  }
+
+  // ===== GET USER PROFILE =====
+  if (req.method === 'GET' && urlPath.startsWith('/api/user/')) {
+    const userId = urlPath.split('/api/user/')[1];
+    const user = db.users[userId];
+    if (!user) return sendJSON(res, 404, { error: 'User not found' });
+    return sendJSON(res, 200, {
+      username: user.username,
+      friendCode: user.friendCode,
+      friendCount: user.friends.length,
+      avgScore: user.avgScore,
+      totalRatings: user.totalRatings,
+      recentRatings: (user.ratings || []).slice(0, 10)
+    });
+  }
+
+  // ===== ADD FRIEND =====
+  if (req.method === 'POST' && urlPath === '/api/add-friend') {
+    try {
+      const body = await parseBody(req);
+      const { userId, friendCode } = body;
+      const user = db.users[userId];
+      if (!user) return sendJSON(res, 404, { error: 'User not found' });
+
+      const code = (friendCode || '').trim().toUpperCase();
+      const friend = Object.values(db.users).find(u => u.friendCode === code);
+      if (!friend) return sendJSON(res, 404, { error: 'No user with that friend code' });
+      if (friend.id === userId) return sendJSON(res, 400, { error: "That's your own code!" });
+      if (user.friends.includes(friend.id)) return sendJSON(res, 400, { error: 'Already friends!' });
+
+      // Two-way friendship
+      user.friends.push(friend.id);
+      friend.friends.push(userId);
+      saveDB();
+      return sendJSON(res, 200, { message: `Added ${friend.username}!`, friend: { username: friend.username, id: friend.id } });
+    } catch (err) {
+      return sendJSON(res, 500, { error: 'Failed to add friend' });
+    }
+  }
+
+  // ===== GET FRIENDS LIST =====
+  if (req.method === 'GET' && urlPath.startsWith('/api/friends/')) {
+    const userId = urlPath.split('/api/friends/')[1];
+    const user = db.users[userId];
+    if (!user) return sendJSON(res, 404, { error: 'User not found' });
+    const friends = user.friends.map(fid => {
+      const f = db.users[fid];
+      if (!f) return null;
+      return {
+        id: f.id, username: f.username, avgScore: f.avgScore,
+        totalRatings: f.totalRatings,
+        lastRating: (f.ratings || [])[0] || null
+      };
+    }).filter(Boolean);
+    return sendJSON(res, 200, { friends });
+  }
+
+  // ===== FRIENDS FEED =====
+  if (req.method === 'GET' && urlPath.startsWith('/api/feed/')) {
+    const userId = urlPath.split('/api/feed/')[1];
+    const user = db.users[userId];
+    if (!user) return sendJSON(res, 404, { error: 'User not found' });
+
+    // Collect recent ratings from friends + self
+    const allPeople = [userId, ...user.friends];
+    let feed = [];
+    for (const pid of allPeople) {
+      const p = db.users[pid];
+      if (!p) continue;
+      const ratings = (p.ratings || []).slice(0, 5).map(r => ({
+        ...r, userId: p.id, username: p.username
+      }));
+      feed = feed.concat(ratings);
+    }
+    // Sort by timestamp desc
+    feed.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+    return sendJSON(res, 200, { feed: feed.slice(0, 30) });
+  }
+
+  // ===== DAILY CHALLENGE =====
+  if (req.method === 'GET' && urlPath === '/api/daily') {
+    const challenge = getDailyChallenge();
+    return sendJSON(res, 200, { challenge, date: todayStr() });
+  }
+
+  // ===== DASHBOARD / LEADERBOARD =====
+  if (req.method === 'GET' && urlPath.startsWith('/api/dashboard/')) {
+    const userId = urlPath.split('/api/dashboard/')[1];
+    const user = db.users[userId];
+    if (!user) return sendJSON(res, 404, { error: 'User not found' });
+
+    // User stats
+    const today = todayStr();
+    const todayRatings = (user.ratings || []).filter(r => {
+      if (!r.timestamp) return false;
+      return new Date(r.timestamp).toISOString().split('T')[0] === today;
+    });
+    const didDailyChallenge = !!(user.dailyRatings && user.dailyRatings[today]);
+
+    // Friends leaderboard (by avg score)
+    const allPeople = [userId, ...user.friends];
+    const leaderboard = allPeople.map(pid => {
+      const p = db.users[pid];
+      if (!p) return null;
+      return {
+        id: p.id, username: p.username,
+        avgScore: p.avgScore, totalRatings: p.totalRatings,
+        isYou: pid === userId
+      };
+    }).filter(Boolean).sort((a, b) => b.avgScore - a.avgScore);
+
+    return sendJSON(res, 200, {
+      username: user.username,
+      friendCode: user.friendCode,
+      friendCount: user.friends.length,
+      avgScore: user.avgScore,
+      totalRatings: user.totalRatings,
+      todayCount: todayRatings.length,
+      didDailyChallenge,
+      leaderboard,
+      recentRatings: (user.ratings || []).slice(0, 5)
+    });
+  }
+
+  // ===== SAVE RATING (attach to user) =====
+  if (req.method === 'POST' && urlPath === '/api/save-rating') {
+    try {
+      const body = await parseBody(req);
+      const { userId, score, commentary, vibe, mode, category, isDaily } = body;
+      const user = db.users[userId];
+      if (!user) return sendJSON(res, 200, { saved: false }); // Silent fail if no user
+
+      const ratingEntry = {
+        score: parseFloat(score),
+        commentary: (commentary || '').slice(0, 300),
+        vibe: vibe || '',
+        mode: mode || 'roast',
+        category: category || 'other',
+        timestamp: Date.now(),
+        isDaily: !!isDaily
+      };
+
+      if (!user.ratings) user.ratings = [];
+      user.ratings.unshift(ratingEntry);
+      if (user.ratings.length > 50) user.ratings = user.ratings.slice(0, 50);
+
+      // Update stats
+      user.totalRatings = (user.totalRatings || 0) + 1;
+      const allScores = user.ratings.map(r => r.score).filter(s => !isNaN(s));
+      user.avgScore = allScores.length > 0 ? Math.round((allScores.reduce((a, b) => a + b, 0) / allScores.length) * 10) / 10 : 0;
+
+      // Track daily challenge
+      if (isDaily) {
+        if (!user.dailyRatings) user.dailyRatings = {};
+        user.dailyRatings[todayStr()] = ratingEntry;
+      }
+
+      saveDB();
+      return sendJSON(res, 200, { saved: true });
+    } catch (err) {
+      return sendJSON(res, 500, { error: 'Failed to save rating' });
+    }
   }
 
   // Rate endpoint
@@ -302,7 +569,7 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  // Battle endpoint - two images head-to-head
+  // Battle endpoint
   if (req.method === 'POST' && req.url === '/api/battle') {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     if (!checkRateLimit(ip)) {
@@ -318,7 +585,6 @@ const server = http.createServer(async (req, res) => {
       if (!image1 || !image2) return sendJSON(res, 400, { error: 'Two images required for battle mode' });
       if (!['roast', 'hype', 'honest', 'unhinged', 'rizz'].includes(mode)) return sendJSON(res, 400, { error: 'Invalid mode' });
 
-      // Parse both images
       let img1Base64 = image1, img2Base64 = image2;
       let media1 = 'image/jpeg', media2 = 'image/jpeg';
       if (image1.includes(',')) {
@@ -336,7 +602,6 @@ const server = http.createServer(async (req, res) => {
 
       const prompt = createBattlePrompt(text, category || 'other', mode);
 
-      // Send both images to Claude
       const content = [
         { type: 'text', text: 'ITEM 1 (first image):' },
         { type: 'image', source: { type: 'base64', media_type: media1, data: img1Base64 } },
@@ -378,7 +643,7 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  // Stripe Checkout - create session
+  // Stripe Checkout
   if (req.method === 'POST' && req.url === '/api/create-checkout') {
     if (!STRIPE_SECRET_KEY || !STRIPE_PRICE_ID) {
       return sendJSON(res, 500, { error: 'Payments not configured' });

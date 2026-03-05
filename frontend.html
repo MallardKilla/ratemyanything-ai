@@ -13,20 +13,12 @@
     <title>RateMyAnything.ai</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
         :root {
-            --bg: #050505;
-            --bg-card: #111113;
-            --bg-elevated: #1a1a1e;
-            --border: rgba(255,255,255,0.06);
-            --border-hover: rgba(255,255,255,0.12);
-            --text: #f5f5f7;
-            --text-dim: #8e8e93;
-            --text-muted: #636366;
-            --radius: 16px;
-            --radius-sm: 12px;
+            --bg: #050505; --bg-card: #111113; --bg-elevated: #1a1a1e;
+            --border: rgba(255,255,255,0.06); --border-hover: rgba(255,255,255,0.12);
+            --text: #f5f5f7; --text-dim: #8e8e93; --text-muted: #636366;
+            --radius: 16px; --radius-sm: 12px;
             --ease: cubic-bezier(0.25, 0.46, 0.45, 0.94);
             --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
             --grad-roast: linear-gradient(135deg, #ff2d55, #af52de);
@@ -35,516 +27,302 @@
             --grad-unhinged: linear-gradient(135deg, #bf5af2, #30d5c8);
             --grad-rizz: linear-gradient(135deg, #ff2d55, #ffd60a);
         }
+        html, body { width:100%;height:100%;background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden; }
+        body { display:flex;flex-direction:column; }
 
-        html, body {
-            width: 100%; height: 100%;
-            background: var(--bg);
-            color: var(--text);
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            overflow-x: hidden;
-        }
+        /* HEADER */
+        .header { padding:14px 20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;background:rgba(5,5,5,0.85);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px); }
+        .logo { font-weight:900;font-size:18px;letter-spacing:-0.5px;background:var(--grad-roast);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;cursor:pointer; }
+        .header-right { display:flex;align-items:center;gap:10px; }
+        .live-badge { display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--text-dim);background:var(--bg-elevated);padding:5px 10px;border-radius:20px;border:1px solid var(--border); }
+        .live-dot { width:6px;height:6px;border-radius:50%;background:#34c759;animation:pulse 2s ease-in-out infinite; }
+        @keyframes pulse { 0%,100%{opacity:1;}50%{opacity:0.4;} }
+        .profile-btn { width:32px;height:32px;border-radius:50%;background:var(--grad-roast);border:none;color:white;font-size:13px;font-weight:800;cursor:pointer;display:none;font-family:inherit; }
 
-        body { display: flex; flex-direction: column; }
+        /* CONTAINER */
+        .container { flex:1;display:flex;flex-direction:column;max-width:500px;width:100%;margin:0 auto;overflow-y:auto;-webkit-overflow-scrolling:touch; }
+        .container::-webkit-scrollbar { display:none; }
 
-        /* ===== HEADER ===== */
-        .header {
-            padding: 14px 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 100;
-            background: rgba(5,5,5,0.85);
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-        }
-        .logo {
-            font-weight: 900; font-size: 18px; letter-spacing: -0.5px;
-            background: var(--grad-roast);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-        .live-badge {
-            display: flex; align-items: center; gap: 6px;
-            font-size: 11px; font-weight: 600; color: var(--text-dim);
-            background: var(--bg-elevated); padding: 5px 10px; border-radius: 20px;
-            border: 1px solid var(--border);
-        }
-        .live-dot {
-            width: 6px; height: 6px; border-radius: 50%; background: #34c759;
-            animation: pulse 2s ease-in-out infinite;
-        }
-        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+        /* BOTTOM NAV */
+        .bottom-nav { display:none;position:sticky;bottom:0;z-index:100;background:rgba(5,5,5,0.92);backdrop-filter:blur(20px);border-top:1px solid var(--border);padding:8px 0 calc(8px + env(safe-area-inset-bottom)); }
+        .bottom-nav.show { display:flex; }
+        .nav-items { display:flex;justify-content:space-around;width:100%;max-width:500px;margin:0 auto; }
+        .nav-item { display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 12px;border:none;background:none;color:var(--text-muted);font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;transition:color 0.2s; }
+        .nav-item .nav-icon { font-size:20px; }
+        .nav-item.active { color:var(--text); }
+        .nav-item.active .nav-icon { transform:scale(1.1); }
 
-        /* ===== CONTAINER ===== */
-        .container {
-            flex: 1; display: flex; flex-direction: column;
-            max-width: 500px; width: 100%; margin: 0 auto;
-            overflow-y: auto; -webkit-overflow-scrolling: touch;
-        }
-        .container::-webkit-scrollbar { display: none; }
+        /* LANDING */
+        .landing { padding:60px 24px 40px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:20px;animation:fadeUp 0.6s var(--ease) both; }
+        @keyframes fadeUp { from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);} }
+        .landing-emoji { font-size:56px;animation:bounce 2s ease-in-out infinite; }
+        @keyframes bounce { 0%,100%{transform:translateY(0);}50%{transform:translateY(-12px);} }
+        .landing h1 { font-size:40px;font-weight:900;line-height:1.05;letter-spacing:-1.5px;background:linear-gradient(135deg,#ff2d55,#af52de,#30d5c8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+        .landing p { font-size:16px;color:var(--text-dim);line-height:1.5;max-width:320px; }
+        .landing-buttons { display:flex;flex-direction:column;gap:10px;align-items:center;width:100%; }
+        .cta-btn { padding:16px 56px;background:var(--grad-roast);color:white;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:700;letter-spacing:0.3px;cursor:pointer;transition:all 0.2s var(--ease);box-shadow:0 4px 24px rgba(255,45,85,0.25); }
+        .cta-btn:active { transform:scale(0.97); }
+        .battle-cta { padding:14px 40px;background:linear-gradient(135deg,#ffd60a,#ff9f0a);color:#000;border:none;border-radius:var(--radius-sm);font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s var(--ease);box-shadow:0 4px 24px rgba(255,214,10,0.2); }
+        .battle-cta:active { transform:scale(0.97); }
+        .social-proof { display:flex;align-items:center;gap:8px;font-size:12px;color:var(--text-muted);margin-top:4px; }
+        .avatars { display:flex; }
+        .avatars span { width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;margin-left:-6px;border:2px solid var(--bg); }
+        .avatars span:first-child { margin-left:0; }
 
-        /* ===== LANDING ===== */
-        .landing {
-            padding: 60px 24px 40px; text-align: center;
-            display: flex; flex-direction: column; align-items: center; gap: 20px;
-            animation: fadeUp 0.6s var(--ease) both;
-        }
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(16px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .landing-emoji { font-size: 56px; animation: bounce 2s ease-in-out infinite; }
-        @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
-        .landing h1 {
-            font-size: 40px; font-weight: 900; line-height: 1.05; letter-spacing: -1.5px;
-            background: linear-gradient(135deg, #ff2d55, #af52de, #30d5c8);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-        .landing p {
-            font-size: 16px; color: var(--text-dim); line-height: 1.5; max-width: 320px;
-        }
-        .landing-buttons { display: flex; flex-direction: column; gap: 10px; align-items: center; width: 100%; }
-        .cta-btn {
-            margin-top: 8px; padding: 16px 56px;
-            background: var(--grad-roast); color: white;
-            border: none; border-radius: var(--radius-sm);
-            font-size: 15px; font-weight: 700; letter-spacing: 0.3px;
-            cursor: pointer; transition: all 0.2s var(--ease);
-            box-shadow: 0 4px 24px rgba(255,45,85,0.25);
-        }
-        .cta-btn:active { transform: scale(0.97); }
-        .battle-cta {
-            padding: 14px 40px;
-            background: linear-gradient(135deg, #ffd60a, #ff9f0a); color: #000;
-            border: none; border-radius: var(--radius-sm);
-            font-size: 14px; font-weight: 700; letter-spacing: 0.3px;
-            cursor: pointer; transition: all 0.2s var(--ease);
-            box-shadow: 0 4px 24px rgba(255,214,10,0.2);
-        }
-        .battle-cta:active { transform: scale(0.97); }
-        .social-proof {
-            display: flex; align-items: center; gap: 8px;
-            font-size: 12px; color: var(--text-muted); margin-top: 4px;
-        }
-        .avatars { display: flex; }
-        .avatars span {
-            width: 24px; height: 24px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 12px; margin-left: -6px;
-            border: 2px solid var(--bg);
-        }
-        .avatars span:first-child { margin-left: 0; }
+        /* SIGNUP SCREEN */
+        .signup-screen { display:none;padding:60px 24px;text-align:center;animation:fadeUp 0.5s var(--ease) both; }
+        .signup-screen.active { display:flex;flex-direction:column;align-items:center;gap:20px; }
+        .signup-screen h2 { font-size:28px;font-weight:900;letter-spacing:-1px; }
+        .signup-screen p { font-size:14px;color:var(--text-dim);max-width:300px; }
+        .signup-input { width:100%;max-width:300px;padding:16px;background:var(--bg-card);border:1.5px solid var(--border-hover);border-radius:var(--radius-sm);color:var(--text);font-size:16px;font-family:inherit;font-weight:600;text-align:center;outline:none;transition:border-color 0.2s; }
+        .signup-input:focus { border-color:rgba(255,45,85,0.5); }
+        .signup-input::placeholder { color:var(--text-muted); }
+        .signup-btn { width:100%;max-width:300px;padding:16px;background:var(--grad-roast);color:white;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:700;cursor:pointer;font-family:inherit; }
+        .signup-btn:active { transform:scale(0.97); }
+        .signup-skip { font-size:13px;color:var(--text-muted);background:none;border:none;cursor:pointer;font-family:inherit;text-decoration:underline; }
 
-        /* ===== RATING INTERFACE ===== */
-        .interface { padding: 8px 16px 0; animation: fadeUp 0.4s var(--ease) both; }
+        /* INTERFACE */
+        .interface { padding:8px 16px 0;animation:fadeUp 0.4s var(--ease) both; }
+        .modes { display:flex;gap:8px;padding:8px 0 16px;overflow-x:auto;scroll-snap-type:x mandatory;-ms-overflow-style:none;scrollbar-width:none; }
+        .modes::-webkit-scrollbar { display:none; }
+        .mode-btn { flex-shrink:0;scroll-snap-align:start;padding:10px 16px;border-radius:100px;border:1.5px solid var(--border);background:transparent;color:var(--text-dim);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.25s var(--ease);white-space:nowrap; }
+        .mode-btn:active { transform:scale(0.95); }
+        .mode-btn.active { color:white;border-color:transparent; }
+        .mode-btn.active.roast { background:var(--grad-roast);box-shadow:0 2px 16px rgba(255,45,85,0.3); }
+        .mode-btn.active.hype { background:var(--grad-hype);box-shadow:0 2px 16px rgba(48,213,200,0.3); }
+        .mode-btn.active.honest { background:var(--grad-honest);box-shadow:0 2px 16px rgba(255,159,10,0.3); }
+        .mode-btn.active.unhinged { background:var(--grad-unhinged);box-shadow:0 2px 16px rgba(191,90,242,0.3); }
+        .mode-btn.active.rizz { background:var(--grad-rizz);box-shadow:0 2px 16px rgba(255,214,10,0.3); }
 
-        /* MODE SELECTOR — horizontal scroll */
-        .modes {
-            display: flex; gap: 8px; padding: 8px 0 16px;
-            overflow-x: auto; scroll-snap-type: x mandatory;
-            -ms-overflow-style: none; scrollbar-width: none;
-        }
-        .modes::-webkit-scrollbar { display: none; }
-        .mode-btn {
-            flex-shrink: 0; scroll-snap-align: start;
-            padding: 10px 16px; border-radius: 100px;
-            border: 1.5px solid var(--border);
-            background: transparent; color: var(--text-dim);
-            font-size: 13px; font-weight: 600; font-family: inherit;
-            cursor: pointer; transition: all 0.25s var(--ease);
-            white-space: nowrap;
-        }
-        .mode-btn:active { transform: scale(0.95); }
-        .mode-btn.active { color: white; border-color: transparent; }
-        .mode-btn.active.roast { background: var(--grad-roast); box-shadow: 0 2px 16px rgba(255,45,85,0.3); }
-        .mode-btn.active.hype { background: var(--grad-hype); box-shadow: 0 2px 16px rgba(48,213,200,0.3); }
-        .mode-btn.active.honest { background: var(--grad-honest); box-shadow: 0 2px 16px rgba(255,159,10,0.3); }
-        .mode-btn.active.unhinged { background: var(--grad-unhinged); box-shadow: 0 2px 16px rgba(191,90,242,0.3); }
-        .mode-btn.active.rizz { background: var(--grad-rizz); box-shadow: 0 2px 16px rgba(255,214,10,0.3); }
+        /* DAILY CHALLENGE BANNER */
+        .daily-banner { background:linear-gradient(135deg,rgba(255,214,10,0.08),rgba(255,159,10,0.08));border:1.5px solid rgba(255,214,10,0.2);border-radius:var(--radius);padding:16px;margin:0 16px 12px;cursor:pointer;transition:all 0.2s var(--ease); }
+        .daily-banner:active { transform:scale(0.98); }
+        .daily-banner-top { display:flex;align-items:center;gap:8px;margin-bottom:6px; }
+        .daily-banner-emoji { font-size:24px; }
+        .daily-banner-label { font-size:11px;font-weight:700;color:#ffd60a;text-transform:uppercase;letter-spacing:1px; }
+        .daily-banner-done { font-size:10px;font-weight:700;color:#34c759;background:rgba(52,199,89,0.15);padding:2px 8px;border-radius:100px;margin-left:auto; }
+        .daily-banner h3 { font-size:15px;font-weight:700;color:var(--text); }
+        .daily-banner p { font-size:12px;color:var(--text-dim);margin-top:2px; }
 
-        /* UPLOAD CARD */
-        .upload-card {
-            background: var(--bg-card); border: 1.5px dashed var(--border-hover);
-            border-radius: var(--radius); padding: 32px 20px;
-            text-align: center; cursor: pointer; transition: all 0.25s var(--ease);
-            margin-bottom: 12px;
-        }
-        .upload-card:active { transform: scale(0.98); border-color: rgba(255,255,255,0.2); }
-        .upload-card .icon { font-size: 36px; margin-bottom: 12px; }
-        .upload-card .label { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
-        .upload-card .hint { font-size: 12px; color: var(--text-muted); }
-        #photoInput { display: none; }
-
-        .image-preview { width: 100%; max-height: 280px; border-radius: var(--radius-sm); object-fit: cover; }
-        .preview-wrap { position: relative; margin-bottom: 12px; }
-        .preview-wrap .remove-btn {
-            position: absolute; top: 8px; right: 8px;
-            width: 28px; height: 28px; border-radius: 50%;
-            background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-            border: none; color: white; font-size: 14px;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-        }
-
-        /* TEXT INPUT */
-        .text-card {
-            background: var(--bg-card); border: 1.5px solid var(--border);
-            border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
-        }
-        .text-card label { display: block; font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 8px; }
-        .text-card textarea {
-            width: 100%; background: transparent; border: none; outline: none;
-            color: var(--text); font-size: 15px; font-family: inherit;
-            resize: none; min-height: 72px; line-height: 1.5;
-        }
-        .text-card textarea::placeholder { color: var(--text-muted); }
-
-        /* CATEGORIES */
-        .cat-card {
-            background: var(--bg-card); border: 1.5px solid var(--border);
-            border-radius: var(--radius); padding: 16px; margin-bottom: 16px;
-        }
-        .cat-card label { display: block; font-size: 13px; font-weight: 600; color: var(--text-dim); margin-bottom: 10px; }
-        .cat-grid { display: flex; flex-wrap: wrap; gap: 6px; }
-        .cat-btn {
-            padding: 8px 14px; border-radius: 100px;
-            border: 1px solid var(--border); background: transparent;
-            color: var(--text-dim); font-size: 12px; font-weight: 600; font-family: inherit;
-            cursor: pointer; transition: all 0.2s var(--ease);
-        }
-        .cat-btn:active { transform: scale(0.95); }
-        .cat-btn.selected { background: rgba(255,255,255,0.08); color: var(--text); border-color: rgba(255,255,255,0.2); }
+        /* UPLOAD & INPUTS */
+        .upload-card { background:var(--bg-card);border:1.5px dashed var(--border-hover);border-radius:var(--radius);padding:32px 20px;text-align:center;cursor:pointer;transition:all 0.25s var(--ease);margin-bottom:12px; }
+        .upload-card:active { transform:scale(0.98);border-color:rgba(255,255,255,0.2); }
+        .upload-card .icon { font-size:36px;margin-bottom:12px; }
+        .upload-card .label { font-size:14px;font-weight:600;color:var(--text);margin-bottom:4px; }
+        .upload-card .hint { font-size:12px;color:var(--text-muted); }
+        #photoInput { display:none; }
+        .image-preview { width:100%;max-height:280px;border-radius:var(--radius-sm);object-fit:cover; }
+        .preview-wrap { position:relative;margin-bottom:12px; }
+        .preview-wrap .remove-btn { position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);border:none;color:white;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center; }
+        .text-card { background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px; }
+        .text-card label { display:block;font-size:13px;font-weight:600;color:var(--text-dim);margin-bottom:8px; }
+        .text-card textarea { width:100%;background:transparent;border:none;outline:none;color:var(--text);font-size:15px;font-family:inherit;resize:none;min-height:72px;line-height:1.5; }
+        .text-card textarea::placeholder { color:var(--text-muted); }
+        .cat-card { background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:16px; }
+        .cat-card label { display:block;font-size:13px;font-weight:600;color:var(--text-dim);margin-bottom:10px; }
+        .cat-grid { display:flex;flex-wrap:wrap;gap:6px; }
+        .cat-btn { padding:8px 14px;border-radius:100px;border:1px solid var(--border);background:transparent;color:var(--text-dim);font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.2s var(--ease); }
+        .cat-btn:active { transform:scale(0.95); }
+        .cat-btn.selected { background:rgba(255,255,255,0.08);color:var(--text);border-color:rgba(255,255,255,0.2); }
 
         /* RATE BUTTON */
-        .rate-btn-wrap {
-            padding: 12px 16px 24px; position: sticky; bottom: 0;
-            background: linear-gradient(to top, var(--bg) 60%, transparent);
-        }
-        .rate-btn {
-            width: 100%; padding: 16px; border: none; border-radius: var(--radius-sm);
-            font-size: 15px; font-weight: 700; font-family: inherit;
-            cursor: pointer; transition: all 0.2s var(--ease);
-            letter-spacing: 0.3px; text-transform: uppercase;
-        }
-        .rate-btn:active { transform: scale(0.97); }
-        .rate-btn.roast { background: var(--grad-roast); color: white; box-shadow: 0 4px 24px rgba(255,45,85,0.2); }
-        .rate-btn.hype { background: var(--grad-hype); color: #000; box-shadow: 0 4px 24px rgba(48,213,200,0.2); }
-        .rate-btn.honest { background: var(--grad-honest); color: white; box-shadow: 0 4px 24px rgba(255,159,10,0.2); }
-        .rate-btn.unhinged { background: var(--grad-unhinged); color: white; box-shadow: 0 4px 24px rgba(191,90,242,0.2); }
-        .rate-btn.rizz { background: var(--grad-rizz); color: white; box-shadow: 0 4px 24px rgba(255,214,10,0.2); }
+        .rate-btn-wrap { padding:12px 16px 24px;position:sticky;bottom:0;background:linear-gradient(to top,var(--bg) 60%,transparent); }
+        .rate-btn { width:100%;padding:16px;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.2s var(--ease);letter-spacing:0.3px;text-transform:uppercase; }
+        .rate-btn:active { transform:scale(0.97); }
+        .rate-btn.roast { background:var(--grad-roast);color:white; }
+        .rate-btn.hype { background:var(--grad-hype);color:#000; }
+        .rate-btn.honest { background:var(--grad-honest);color:white; }
+        .rate-btn.unhinged { background:var(--grad-unhinged);color:white; }
+        .rate-btn.rizz { background:var(--grad-rizz);color:white; }
 
-        /* ===== LOADING ===== */
-        .loading { display: none; padding: 80px 24px; text-align: center; }
-        .loading.active { display: flex; flex-direction: column; align-items: center; gap: 24px; }
-        .loading-ring {
-            width: 56px; height: 56px; position: relative;
-        }
-        .loading-ring .ring {
-            position: absolute; width: 100%; height: 100%; border-radius: 50%;
-            border: 3px solid transparent;
-        }
-        .loading-ring .ring:nth-child(1) { border-top-color: #ff2d55; animation: spin 1s linear infinite; }
-        .loading-ring .ring:nth-child(2) { border-right-color: #af52de; animation: spin 1.5s linear infinite reverse; }
-        .loading-ring .ring:nth-child(3) { border-bottom-color: #30d5c8; animation: spin 2s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading h3 { font-size: 16px; font-weight: 700; }
-        .loading-msg { font-size: 13px; color: var(--text-muted); transition: opacity 0.3s; min-height: 20px; }
+        /* LOADING */
+        .loading { display:none;padding:80px 24px;text-align:center; }
+        .loading.active { display:flex;flex-direction:column;align-items:center;gap:24px; }
+        .loading-ring { width:56px;height:56px;position:relative; }
+        .loading-ring .ring { position:absolute;width:100%;height:100%;border-radius:50%;border:3px solid transparent; }
+        .loading-ring .ring:nth-child(1) { border-top-color:#ff2d55;animation:spin 1s linear infinite; }
+        .loading-ring .ring:nth-child(2) { border-right-color:#af52de;animation:spin 1.5s linear infinite reverse; }
+        .loading-ring .ring:nth-child(3) { border-bottom-color:#30d5c8;animation:spin 2s linear infinite; }
+        @keyframes spin { to{transform:rotate(360deg);} }
+        .loading h3 { font-size:16px;font-weight:700; }
+        .loading-msg { font-size:13px;color:var(--text-muted);transition:opacity 0.3s;min-height:20px; }
 
-        /* ===== RESULTS ===== */
-        .results { display: none; padding: 16px; animation: fadeUp 0.5s var(--ease) both; }
-        .results.active { display: flex; flex-direction: column; gap: 16px; }
+        /* RESULTS */
+        .results { display:none;padding:16px;animation:fadeUp 0.5s var(--ease) both; }
+        .results.active { display:flex;flex-direction:column;gap:16px; }
+        .score-card { background:var(--bg-card);border:1.5px solid var(--border);border-radius:20px;padding:36px 24px 28px;text-align:center;position:relative;overflow:hidden; }
+        .score-card::after { content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,0.03) 0%,transparent 60%); }
+        .result-thumb { width:56px;height:56px;border-radius:14px;object-fit:cover;margin:0 auto 16px;border:2px solid var(--border); }
+        .score-label { font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;position:relative;z-index:1; }
+        .score-num { font-size:80px;font-weight:900;line-height:1;letter-spacing:-3px;position:relative;z-index:1;margin:8px 0;animation:scoreReveal 0.6s var(--spring) both; }
+        @keyframes scoreReveal { from{opacity:0;transform:scale(0.3) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);} }
+        .score-card.roast .score-num { background:var(--grad-roast);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+        .score-card.hype .score-num { background:var(--grad-hype);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+        .score-card.honest .score-num { background:var(--grad-honest);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+        .score-card.unhinged .score-num { background:var(--grad-unhinged);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+        .score-card.rizz .score-num { background:var(--grad-rizz);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+        .score-out-of { font-size:14px;color:var(--text-muted);font-weight:600;margin-bottom:16px;position:relative;z-index:1; }
+        .gauge { width:100%;height:6px;background:rgba(255,255,255,0.04);border-radius:3px;overflow:hidden;position:relative;z-index:1; }
+        .gauge-fill { height:100%;border-radius:3px;width:0%;animation:fill 0.8s var(--spring) forwards; }
+        @keyframes fill { from{width:0%;}to{width:var(--pct);} }
+        .score-card.roast .gauge-fill { background:var(--grad-roast); }
+        .score-card.hype .gauge-fill { background:var(--grad-hype); }
+        .score-card.honest .gauge-fill { background:var(--grad-honest); }
+        .score-card.unhinged .gauge-fill { background:var(--grad-unhinged); }
+        .score-card.rizz .gauge-fill { background:var(--grad-rizz); }
+        .mode-pill { display:inline-block;font-size:11px;font-weight:700;padding:5px 12px;border-radius:100px;margin:16px 0 0;text-transform:uppercase;letter-spacing:0.5px;position:relative;z-index:1; }
+        .score-card.roast .mode-pill { background:rgba(255,45,85,0.15);color:#ff2d55; }
+        .score-card.hype .mode-pill { background:rgba(48,213,200,0.15);color:#30d5c8; }
+        .score-card.honest .mode-pill { background:rgba(255,159,10,0.15);color:#ff9f0a; }
+        .score-card.unhinged .mode-pill { background:rgba(191,90,242,0.15);color:#bf5af2; }
+        .score-card.rizz .mode-pill { background:rgba(255,214,10,0.15);color:#ffd60a; }
+        .vibe-badge { display:inline-block;font-size:20px;font-weight:900;padding:6px 16px;border-radius:100px;margin:12px 0 0;text-transform:uppercase;letter-spacing:1px;position:relative;z-index:1;animation:vibeIn 0.5s var(--spring) 0.4s both; }
+        @keyframes vibeIn { from{opacity:0;transform:scale(0.5);}to{opacity:1;transform:scale(1);} }
+        .score-card.roast .vibe-badge { background:rgba(255,45,85,0.12);color:#ff2d55; }
+        .score-card.hype .vibe-badge { background:rgba(48,213,200,0.12);color:#30d5c8; }
+        .score-card.honest .vibe-badge { background:rgba(255,159,10,0.12);color:#ff9f0a; }
+        .score-card.unhinged .vibe-badge { background:rgba(191,90,242,0.12);color:#bf5af2; }
+        .score-card.rizz .vibe-badge { background:rgba(255,214,10,0.12);color:#ffd60a; }
+        .commentary { font-size:16px;line-height:1.65;color:var(--text-dim);margin:20px 0 0;font-weight:500;position:relative;z-index:1;animation:fadeUp 0.5s var(--ease) 0.6s both; }
+        .commentary strong { color:var(--text); }
+        .confetti-container { position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;overflow:hidden; }
+        .confetti-piece { position:absolute;width:8px;height:8px;top:-10px;border-radius:2px;animation:confettiFall 2.5s ease-in forwards; }
+        @keyframes confettiFall { 0%{transform:translateY(0) rotate(0deg) scale(1);opacity:1;}100%{transform:translateY(100vh) rotate(720deg) scale(0.3);opacity:0;} }
+        .actions { display:flex;gap:8px; }
+        .act-btn { flex:1;padding:14px 8px;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;transition:all 0.2s var(--ease);display:flex;align-items:center;justify-content:center;gap:5px; }
+        .act-btn:active { transform:scale(0.95);background:var(--bg-elevated); }
+        .again-btn { width:100%;padding:15px;background:var(--bg-elevated);border:1.5px solid var(--border-hover);border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.2s var(--ease); }
+        .again-btn:active { transform:scale(0.97); }
+        .upsell { width:100%;padding:15px;background:linear-gradient(135deg,rgba(255,214,10,0.1),rgba(255,159,10,0.1));border:1.5px solid rgba(255,214,10,0.2);color:#ffd60a;border-radius:var(--radius-sm);font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;transition:all 0.2s var(--ease); }
+        .upsell:active { transform:scale(0.97); }
+        .share-card-container { display:none; }
+        .share-card-container.active { display:block; }
 
-        .score-card {
-            background: var(--bg-card); border: 1.5px solid var(--border);
-            border-radius: 20px; padding: 36px 24px 28px; text-align: center;
-            position: relative; overflow: hidden;
-        }
-        .score-card::after {
-            content: ''; position: absolute; inset: 0; pointer-events: none;
-            background: radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.03) 0%, transparent 60%);
-        }
-        .result-thumb {
-            width: 56px; height: 56px; border-radius: 14px; object-fit: cover;
-            margin: 0 auto 16px; border: 2px solid var(--border);
-        }
-        .score-label {
-            font-size: 11px; font-weight: 700; color: var(--text-muted);
-            text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 4px;
-            position: relative; z-index: 1;
-        }
-        .score-num {
-            font-size: 80px; font-weight: 900; line-height: 1; letter-spacing: -3px;
-            position: relative; z-index: 1; margin: 8px 0;
-            animation: scoreReveal 0.6s var(--spring) both;
-        }
-        @keyframes scoreReveal { from { opacity: 0; transform: scale(0.3) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
-        .score-card.roast .score-num { background: var(--grad-roast); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .score-card.hype .score-num { background: var(--grad-hype); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .score-card.honest .score-num { background: var(--grad-honest); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .score-card.unhinged .score-num { background: var(--grad-unhinged); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .score-card.rizz .score-num { background: var(--grad-rizz); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        /* PAYWALL */
+        .paywall { display:none;padding:24px 16px;animation:fadeUp 0.5s var(--ease) both; }
+        .paywall.active { display:flex;flex-direction:column;align-items:center;gap:16px; }
+        .paywall-card { background:var(--bg-card);border:1.5px solid var(--border);border-radius:20px;padding:40px 24px;text-align:center;width:100%; }
+        .paywall-card .lock { font-size:48px;margin-bottom:16px; }
+        .paywall-card h2 { font-size:22px;font-weight:800;margin-bottom:8px;letter-spacing:-0.5px; }
+        .paywall-card p { font-size:15px;color:var(--text-dim);line-height:1.5;margin-bottom:24px; }
+        .paywall-cta { width:100%;padding:16px;background:var(--grad-roast);color:white;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;box-shadow:0 4px 24px rgba(255,45,85,0.25); }
+        .paywall-cta:active { transform:scale(0.97); }
+        .paywall-fine { font-size:11px;color:var(--text-muted);margin-top:8px; }
 
-        .score-out-of { font-size: 14px; color: var(--text-muted); font-weight: 600; margin-bottom: 16px; position: relative; z-index: 1; }
-        .gauge { width: 100%; height: 6px; background: rgba(255,255,255,0.04); border-radius: 3px; overflow: hidden; position: relative; z-index: 1; }
-        .gauge-fill { height: 100%; border-radius: 3px; width: 0%; animation: fill 0.8s var(--spring) forwards; }
-        @keyframes fill { from { width: 0%; } to { width: var(--pct); } }
-        .score-card.roast .gauge-fill { background: var(--grad-roast); }
-        .score-card.hype .gauge-fill { background: var(--grad-hype); }
-        .score-card.honest .gauge-fill { background: var(--grad-honest); }
-        .score-card.unhinged .gauge-fill { background: var(--grad-unhinged); }
-        .score-card.rizz .gauge-fill { background: var(--grad-rizz); }
+        /* BATTLE */
+        .battle-interface { padding:8px 16px 0;animation:fadeUp 0.4s var(--ease) both; }
+        .battle-title { font-size:22px;font-weight:900;text-align:center;margin:16px 0;background:linear-gradient(135deg,#ffd60a,#ff9f0a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+        .battle-uploads { display:flex;gap:12px;margin-bottom:12px; }
+        .battle-upload { flex:1;background:var(--bg-card);border:1.5px dashed var(--border-hover);border-radius:var(--radius);padding:20px 8px;text-align:center;cursor:pointer;transition:all 0.25s var(--ease);position:relative;min-height:140px;display:flex;flex-direction:column;align-items:center;justify-content:center; }
+        .battle-upload:active { transform:scale(0.98); }
+        .battle-upload .icon { font-size:28px;margin-bottom:8px; }
+        .battle-upload .label { font-size:13px;font-weight:600;color:var(--text); }
+        .battle-upload .hint { font-size:11px;color:var(--text-muted);margin-top:2px; }
+        .battle-upload .vs-badge { position:absolute;right:-18px;top:50%;transform:translateY(-50%);width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#ffd60a,#ff9f0a);color:#000;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;z-index:2;border:2px solid var(--bg); }
+        .battle-preview { width:100%;height:100px;object-fit:cover;border-radius:var(--radius-sm); }
+        .battle-remove { position:absolute;top:6px;right:6px;width:24px;height:24px;border-radius:50%;background:rgba(0,0,0,0.7);border:none;color:white;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:3; }
+        #battleInput1,#battleInput2 { display:none; }
+        .battle-results { display:none;padding:16px;animation:fadeUp 0.5s var(--ease) both; }
+        .battle-results.active { display:flex;flex-direction:column;gap:16px; }
+        .battle-vs-header { text-align:center;font-size:28px;font-weight:900;background:linear-gradient(135deg,#ffd60a,#ff9f0a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px; }
+        .battle-cards { display:flex;gap:12px; }
+        .battle-card { flex:1;background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius);padding:16px;text-align:center;position:relative;transition:all 0.5s var(--ease); }
+        .battle-card.winner { border-color:#ffd60a;box-shadow:0 0 30px rgba(255,214,10,0.15); }
+        .battle-card .winner-crown { position:absolute;top:-14px;left:50%;transform:translateX(-50%);font-size:24px;display:none; }
+        .battle-card.winner .winner-crown { display:block;animation:crownBounce 0.5s var(--spring); }
+        @keyframes crownBounce { from{transform:translateX(-50%) scale(0);}to{transform:translateX(-50%) scale(1);} }
+        .battle-card-img { width:100%;height:80px;object-fit:cover;border-radius:10px;margin-bottom:10px; }
+        .battle-card-score { font-size:36px;font-weight:900;line-height:1;margin:4px 0; }
+        .battle-card-vibe { font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:3px 8px;border-radius:100px;display:inline-block;margin-top:6px; }
+        .battle-card-commentary { font-size:12px;color:var(--text-dim);margin-top:8px;line-height:1.5; }
+        .battle-verdict { background:var(--bg-card);border:1.5px solid rgba(255,214,10,0.3);border-radius:var(--radius);padding:20px;text-align:center; }
+        .battle-verdict-text { font-size:16px;font-weight:700;color:var(--text);line-height:1.5; }
 
-        .mode-pill {
-            display: inline-block; font-size: 11px; font-weight: 700; padding: 5px 12px;
-            border-radius: 100px; margin: 16px 0 0; text-transform: uppercase; letter-spacing: 0.5px;
-            position: relative; z-index: 1;
-        }
-        .score-card.roast .mode-pill { background: rgba(255,45,85,0.15); color: #ff2d55; }
-        .score-card.hype .mode-pill { background: rgba(48,213,200,0.15); color: #30d5c8; }
-        .score-card.honest .mode-pill { background: rgba(255,159,10,0.15); color: #ff9f0a; }
-        .score-card.unhinged .mode-pill { background: rgba(191,90,242,0.15); color: #bf5af2; }
-        .score-card.rizz .mode-pill { background: rgba(255,214,10,0.15); color: #ffd60a; }
+        /* ===== DASHBOARD ===== */
+        .dashboard { display:none;padding:16px;animation:fadeUp 0.4s var(--ease) both; }
+        .dashboard.active { display:flex;flex-direction:column;gap:16px; }
+        .dash-header { text-align:center;padding:16px 0; }
+        .dash-username { font-size:24px;font-weight:900;letter-spacing:-0.5px; }
+        .dash-code { font-size:12px;color:var(--text-muted);margin-top:4px; }
+        .dash-code span { color:#ffd60a;font-weight:700;cursor:pointer; }
+        .dash-stats { display:flex;gap:8px; }
+        .dash-stat { flex:1;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 8px;text-align:center; }
+        .dash-stat-num { font-size:28px;font-weight:900;line-height:1; }
+        .dash-stat-num.grad { background:var(--grad-roast);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text; }
+        .dash-stat-label { font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-top:4px; }
+        .dash-section-title { font-size:13px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;padding:8px 0 4px; }
+        .leaderboard-item { display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px; }
+        .leaderboard-rank { font-size:16px;font-weight:900;width:28px;text-align:center; }
+        .leaderboard-rank.gold { color:#ffd60a; }
+        .leaderboard-rank.silver { color:#c0c0c0; }
+        .leaderboard-rank.bronze { color:#cd7f32; }
+        .leaderboard-name { flex:1;font-size:14px;font-weight:600; }
+        .leaderboard-name .you-tag { font-size:10px;color:var(--text-muted);font-weight:700; }
+        .leaderboard-score { font-size:18px;font-weight:800; }
 
-        .vibe-badge {
-            display: inline-block; font-size: 20px; font-weight: 900; padding: 6px 16px;
-            border-radius: 100px; margin: 12px 0 0; text-transform: uppercase; letter-spacing: 1px;
-            position: relative; z-index: 1; animation: vibeIn 0.5s var(--spring) 0.4s both;
-        }
-        @keyframes vibeIn { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
-        .score-card.roast .vibe-badge { background: rgba(255,45,85,0.12); color: #ff2d55; }
-        .score-card.hype .vibe-badge { background: rgba(48,213,200,0.12); color: #30d5c8; }
-        .score-card.honest .vibe-badge { background: rgba(255,159,10,0.12); color: #ff9f0a; }
-        .score-card.unhinged .vibe-badge { background: rgba(191,90,242,0.12); color: #bf5af2; }
-        .score-card.rizz .vibe-badge { background: rgba(255,214,10,0.12); color: #ffd60a; }
+        /* FEED */
+        .feed { display:none;padding:16px;animation:fadeUp 0.4s var(--ease) both; }
+        .feed.active { display:flex;flex-direction:column;gap:12px; }
+        .feed-title { font-size:20px;font-weight:900;letter-spacing:-0.5px;padding-bottom:4px; }
+        .feed-empty { text-align:center;padding:40px 20px;color:var(--text-muted);font-size:14px; }
+        .feed-item { background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;transition:all 0.2s var(--ease); }
+        .feed-item-header { display:flex;align-items:center;gap:8px;margin-bottom:10px; }
+        .feed-avatar { width:28px;height:28px;border-radius:50%;background:var(--grad-roast);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:white; }
+        .feed-username { font-size:13px;font-weight:700; }
+        .feed-time { font-size:11px;color:var(--text-muted);margin-left:auto; }
+        .feed-content { display:flex;align-items:center;gap:12px; }
+        .feed-score { font-size:32px;font-weight:900;min-width:60px;text-align:center; }
+        .feed-details { flex:1;min-width:0; }
+        .feed-cat { font-size:12px;font-weight:600;color:var(--text-dim); }
+        .feed-comm { font-size:12px;color:var(--text-muted);margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden; }
+        .feed-mode-badge { font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;display:inline-block;margin-top:4px; }
 
-        .commentary {
-            font-size: 16px; line-height: 1.65; color: var(--text-dim);
-            margin: 20px 0 0; font-weight: 500; position: relative; z-index: 1;
-            animation: fadeUp 0.5s var(--ease) 0.6s both;
-        }
-        .commentary strong { color: var(--text); }
+        /* FRIENDS */
+        .friends-section { display:none;padding:16px;animation:fadeUp 0.4s var(--ease) both; }
+        .friends-section.active { display:flex;flex-direction:column;gap:12px; }
+        .friends-title { font-size:20px;font-weight:900;letter-spacing:-0.5px; }
+        .add-friend-row { display:flex;gap:8px; }
+        .add-friend-input { flex:1;padding:14px;background:var(--bg-card);border:1.5px solid var(--border-hover);border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-family:inherit;font-weight:600;outline:none;text-transform:uppercase;letter-spacing:2px;text-align:center; }
+        .add-friend-input::placeholder { color:var(--text-muted);text-transform:none;letter-spacing:0; }
+        .add-friend-btn { padding:14px 20px;background:var(--grad-hype);border:none;border-radius:var(--radius-sm);color:#000;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap; }
+        .add-friend-btn:active { transform:scale(0.95); }
+        .friend-card { display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm); }
+        .friend-avatar { width:36px;height:36px;border-radius:50%;background:var(--grad-unhinged);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:white; }
+        .friend-info { flex:1; }
+        .friend-name { font-size:14px;font-weight:700; }
+        .friend-stat { font-size:11px;color:var(--text-muted);margin-top:1px; }
+        .your-code-card { background:var(--bg-card);border:1.5px solid var(--border);border-radius:var(--radius);padding:20px;text-align:center; }
+        .your-code-label { font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px; }
+        .your-code { font-size:32px;font-weight:900;letter-spacing:6px;color:#ffd60a;cursor:pointer; }
+        .your-code-hint { font-size:11px;color:var(--text-muted);margin-top:6px; }
 
-        /* CONFETTI */
-        .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; overflow: hidden; }
-        .confetti-piece {
-            position: absolute; width: 8px; height: 8px; top: -10px;
-            border-radius: 2px; animation: confettiFall 2.5s ease-in forwards;
-        }
-        @keyframes confettiFall {
-            0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg) scale(0.3); opacity: 0; }
-        }
+        /* HISTORY */
+        .history { display:none;padding:0 16px 16px; }
+        .history.show { display:block; }
+        .history-label { font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px; }
+        .hist-item { display:flex;align-items:center;gap:10px;padding:10px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:6px;cursor:pointer;transition:all 0.2s var(--ease); }
+        .hist-item:active { background:var(--bg-elevated); }
+        .hist-img { width:36px;height:36px;border-radius:8px;object-fit:cover;flex-shrink:0; }
+        .hist-info { flex:1;min-width:0; }
+        .hist-cat { font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+        .hist-score { font-size:11px;color:var(--text-muted);margin-top:1px; }
 
-        /* ACTION BUTTONS */
-        .actions { display: flex; gap: 8px; }
-        .act-btn {
-            flex: 1; padding: 14px 8px;
-            background: var(--bg-card); border: 1.5px solid var(--border);
-            border-radius: var(--radius-sm); color: var(--text);
-            font-size: 13px; font-weight: 600; font-family: inherit;
-            cursor: pointer; transition: all 0.2s var(--ease);
-            display: flex; align-items: center; justify-content: center; gap: 5px;
-        }
-        .act-btn:active { transform: scale(0.95); background: var(--bg-elevated); }
-        .act-btn.wide { flex: 2; }
-
-        .again-btn {
-            width: 100%; padding: 15px;
-            background: var(--bg-elevated); border: 1.5px solid var(--border-hover);
-            border-radius: var(--radius-sm); color: var(--text);
-            font-size: 14px; font-weight: 700; font-family: inherit;
-            cursor: pointer; transition: all 0.2s var(--ease);
-        }
-        .again-btn:active { transform: scale(0.97); }
-
-        .upsell {
-            width: 100%; padding: 15px;
-            background: linear-gradient(135deg, rgba(255,214,10,0.1), rgba(255,159,10,0.1));
-            border: 1.5px solid rgba(255,214,10,0.2); color: #ffd60a;
-            border-radius: var(--radius-sm); font-size: 13px; font-weight: 700;
-            font-family: inherit; cursor: pointer; transition: all 0.2s var(--ease);
-            letter-spacing: 0.3px;
-        }
-        .upsell:active { transform: scale(0.97); }
-
-        /* ===== PAYWALL ===== */
-        .paywall { display: none; padding: 24px 16px; animation: fadeUp 0.5s var(--ease) both; }
-        .paywall.active { display: flex; flex-direction: column; align-items: center; gap: 16px; }
-        .paywall-card {
-            background: var(--bg-card); border: 1.5px solid var(--border);
-            border-radius: 20px; padding: 40px 24px; text-align: center; width: 100%;
-        }
-        .paywall-card .lock { font-size: 48px; margin-bottom: 16px; }
-        .paywall-card h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; letter-spacing: -0.5px; }
-        .paywall-card p { font-size: 15px; color: var(--text-dim); line-height: 1.5; margin-bottom: 24px; }
-        .paywall-cta {
-            width: 100%; padding: 16px;
-            background: var(--grad-roast); color: white;
-            border: none; border-radius: var(--radius-sm);
-            font-size: 15px; font-weight: 700; font-family: inherit;
-            cursor: pointer; box-shadow: 0 4px 24px rgba(255,45,85,0.25);
-            transition: all 0.2s var(--ease);
-        }
-        .paywall-cta:active { transform: scale(0.97); }
-        .paywall-fine { font-size: 11px; color: var(--text-muted); margin-top: 8px; }
-
-        /* ===== BATTLE MODE ===== */
-        .battle-interface { padding: 8px 16px 0; animation: fadeUp 0.4s var(--ease) both; }
-        .battle-title {
-            font-size: 22px; font-weight: 900; text-align: center; margin: 16px 0;
-            background: linear-gradient(135deg, #ffd60a, #ff9f0a);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-        .battle-uploads {
-            display: flex; gap: 12px; margin-bottom: 12px;
-        }
-        .battle-upload {
-            flex: 1; background: var(--bg-card); border: 1.5px dashed var(--border-hover);
-            border-radius: var(--radius); padding: 20px 8px; text-align: center;
-            cursor: pointer; transition: all 0.25s var(--ease); position: relative;
-            min-height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .battle-upload:active { transform: scale(0.98); }
-        .battle-upload .icon { font-size: 28px; margin-bottom: 8px; }
-        .battle-upload .label { font-size: 13px; font-weight: 600; color: var(--text); }
-        .battle-upload .hint { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
-        .battle-upload .vs-badge {
-            position: absolute; right: -18px; top: 50%; transform: translateY(-50%);
-            width: 28px; height: 28px; border-radius: 50%;
-            background: linear-gradient(135deg, #ffd60a, #ff9f0a);
-            color: #000; font-size: 10px; font-weight: 900;
-            display: flex; align-items: center; justify-content: center;
-            z-index: 2; border: 2px solid var(--bg);
-        }
-        .battle-preview {
-            width: 100%; height: 100px; object-fit: cover; border-radius: var(--radius-sm);
-        }
-        .battle-remove {
-            position: absolute; top: 6px; right: 6px; width: 24px; height: 24px;
-            border-radius: 50%; background: rgba(0,0,0,0.7); border: none;
-            color: white; font-size: 12px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; z-index: 3;
-        }
-        #battleInput1, #battleInput2 { display: none; }
-
-        /* BATTLE RESULTS */
-        .battle-results { display: none; padding: 16px; animation: fadeUp 0.5s var(--ease) both; }
-        .battle-results.active { display: flex; flex-direction: column; gap: 16px; }
-        .battle-vs-header {
-            text-align: center; font-size: 28px; font-weight: 900;
-            background: linear-gradient(135deg, #ffd60a, #ff9f0a);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-            margin-bottom: 4px;
-        }
-        .battle-cards { display: flex; gap: 12px; }
-        .battle-card {
-            flex: 1; background: var(--bg-card); border: 1.5px solid var(--border);
-            border-radius: var(--radius); padding: 16px; text-align: center;
-            position: relative; transition: all 0.5s var(--ease);
-        }
-        .battle-card.winner {
-            border-color: #ffd60a;
-            box-shadow: 0 0 30px rgba(255,214,10,0.15);
-        }
-        .battle-card .winner-crown {
-            position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
-            font-size: 24px; display: none;
-        }
-        .battle-card.winner .winner-crown { display: block; animation: crownBounce 0.5s var(--spring); }
-        @keyframes crownBounce { from { transform: translateX(-50%) scale(0); } to { transform: translateX(-50%) scale(1); } }
-        .battle-card-img {
-            width: 100%; height: 80px; object-fit: cover; border-radius: 10px; margin-bottom: 10px;
-        }
-        .battle-card-score {
-            font-size: 36px; font-weight: 900; line-height: 1; margin: 4px 0;
-        }
-        .battle-card-vibe {
-            font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-            padding: 3px 8px; border-radius: 100px; display: inline-block; margin-top: 6px;
-        }
-        .battle-card-commentary {
-            font-size: 12px; color: var(--text-dim); margin-top: 8px; line-height: 1.5;
-        }
-        .battle-verdict {
-            background: var(--bg-card); border: 1.5px solid rgba(255,214,10,0.3);
-            border-radius: var(--radius); padding: 20px; text-align: center;
-        }
-        .battle-verdict-text {
-            font-size: 16px; font-weight: 700; color: var(--text); line-height: 1.5;
-        }
-
-        /* ===== SCORE CARD (shareable) ===== */
-        .share-card-container {
-            display: none; position: relative;
-        }
-        .share-card-container.active { display: block; }
-        .share-card {
-            background: linear-gradient(145deg, #111113 0%, #1a1a1e 100%);
-            border-radius: 20px; padding: 32px 24px; text-align: center;
-            position: relative; overflow: hidden;
-        }
-        .share-card .watermark {
-            font-size: 11px; font-weight: 700; color: var(--text-muted);
-            letter-spacing: 1px; margin-top: 16px;
-        }
-        .save-card-btn {
-            width: 100%; padding: 14px; margin-top: 12px;
-            background: linear-gradient(135deg, #30d5c8, #34c759); color: #000;
-            border: none; border-radius: var(--radius-sm);
-            font-size: 14px; font-weight: 700; font-family: inherit;
-            cursor: pointer; transition: all 0.2s var(--ease);
-        }
-        .save-card-btn:active { transform: scale(0.97); }
-
-        /* ===== HISTORY ===== */
-        .history { display: none; padding: 0 16px 16px; }
-        .history.show { display: block; }
-        .history-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
-        .hist-item {
-            display: flex; align-items: center; gap: 10px; padding: 10px;
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-sm); margin-bottom: 6px; cursor: pointer;
-            transition: all 0.2s var(--ease);
-        }
-        .hist-item:active { background: var(--bg-elevated); }
-        .hist-img { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; flex-shrink: 0; }
-        .hist-info { flex: 1; min-width: 0; }
-        .hist-cat { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .hist-score { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
-
-        /* ===== TOAST ===== */
-        .toast {
-            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-            background: var(--bg-elevated); color: var(--text); padding: 10px 20px;
-            border-radius: 100px; border: 1px solid var(--border-hover);
-            font-size: 13px; font-weight: 600;
-            backdrop-filter: blur(16px); z-index: 1000;
-            animation: toastIn 0.3s var(--ease); pointer-events: none;
-        }
-        @keyframes toastIn {
-            from { opacity: 0; transform: translateX(-50%) translateY(8px); }
-            to { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-
-        .hidden { display: none !important; }
-
-        /* ===== MOBILE TWEAKS ===== */
-        @media (max-width: 400px) {
-            .landing h1 { font-size: 34px; }
-            .score-num { font-size: 64px; }
-            .mode-btn { padding: 9px 14px; font-size: 12px; }
-            .battle-card-score { font-size: 28px; }
-        }
+        .toast { position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:var(--bg-elevated);color:var(--text);padding:10px 20px;border-radius:100px;border:1px solid var(--border-hover);font-size:13px;font-weight:600;backdrop-filter:blur(16px);z-index:1000;animation:toastIn 0.3s var(--ease);pointer-events:none; }
+        @keyframes toastIn { from{opacity:0;transform:translateX(-50%) translateY(8px);}to{opacity:1;transform:translateX(-50%) translateY(0);} }
+        .hidden { display:none !important; }
+        @media (max-width:400px) { .landing h1{font-size:34px;} .score-num{font-size:64px;} .mode-btn{padding:9px 14px;font-size:12px;} .battle-card-score{font-size:28px;} }
     </style>
 </head>
 <body>
-    <!-- HEADER -->
     <div class="header">
-        <div class="logo">RateMyAnything.ai</div>
-        <div class="live-badge">
-            <div class="live-dot"></div>
-            <span id="ratingCounter">2,847</span> rated
+        <div class="logo" onclick="goHome()">RateMyAnything.ai</div>
+        <div class="header-right">
+            <div class="live-badge"><div class="live-dot"></div><span id="ratingCounter">2,847</span> rated</div>
+            <button class="profile-btn" id="profileBtn" onclick="showDashboard()"></button>
         </div>
     </div>
 
-    <div class="container">
+    <div class="container" id="mainContainer">
         <!-- LANDING -->
         <div class="landing" id="landingPage">
             <div class="landing-emoji">🎯</div>
@@ -555,17 +333,34 @@
                 <button class="battle-cta" onclick="startBattle()">⚔️ Head-to-Head Battle</button>
             </div>
             <div class="social-proof">
-                <div class="avatars">
-                    <span>😎</span><span>🤣</span><span>🔥</span><span>💀</span>
-                </div>
+                <div class="avatars"><span>😎</span><span>🤣</span><span>🔥</span><span>💀</span></div>
                 2,847 ratings and counting
             </div>
         </div>
 
+        <!-- SIGNUP -->
+        <div class="signup-screen" id="signupScreen">
+            <div style="font-size:48px">👤</div>
+            <h2>Pick a Username</h2>
+            <p>Join the community, add friends, and see what everyone's rating.</p>
+            <input class="signup-input" id="usernameInput" placeholder="username" maxlength="20" autocomplete="off" autocapitalize="off">
+            <button class="signup-btn" onclick="doSignup()">Let's Go</button>
+            <button class="signup-skip" onclick="skipSignup()">Skip for now</button>
+        </div>
+
         <!-- RATING INTERFACE -->
         <div id="ratingInterface" class="hidden">
+            <!-- DAILY CHALLENGE BANNER -->
+            <div class="daily-banner" id="dailyBanner" onclick="startDailyChallenge()" style="display:none">
+                <div class="daily-banner-top">
+                    <div class="daily-banner-emoji" id="dailyEmoji">🛏️</div>
+                    <div class="daily-banner-label">Daily Challenge</div>
+                    <div class="daily-banner-done" id="dailyDoneBadge" style="display:none">Done!</div>
+                </div>
+                <h3 id="dailyTitle">Rate Your Bed Setup</h3>
+                <p id="dailyPrompt">Show us your bed right now</p>
+            </div>
             <div class="interface">
-                <!-- MODES -->
                 <div class="modes">
                     <button class="mode-btn roast active" onclick="setMode('roast')" id="mode-roast">🔥 Roast</button>
                     <button class="mode-btn hype" onclick="setMode('hype')" id="mode-hype">✨ Hype</button>
@@ -573,32 +368,13 @@
                     <button class="mode-btn unhinged" onclick="setMode('unhinged')" id="mode-unhinged">🤪 Unhinged</button>
                     <button class="mode-btn rizz" onclick="setMode('rizz')" id="mode-rizz">💀 Rizz Check</button>
                 </div>
-
-                <!-- UPLOAD -->
                 <div class="upload-card" id="photoCard" onclick="document.getElementById('photoInput').click()">
-                    <div id="uploadArea">
-                        <div class="icon">📸</div>
-                        <div class="label">Tap to upload a photo</div>
-                        <div class="hint">JPG, PNG, GIF up to 10MB</div>
-                    </div>
-                    <div id="imagePreviewContainer" class="hidden">
-                        <div class="preview-wrap">
-                            <img id="imagePreview" class="image-preview" alt="Preview">
-                            <button class="remove-btn" onclick="removeImage(event)">✕</button>
-                        </div>
-                    </div>
+                    <div id="uploadArea"><div class="icon">📸</div><div class="label">Tap to upload a photo</div><div class="hint">JPG, PNG, GIF up to 10MB</div></div>
+                    <div id="imagePreviewContainer" class="hidden"><div class="preview-wrap"><img id="imagePreview" class="image-preview" alt="Preview"><button class="remove-btn" onclick="removeImage(event)">✕</button></div></div>
                 </div>
                 <input type="file" id="photoInput" accept="image/*" onchange="handleImageUpload(event)">
-
-                <!-- TEXT -->
-                <div class="text-card">
-                    <label>Or describe it</label>
-                    <textarea id="descriptionInput" placeholder="My dorm room has posters everywhere..."></textarea>
-                </div>
-
-                <!-- CATEGORIES -->
-                <div class="cat-card">
-                    <label>What are we rating?</label>
+                <div class="text-card"><label>Or describe it</label><textarea id="descriptionInput" placeholder="My dorm room has posters everywhere..."></textarea></div>
+                <div class="cat-card"><label>What are we rating?</label>
                     <div class="cat-grid">
                         <button class="cat-btn" onclick="selectCategory(event,'Room')">🏠 Room</button>
                         <button class="cat-btn" onclick="selectCategory(event,'Bar')">🍹 Bar</button>
@@ -612,19 +388,13 @@
                     </div>
                 </div>
             </div>
-
-            <!-- HISTORY -->
-            <div class="history" id="historySection">
-                <div class="history-label">Recent Ratings</div>
-                <div id="historyItems"></div>
-            </div>
+            <div class="history" id="historySection"><div class="history-label">Recent Ratings</div><div id="historyItems"></div></div>
         </div>
 
         <!-- BATTLE INTERFACE -->
         <div id="battleInterface" class="hidden">
             <div class="battle-interface">
                 <div class="battle-title">⚔️ HEAD-TO-HEAD</div>
-
                 <div class="modes">
                     <button class="mode-btn roast active" onclick="setMode('roast')" id="bmode-roast">🔥 Roast</button>
                     <button class="mode-btn hype" onclick="setMode('hype')" id="bmode-hype">✨ Hype</button>
@@ -632,37 +402,20 @@
                     <button class="mode-btn unhinged" onclick="setMode('unhinged')" id="bmode-unhinged">🤪 Unhinged</button>
                     <button class="mode-btn rizz" onclick="setMode('rizz')" id="bmode-rizz">💀 Rizz Check</button>
                 </div>
-
                 <div class="battle-uploads">
                     <div class="battle-upload" id="battleCard1" onclick="document.getElementById('battleInput1').click()">
-                        <div id="battleUpload1">
-                            <div class="icon">📸</div>
-                            <div class="label">Item 1</div>
-                            <div class="hint">Tap to upload</div>
-                        </div>
-                        <div id="battlePreview1" class="hidden" style="width:100%">
-                            <img id="battleImg1" class="battle-preview" alt="">
-                            <button class="battle-remove" onclick="removeBattleImage(event,1)">✕</button>
-                        </div>
+                        <div id="battleUpload1"><div class="icon">📸</div><div class="label">Item 1</div><div class="hint">Tap to upload</div></div>
+                        <div id="battlePreview1" class="hidden" style="width:100%"><img id="battleImg1" class="battle-preview" alt=""><button class="battle-remove" onclick="removeBattleImage(event,1)">✕</button></div>
                         <div class="vs-badge">VS</div>
                     </div>
                     <div class="battle-upload" id="battleCard2" onclick="document.getElementById('battleInput2').click()">
-                        <div id="battleUpload2">
-                            <div class="icon">📸</div>
-                            <div class="label">Item 2</div>
-                            <div class="hint">Tap to upload</div>
-                        </div>
-                        <div id="battlePreview2" class="hidden" style="width:100%">
-                            <img id="battleImg2" class="battle-preview" alt="">
-                            <button class="battle-remove" onclick="removeBattleImage(event,2)">✕</button>
-                        </div>
+                        <div id="battleUpload2"><div class="icon">📸</div><div class="label">Item 2</div><div class="hint">Tap to upload</div></div>
+                        <div id="battlePreview2" class="hidden" style="width:100%"><img id="battleImg2" class="battle-preview" alt=""><button class="battle-remove" onclick="removeBattleImage(event,2)">✕</button></div>
                     </div>
                 </div>
                 <input type="file" id="battleInput1" accept="image/*" onchange="handleBattleUpload(event,1)">
                 <input type="file" id="battleInput2" accept="image/*" onchange="handleBattleUpload(event,2)">
-
-                <div class="cat-card">
-                    <label>What are we comparing?</label>
+                <div class="cat-card"><label>What are we comparing?</label>
                     <div class="cat-grid">
                         <button class="cat-btn" onclick="selectCategory(event,'Room')">🏠 Room</button>
                         <button class="cat-btn" onclick="selectCategory(event,'Outfit')">👕 Outfit</button>
@@ -672,24 +425,12 @@
                         <button class="cat-btn" onclick="selectCategory(event,'Other')">❓ Other</button>
                     </div>
                 </div>
-
-                <div class="text-card">
-                    <label>Add context (optional)</label>
-                    <textarea id="battleDescInput" placeholder="Which outfit should I wear tonight?"></textarea>
-                </div>
+                <div class="text-card"><label>Add context (optional)</label><textarea id="battleDescInput" placeholder="Which outfit should I wear tonight?"></textarea></div>
             </div>
         </div>
 
         <!-- LOADING -->
-        <div class="loading" id="loadingState">
-            <div class="loading-ring">
-                <div class="ring"></div>
-                <div class="ring"></div>
-                <div class="ring"></div>
-            </div>
-            <h3 id="loadingTitle">AI is judging you...</h3>
-            <div class="loading-msg" id="loadingMsg">Analyzing every detail</div>
-        </div>
+        <div class="loading" id="loadingState"><div class="loading-ring"><div class="ring"></div><div class="ring"></div><div class="ring"></div></div><h3 id="loadingTitle">AI is judging you...</h3><div class="loading-msg" id="loadingMsg">Analyzing every detail</div></div>
 
         <!-- RESULTS -->
         <div class="results" id="resultsPage">
@@ -698,24 +439,17 @@
                 <div class="score-label" id="scoreCategoryLabel"></div>
                 <div class="score-num" id="scoreNumber">0</div>
                 <div class="score-out-of">/ 10</div>
-                <div class="gauge"><div class="gauge-fill" id="scoreGaugeFill" style="--pct: 0%"></div></div>
+                <div class="gauge"><div class="gauge-fill" id="scoreGaugeFill" style="--pct:0%"></div></div>
                 <div class="mode-pill" id="modeBadge"></div>
                 <div class="vibe-badge" id="vibeBadge"></div>
                 <div class="commentary" id="commentary"></div>
             </div>
-
-            <!-- Shareable Score Card -->
-            <div class="share-card-container" id="shareCardContainer">
-                <canvas id="shareCanvas" style="display:none"></canvas>
-                <img id="shareCardImage" style="width:100%; border-radius:16px; border: 1px solid var(--border);" alt="Share card">
-            </div>
-
+            <div class="share-card-container" id="shareCardContainer"><canvas id="shareCanvas" style="display:none"></canvas><img id="shareCardImage" style="width:100%;border-radius:16px;border:1px solid var(--border);" alt="Share card"></div>
             <div class="actions">
                 <button class="act-btn" onclick="shareToClipboard()">📋 Copy</button>
                 <button class="act-btn" onclick="shareToTwitter()">𝕏 Share</button>
-                <button class="act-btn" onclick="saveShareCard()">💾 Save Card</button>
+                <button class="act-btn" onclick="saveShareCard()">💾 Save</button>
             </div>
-
             <button class="again-btn" onclick="goBack()">Rate Something Else</button>
             <button class="upsell" onclick="buyMoreRatings()">🔓 Get 5 More Ratings — $0.99</button>
         </div>
@@ -724,32 +458,52 @@
         <div class="battle-results" id="battleResultsPage">
             <div class="battle-vs-header">⚔️ BATTLE RESULTS</div>
             <div class="battle-cards">
-                <div class="battle-card" id="battleResult1">
-                    <div class="winner-crown">👑</div>
-                    <img id="battleResultImg1" class="battle-card-img" alt="">
-                    <div class="battle-card-score" id="battleScore1">0</div>
-                    <div class="score-out-of" style="font-size:12px">/10</div>
-                    <div class="battle-card-vibe" id="battleVibe1"></div>
-                    <div class="battle-card-commentary" id="battleComm1"></div>
-                </div>
-                <div class="battle-card" id="battleResult2">
-                    <div class="winner-crown">👑</div>
-                    <img id="battleResultImg2" class="battle-card-img" alt="">
-                    <div class="battle-card-score" id="battleScore2">0</div>
-                    <div class="score-out-of" style="font-size:12px">/10</div>
-                    <div class="battle-card-vibe" id="battleVibe2"></div>
-                    <div class="battle-card-commentary" id="battleComm2"></div>
-                </div>
+                <div class="battle-card" id="battleResult1"><div class="winner-crown">👑</div><img id="battleResultImg1" class="battle-card-img" alt=""><div class="battle-card-score" id="battleScore1">0</div><div class="score-out-of" style="font-size:12px">/10</div><div class="battle-card-vibe" id="battleVibe1"></div><div class="battle-card-commentary" id="battleComm1"></div></div>
+                <div class="battle-card" id="battleResult2"><div class="winner-crown">👑</div><img id="battleResultImg2" class="battle-card-img" alt=""><div class="battle-card-score" id="battleScore2">0</div><div class="score-out-of" style="font-size:12px">/10</div><div class="battle-card-vibe" id="battleVibe2"></div><div class="battle-card-commentary" id="battleComm2"></div></div>
             </div>
-            <div class="battle-verdict">
-                <div class="battle-verdict-text" id="battleVerdict"></div>
-            </div>
-            <div class="actions">
-                <button class="act-btn" onclick="shareBattleToClipboard()">📋 Copy</button>
-                <button class="act-btn" onclick="shareBattleToTwitter()">𝕏 Share</button>
-            </div>
+            <div class="battle-verdict"><div class="battle-verdict-text" id="battleVerdict"></div></div>
+            <div class="actions"><button class="act-btn" onclick="shareBattleToClipboard()">📋 Copy</button><button class="act-btn" onclick="shareBattleToTwitter()">𝕏 Share</button></div>
             <button class="again-btn" onclick="goBack()">Battle Again</button>
             <button class="upsell" onclick="buyMoreRatings()">🔓 Get 5 More Ratings — $0.99</button>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div class="dashboard" id="dashboardPage">
+            <div class="dash-header">
+                <div class="dash-username" id="dashUsername">@username</div>
+                <div class="dash-code">Friend Code: <span id="dashCode" onclick="copyFriendCode()">------</span> (tap to copy)</div>
+            </div>
+            <div class="dash-stats">
+                <div class="dash-stat"><div class="dash-stat-num grad" id="dashAvg">0.0</div><div class="dash-stat-label">Avg Score</div></div>
+                <div class="dash-stat"><div class="dash-stat-num" id="dashTotal">0</div><div class="dash-stat-label">Ratings</div></div>
+                <div class="dash-stat"><div class="dash-stat-num" id="dashFriends">0</div><div class="dash-stat-label">Friends</div></div>
+                <div class="dash-stat"><div class="dash-stat-num" id="dashToday">0</div><div class="dash-stat-label">Today</div></div>
+            </div>
+            <div class="dash-section-title">Leaderboard</div>
+            <div id="leaderboardList"></div>
+            <div class="dash-section-title">Recent Ratings</div>
+            <div id="dashRecentList"></div>
+        </div>
+
+        <!-- FEED -->
+        <div class="feed" id="feedPage">
+            <div class="feed-title">Friends Feed</div>
+            <div id="feedList"></div>
+        </div>
+
+        <!-- FRIENDS -->
+        <div class="friends-section" id="friendsPage">
+            <div class="friends-title">Friends</div>
+            <div class="your-code-card">
+                <div class="your-code-label">Your Friend Code</div>
+                <div class="your-code" id="myCodeDisplay" onclick="copyFriendCode()">------</div>
+                <div class="your-code-hint">Share this code so friends can add you</div>
+            </div>
+            <div class="add-friend-row">
+                <input class="add-friend-input" id="friendCodeInput" placeholder="Enter code" maxlength="6">
+                <button class="add-friend-btn" onclick="addFriend()">Add</button>
+            </div>
+            <div id="friendsList"></div>
         </div>
 
         <!-- PAYWALL -->
@@ -760,890 +514,524 @@
                 <p>You used all 3 free ratings. Get 5 more for less than a dollar.</p>
                 <button class="paywall-cta" onclick="buyMoreRatings()">Unlock 5 More — $0.99</button>
                 <div class="paywall-fine">Instant access · All 5 modes · Rate anything</div>
-                <div style="display: flex; gap: 8px; justify-content: center; margin-top: 16px; flex-wrap: wrap;">
-                    <span style="font-size: 11px; color: var(--text-muted); background: var(--bg-elevated); padding: 4px 10px; border-radius: 100px;">🔥 Roast</span>
-                    <span style="font-size: 11px; color: var(--text-muted); background: var(--bg-elevated); padding: 4px 10px; border-radius: 100px;">✨ Hype</span>
-                    <span style="font-size: 11px; color: var(--text-muted); background: var(--bg-elevated); padding: 4px 10px; border-radius: 100px;">😐 Honest</span>
-                    <span style="font-size: 11px; color: var(--text-muted); background: var(--bg-elevated); padding: 4px 10px; border-radius: 100px;">🤪 Unhinged</span>
-                    <span style="font-size: 11px; color: var(--text-muted); background: var(--bg-elevated); padding: 4px 10px; border-radius: 100px;">💀 Rizz</span>
-                </div>
             </div>
         </div>
     </div>
 
     <!-- RATE BUTTON -->
-    <div class="rate-btn-wrap" id="rateButtonContainer" style="display: none;">
-        <button class="rate-btn roast" id="rateBtn" onclick="submitRating()">Rate It</button>
-    </div>
+    <div class="rate-btn-wrap" id="rateButtonContainer" style="display:none"><button class="rate-btn roast" id="rateBtn" onclick="submitRating()">Rate It</button></div>
+    <div class="rate-btn-wrap" id="battleButtonContainer" style="display:none"><button class="rate-btn" id="battleBtn" style="background:linear-gradient(135deg,#ffd60a,#ff9f0a);color:#000" onclick="submitBattle()">⚔️ BATTLE!</button></div>
 
-    <!-- BATTLE BUTTON -->
-    <div class="rate-btn-wrap" id="battleButtonContainer" style="display: none;">
-        <button class="rate-btn" id="battleBtn" style="background: linear-gradient(135deg, #ffd60a, #ff9f0a); color: #000;" onclick="submitBattle()">⚔️ BATTLE!</button>
+    <!-- BOTTOM NAV -->
+    <div class="bottom-nav" id="bottomNav">
+        <div class="nav-items">
+            <button class="nav-item active" onclick="navTo('rate')" id="nav-rate"><div class="nav-icon">🎯</div>Rate</button>
+            <button class="nav-item" onclick="navTo('feed')" id="nav-feed"><div class="nav-icon">📰</div>Feed</button>
+            <button class="nav-item" onclick="navTo('friends')" id="nav-friends"><div class="nav-icon">👥</div>Friends</button>
+            <button class="nav-item" onclick="navTo('dashboard')" id="nav-dashboard"><div class="nav-icon">📊</div>Me</button>
+        </div>
     </div>
 
     <script>
         // ===== STATE =====
-        let currentMode = 'roast';
-        let currentCategory = 'Other';
-        let uploadedImage = null;
-        let currentRating = null;
-        let ratingHistory = [];
-        let currentRatingCount = 2847;
-        let isBattleMode = false;
-        let battleImage1 = null;
-        let battleImage2 = null;
-        let currentBattleResult = null;
-        const FREE_RATINGS = 3;
-        const PAID_RATINGS = 5;
+        var currentMode = 'roast';
+        var currentCategory = 'Other';
+        var uploadedImage = null;
+        var currentRating = null;
+        var ratingHistory = [];
+        var currentRatingCount = 2847;
+        var isBattleMode = false;
+        var battleImage1 = null;
+        var battleImage2 = null;
+        var currentBattleResult = null;
+        var isDailyChallenge = false;
+        var dailyChallenge = null;
+        var FREE_RATINGS = 3;
+        var PAID_RATINGS = 5;
 
-        // ===== CANVAS POLYFILL =====
-        if (!CanvasRenderingContext2D.prototype.roundRect) {
-            CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-                if (typeof r === 'number') r = [r,r,r,r];
-                this.beginPath();
-                this.moveTo(x + r[0], y);
-                this.lineTo(x + w - r[1], y);
-                this.quadraticCurveTo(x + w, y, x + w, y + r[1]);
-                this.lineTo(x + w, y + h - r[2]);
-                this.quadraticCurveTo(x + w, y + h, x + w - r[2], y + h);
-                this.lineTo(x + r[3], y + h);
-                this.quadraticCurveTo(x, y + h, x, y + h - r[3]);
-                this.lineTo(x, y + r[0]);
-                this.quadraticCurveTo(x, y, x + r[0], y);
-                this.closePath();
-                return this;
-            };
-        }
+        // User state
+        var currentUserId = null;
+        var currentUsername = null;
+        var currentFriendCode = null;
 
-        // ===== SOUND EFFECTS (Web Audio API) =====
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        let audioCtx = null;
-
-        function getAudioCtx() {
-            if (!audioCtx) audioCtx = new AudioCtx();
-            return audioCtx;
-        }
-
-        function playScoreSound(score) {
+        function loadUserState() {
             try {
-                const ctx = getAudioCtx();
-                if (ctx.state === 'suspended') ctx.resume();
-
-                if (score >= 8) {
-                    // AIRHORN / HYPE - rising triumphant chord
-                    playHypeSound(ctx);
-                } else if (score >= 5) {
-                    // MID - neutral ding
-                    playMidSound(ctx);
-                } else {
-                    // LOW - sad descending trombone
-                    playSadSound(ctx);
-                }
-            } catch(e) { console.log('Audio not available'); }
+                currentUserId = localStorage.getItem('userId');
+                currentUsername = localStorage.getItem('username');
+                currentFriendCode = localStorage.getItem('friendCode');
+            } catch(e) {}
         }
-
-        function playHypeSound(ctx) {
-            const now = ctx.currentTime;
-            // Triumphant rising chord
-            [523.25, 659.25, 783.99, 1046.5].forEach(function(freq, i) {
-                var osc = ctx.createOscillator();
-                var gain = ctx.createGain();
-                osc.type = 'square';
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0, now + i * 0.08);
-                gain.gain.linearRampToValueAtTime(0.15, now + i * 0.08 + 0.05);
-                gain.gain.linearRampToValueAtTime(0.08, now + i * 0.08 + 0.3);
-                gain.gain.linearRampToValueAtTime(0, now + 0.8);
-                osc.connect(gain); gain.connect(ctx.destination);
-                osc.start(now + i * 0.08);
-                osc.stop(now + 0.9);
-            });
-            // Extra sparkle
-            var osc2 = ctx.createOscillator();
-            var gain2 = ctx.createGain();
-            osc2.type = 'sine';
-            osc2.frequency.setValueAtTime(1200, now + 0.3);
-            osc2.frequency.linearRampToValueAtTime(2000, now + 0.6);
-            gain2.gain.setValueAtTime(0.1, now + 0.3);
-            gain2.gain.linearRampToValueAtTime(0, now + 0.7);
-            osc2.connect(gain2); gain2.connect(ctx.destination);
-            osc2.start(now + 0.3); osc2.stop(now + 0.8);
-        }
-
-        function playMidSound(ctx) {
-            var now = ctx.currentTime;
-            var osc = ctx.createOscillator();
-            var gain = ctx.createGain();
-            osc.type = 'sine';
-            osc.frequency.value = 440;
-            gain.gain.setValueAtTime(0.2, now);
-            gain.gain.linearRampToValueAtTime(0, now + 0.4);
-            osc.connect(gain); gain.connect(ctx.destination);
-            osc.start(now); osc.stop(now + 0.5);
-        }
-
-        function playSadSound(ctx) {
-            var now = ctx.currentTime;
-            // Descending sad trombone: wah wah wah wahhh
-            var notes = [392, 370, 349, 233];
-            notes.forEach(function(freq, i) {
-                var osc = ctx.createOscillator();
-                var gain = ctx.createGain();
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(freq, now + i * 0.25);
-                osc.frequency.linearRampToValueAtTime(freq * 0.97, now + i * 0.25 + 0.2);
-                gain.gain.setValueAtTime(0, now + i * 0.25);
-                gain.gain.linearRampToValueAtTime(0.12, now + i * 0.25 + 0.03);
-                gain.gain.linearRampToValueAtTime(i === 3 ? 0.12 : 0.02, now + i * 0.25 + 0.22);
-                if (i === 3) gain.gain.linearRampToValueAtTime(0, now + 1.4);
-                osc.connect(gain); gain.connect(ctx.destination);
-                osc.start(now + i * 0.25);
-                osc.stop(now + 1.5);
-            });
-        }
-
-        function playBattleSound() {
+        function saveUserState() {
             try {
-                var ctx = getAudioCtx();
-                if (ctx.state === 'suspended') ctx.resume();
-                var now = ctx.currentTime;
-                // Epic battle reveal
-                [261.63, 329.63, 392, 523.25, 659.25].forEach(function(freq, i) {
-                    var osc = ctx.createOscillator();
-                    var gain = ctx.createGain();
-                    osc.type = 'square';
-                    osc.frequency.value = freq;
-                    gain.gain.setValueAtTime(0, now + i * 0.06);
-                    gain.gain.linearRampToValueAtTime(0.12, now + i * 0.06 + 0.03);
-                    gain.gain.linearRampToValueAtTime(0, now + 0.6);
-                    osc.connect(gain); gain.connect(ctx.destination);
-                    osc.start(now + i * 0.06); osc.stop(now + 0.7);
-                });
+                if (currentUserId) localStorage.setItem('userId', currentUserId);
+                if (currentUsername) localStorage.setItem('username', currentUsername);
+                if (currentFriendCode) localStorage.setItem('friendCode', currentFriendCode);
             } catch(e) {}
         }
 
-        // ===== PAYWALL HELPERS =====
-        function getRatingsUsed() {
-            try { return parseInt(localStorage.getItem('ratingsUsed') || '0'); } catch(e) { return 0; }
+        // ===== CANVAS POLYFILL =====
+        if (!CanvasRenderingContext2D.prototype.roundRect) {
+            CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r) {
+                if (typeof r==='number') r=[r,r,r,r];
+                this.beginPath();this.moveTo(x+r[0],y);this.lineTo(x+w-r[1],y);this.quadraticCurveTo(x+w,y,x+w,y+r[1]);this.lineTo(x+w,y+h-r[2]);this.quadraticCurveTo(x+w,y+h,x+w-r[2],y+h);this.lineTo(x+r[3],y+h);this.quadraticCurveTo(x,y+h,x,y+h-r[3]);this.lineTo(x,y+r[0]);this.quadraticCurveTo(x,y,x+r[0],y);this.closePath();return this;
+            };
         }
-        function setRatingsUsed(n) {
-            try { localStorage.setItem('ratingsUsed', n.toString()); } catch(e) {}
+
+        // ===== SOUND EFFECTS =====
+        var AudioCtx = window.AudioContext || window.webkitAudioContext;
+        var audioCtx = null;
+        function getAudioCtx() { if (!audioCtx) audioCtx = new AudioCtx(); return audioCtx; }
+        function playScoreSound(score) {
+            try { var ctx = getAudioCtx(); if (ctx.state==='suspended') ctx.resume();
+                if (score >= 8) playHypeSound(ctx); else if (score >= 5) playMidSound(ctx); else playSadSound(ctx);
+            } catch(e) {}
         }
-        function getPaidRatings() {
-            try { return parseInt(localStorage.getItem('paidRatings') || '0'); } catch(e) { return 0; }
-        }
-        function setPaidRatings(n) {
-            try { localStorage.setItem('paidRatings', n.toString()); } catch(e) {}
-        }
-        function canRate() {
-            return getRatingsUsed() < FREE_RATINGS + getPaidRatings();
-        }
-        function getRatingsRemaining() {
-            return Math.max(0, (FREE_RATINGS + getPaidRatings()) - getRatingsUsed());
-        }
+        function playHypeSound(ctx) { var now=ctx.currentTime;[523.25,659.25,783.99,1046.5].forEach(function(f,i){var o=ctx.createOscillator();var g=ctx.createGain();o.type='square';o.frequency.value=f;g.gain.setValueAtTime(0,now+i*0.08);g.gain.linearRampToValueAtTime(0.15,now+i*0.08+0.05);g.gain.linearRampToValueAtTime(0,now+0.8);o.connect(g);g.connect(ctx.destination);o.start(now+i*0.08);o.stop(now+0.9);}); }
+        function playMidSound(ctx) { var now=ctx.currentTime;var o=ctx.createOscillator();var g=ctx.createGain();o.type='sine';o.frequency.value=440;g.gain.setValueAtTime(0.2,now);g.gain.linearRampToValueAtTime(0,now+0.4);o.connect(g);g.connect(ctx.destination);o.start(now);o.stop(now+0.5); }
+        function playSadSound(ctx) { var now=ctx.currentTime;[392,370,349,233].forEach(function(f,i){var o=ctx.createOscillator();var g=ctx.createGain();o.type='sawtooth';o.frequency.setValueAtTime(f,now+i*0.25);g.gain.setValueAtTime(0,now+i*0.25);g.gain.linearRampToValueAtTime(0.12,now+i*0.25+0.03);g.gain.linearRampToValueAtTime(i===3?0.12:0.02,now+i*0.25+0.22);if(i===3)g.gain.linearRampToValueAtTime(0,now+1.4);o.connect(g);g.connect(ctx.destination);o.start(now+i*0.25);o.stop(now+1.5);}); }
+        function playBattleSound() { try{var ctx=getAudioCtx();if(ctx.state==='suspended')ctx.resume();var now=ctx.currentTime;[261.63,329.63,392,523.25,659.25].forEach(function(f,i){var o=ctx.createOscillator();var g=ctx.createGain();o.type='square';o.frequency.value=f;g.gain.setValueAtTime(0,now+i*0.06);g.gain.linearRampToValueAtTime(0.12,now+i*0.06+0.03);g.gain.linearRampToValueAtTime(0,now+0.6);o.connect(g);g.connect(ctx.destination);o.start(now+i*0.06);o.stop(now+0.7);});}catch(e){} }
+
+        // ===== PAYWALL =====
+        function getRatingsUsed() { try{return parseInt(localStorage.getItem('ratingsUsed')||'0');}catch(e){return 0;} }
+        function setRatingsUsed(n) { try{localStorage.setItem('ratingsUsed',n.toString());}catch(e){} }
+        function getPaidRatings() { try{return parseInt(localStorage.getItem('paidRatings')||'0');}catch(e){return 0;} }
+        function setPaidRatings(n) { try{localStorage.setItem('paidRatings',n.toString());}catch(e){} }
+        function canRate() { return getRatingsUsed() < FREE_RATINGS + getPaidRatings(); }
+        function getRatingsRemaining() { return Math.max(0,(FREE_RATINGS+getPaidRatings())-getRatingsUsed()); }
         function showPaywall() {
-            document.getElementById('ratingInterface').classList.add('hidden');
-            document.getElementById('battleInterface').classList.add('hidden');
-            document.getElementById('rateButtonContainer').style.display = 'none';
-            document.getElementById('battleButtonContainer').style.display = 'none';
+            hideAllPages();
             document.getElementById('paywallScreen').classList.add('active');
         }
 
-        // ===== MODE SWITCHING =====
+        // ===== NAVIGATION =====
+        function hideAllPages() {
+            ['landingPage','signupScreen','ratingInterface','battleInterface','loadingState','resultsPage','battleResultsPage','paywallScreen','dashboardPage','feedPage','friendsPage'].forEach(function(id) {
+                var el = document.getElementById(id);
+                if (el) { el.classList.add('hidden'); el.classList.remove('active'); }
+            });
+            document.getElementById('rateButtonContainer').style.display = 'none';
+            document.getElementById('battleButtonContainer').style.display = 'none';
+            document.getElementById('shareCardContainer').classList.remove('active');
+        }
+
+        function navTo(tab) {
+            document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
+            document.getElementById('nav-'+tab).classList.add('active');
+            hideAllPages();
+            if (tab === 'rate') { startRating(); }
+            else if (tab === 'feed') { showFeed(); }
+            else if (tab === 'friends') { showFriends(); }
+            else if (tab === 'dashboard') { showDashboard(); }
+        }
+
+        function goHome() {
+            hideAllPages();
+            document.getElementById('bottomNav').classList.remove('show');
+            document.getElementById('landingPage').classList.remove('hidden');
+            document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
+            document.getElementById('nav-rate').classList.add('active');
+        }
+
         function setMode(mode) {
             currentMode = mode;
-            // Update both normal and battle mode selectors
-            document.querySelectorAll('.mode-btn').forEach(function(btn) { btn.classList.remove('active'); });
-            var el = document.getElementById('mode-' + mode);
-            if (el) el.classList.add('active');
-            var bel = document.getElementById('bmode-' + mode);
-            if (bel) bel.classList.add('active');
+            document.querySelectorAll('.mode-btn').forEach(function(b){b.classList.remove('active');});
+            var el = document.getElementById('mode-'+mode); if(el) el.classList.add('active');
+            var bel = document.getElementById('bmode-'+mode); if(bel) bel.classList.add('active');
             updateRateButtonStyle();
         }
 
         // ===== IMAGE HANDLING =====
-        function compressImage(file, callback) {
+        function compressImage(file, cb) {
             var reader = new FileReader();
             reader.onload = function(e) {
                 var img = new Image();
                 img.onload = function() {
                     var canvas = document.createElement('canvas');
-                    var maxDim = 800;
-                    var w = img.width, h = img.height;
-                    if (w > maxDim || h > maxDim) {
-                        if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
-                        else { w = Math.round(w * maxDim / h); h = maxDim; }
-                    }
-                    canvas.width = w; canvas.height = h;
-                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                    callback(canvas.toDataURL('image/jpeg', 0.7));
+                    var maxDim = 800; var w = img.width, h = img.height;
+                    if(w>maxDim||h>maxDim){if(w>h){h=Math.round(h*maxDim/w);w=maxDim;}else{w=Math.round(w*maxDim/h);h=maxDim;}}
+                    canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);
+                    cb(canvas.toDataURL('image/jpeg',0.7));
                 };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
-
         function handleImageUpload(event) {
-            var file = event.target.files[0];
-            if (!file) return;
-            if (file.size > 10 * 1024 * 1024) { showToast('Image must be under 10MB'); return; }
-            compressImage(file, function(dataUrl) {
-                uploadedImage = dataUrl;
-                displayImagePreview();
-                document.getElementById('descriptionInput').value = '';
-            });
+            var file = event.target.files[0]; if(!file) return;
+            if(file.size>10*1024*1024){showToast('Image must be under 10MB');return;}
+            compressImage(file,function(d){uploadedImage=d;displayImagePreview();document.getElementById('descriptionInput').value='';});
         }
-
-        function displayImagePreview() {
-            document.getElementById('imagePreview').src = uploadedImage;
-            document.getElementById('imagePreviewContainer').classList.remove('hidden');
-            document.getElementById('uploadArea').classList.add('hidden');
+        function displayImagePreview() { document.getElementById('imagePreview').src=uploadedImage;document.getElementById('imagePreviewContainer').classList.remove('hidden');document.getElementById('uploadArea').classList.add('hidden'); }
+        function removeImage(e) { e.stopPropagation();uploadedImage=null;document.getElementById('imagePreviewContainer').classList.add('hidden');document.getElementById('uploadArea').classList.remove('hidden');document.getElementById('photoInput').value=''; }
+        function handleBattleUpload(event,num) {
+            var file=event.target.files[0];if(!file)return;if(file.size>10*1024*1024){showToast('Image must be under 10MB');return;}
+            compressImage(file,function(d){if(num===1)battleImage1=d;else battleImage2=d;document.getElementById('battleImg'+num).src=d;document.getElementById('battlePreview'+num).classList.remove('hidden');document.getElementById('battleUpload'+num).classList.add('hidden');});
         }
+        function removeBattleImage(e,num) { e.stopPropagation();if(num===1)battleImage1=null;else battleImage2=null;document.getElementById('battlePreview'+num).classList.add('hidden');document.getElementById('battleUpload'+num).classList.remove('hidden');document.getElementById('battleInput'+num).value=''; }
+        function selectCategory(event,cat) { currentCategory=cat;document.querySelectorAll('.cat-btn').forEach(function(b){b.classList.remove('selected');});event.target.classList.add('selected'); }
 
-        function removeImage(e) {
-            e.stopPropagation();
-            uploadedImage = null;
-            document.getElementById('imagePreviewContainer').classList.add('hidden');
-            document.getElementById('uploadArea').classList.remove('hidden');
-            document.getElementById('photoInput').value = '';
-        }
-
-        // ===== BATTLE IMAGE HANDLING =====
-        function handleBattleUpload(event, num) {
-            var file = event.target.files[0];
-            if (!file) return;
-            if (file.size > 10 * 1024 * 1024) { showToast('Image must be under 10MB'); return; }
-            compressImage(file, function(dataUrl) {
-                if (num === 1) battleImage1 = dataUrl;
-                else battleImage2 = dataUrl;
-                document.getElementById('battleImg' + num).src = dataUrl;
-                document.getElementById('battlePreview' + num).classList.remove('hidden');
-                document.getElementById('battleUpload' + num).classList.add('hidden');
-            });
-        }
-
-        function removeBattleImage(e, num) {
-            e.stopPropagation();
-            if (num === 1) battleImage1 = null;
-            else battleImage2 = null;
-            document.getElementById('battlePreview' + num).classList.add('hidden');
-            document.getElementById('battleUpload' + num).classList.remove('hidden');
-            document.getElementById('battleInput' + num).value = '';
-        }
-
-        // ===== CATEGORY SELECTION =====
-        function selectCategory(event, category) {
-            currentCategory = category;
-            document.querySelectorAll('.cat-btn').forEach(function(btn) { btn.classList.remove('selected'); });
-            event.target.classList.add('selected');
-        }
-
-        // ===== NAVIGATION =====
         function startRating() {
             isBattleMode = false;
-            document.getElementById('landingPage').classList.add('hidden');
-            document.getElementById('resultsPage').classList.remove('active');
-            document.getElementById('battleResultsPage').classList.remove('active');
-            document.getElementById('battleInterface').classList.add('hidden');
-            document.getElementById('battleButtonContainer').style.display = 'none';
-            if (canRate()) {
+            hideAllPages();
+            document.getElementById('bottomNav').classList.add('show');
+            if(canRate()){
                 document.getElementById('ratingInterface').classList.remove('hidden');
-                document.getElementById('rateButtonContainer').style.display = 'block';
-                updateRateButtonStyle();
-                updateRateButtonText();
-            } else {
-                showPaywall();
-            }
+                document.getElementById('rateButtonContainer').style.display='block';
+                updateRateButtonStyle(); updateRateButtonText(); loadDailyChallenge();
+            } else { showPaywall(); }
             loadHistory();
+            if(currentUserId) document.getElementById('profileBtn').style.display='flex';
         }
 
         function startBattle() {
             isBattleMode = true;
-            document.getElementById('landingPage').classList.add('hidden');
-            document.getElementById('resultsPage').classList.remove('active');
-            document.getElementById('battleResultsPage').classList.remove('active');
-            document.getElementById('ratingInterface').classList.add('hidden');
-            document.getElementById('rateButtonContainer').style.display = 'none';
-            if (canRate()) {
+            hideAllPages();
+            document.getElementById('bottomNav').classList.add('show');
+            if(canRate()){
                 document.getElementById('battleInterface').classList.remove('hidden');
-                document.getElementById('battleButtonContainer').style.display = 'block';
-            } else {
-                showPaywall();
-            }
+                document.getElementById('battleButtonContainer').style.display='block';
+            } else { showPaywall(); }
         }
 
-        function updateRateButtonText() {
-            var remaining = getRatingsRemaining();
-            var btn = document.getElementById('rateBtn');
-            btn.textContent = remaining <= 3 ? 'Rate It (' + remaining + ' left)' : 'Rate It';
-        }
+        function updateRateButtonText() { var r=getRatingsRemaining();var btn=document.getElementById('rateBtn');btn.textContent=r<=3?'Rate It ('+r+' left)':'Rate It'; }
 
         function goBack() {
-            document.getElementById('resultsPage').classList.remove('active');
-            document.getElementById('battleResultsPage').classList.remove('active');
-            document.getElementById('paywallScreen').classList.remove('active');
-            document.getElementById('loadingState').classList.remove('active');
-            document.getElementById('shareCardContainer').classList.remove('active');
-
-            if (isBattleMode) {
-                if (canRate()) {
-                    document.getElementById('battleInterface').classList.remove('hidden');
-                    document.getElementById('battleButtonContainer').style.display = 'block';
-                } else { showPaywall(); }
-                clearBattleForm();
-            } else {
-                if (canRate()) {
-                    document.getElementById('ratingInterface').classList.remove('hidden');
-                    document.getElementById('rateButtonContainer').style.display = 'block';
-                    updateRateButtonText();
-                } else { showPaywall(); }
-                clearForm();
-            }
+            hideAllPages();
+            if(isBattleMode){ if(canRate()){document.getElementById('battleInterface').classList.remove('hidden');document.getElementById('battleButtonContainer').style.display='block';}else{showPaywall();}clearBattleForm(); }
+            else { if(canRate()){document.getElementById('ratingInterface').classList.remove('hidden');document.getElementById('rateButtonContainer').style.display='block';updateRateButtonText();}else{showPaywall();}clearForm(); }
         }
+        function clearForm() { uploadedImage=null;isDailyChallenge=false;document.getElementById('descriptionInput').value='';document.getElementById('photoInput').value='';document.getElementById('imagePreviewContainer').classList.add('hidden');document.getElementById('uploadArea').classList.remove('hidden');document.querySelectorAll('.cat-btn').forEach(function(b){b.classList.remove('selected');});currentCategory='Other'; }
+        function clearBattleForm() { battleImage1=null;battleImage2=null;['1','2'].forEach(function(n){document.getElementById('battlePreview'+n).classList.add('hidden');document.getElementById('battleUpload'+n).classList.remove('hidden');document.getElementById('battleInput'+n).value='';});document.getElementById('battleDescInput').value='';document.querySelectorAll('.cat-btn').forEach(function(b){b.classList.remove('selected');});currentCategory='Other'; }
 
-        function clearForm() {
-            uploadedImage = null;
-            document.getElementById('descriptionInput').value = '';
-            document.getElementById('photoInput').value = '';
-            document.getElementById('imagePreviewContainer').classList.add('hidden');
-            document.getElementById('uploadArea').classList.remove('hidden');
-            document.querySelectorAll('.cat-btn').forEach(function(btn) { btn.classList.remove('selected'); });
-            currentCategory = 'Other';
+        // ===== SIGNUP =====
+        function promptSignup() {
+            if(currentUserId) return;
+            hideAllPages();
+            document.getElementById('signupScreen').classList.remove('hidden');
+            document.getElementById('signupScreen').classList.add('active');
         }
-
-        function clearBattleForm() {
-            battleImage1 = null; battleImage2 = null;
-            ['1','2'].forEach(function(n) {
-                document.getElementById('battlePreview' + n).classList.add('hidden');
-                document.getElementById('battleUpload' + n).classList.remove('hidden');
-                document.getElementById('battleInput' + n).value = '';
-            });
-            document.getElementById('battleDescInput').value = '';
-            document.querySelectorAll('.cat-btn').forEach(function(btn) { btn.classList.remove('selected'); });
-            currentCategory = 'Other';
-        }
-
-        // ===== RATING SUBMISSION =====
-        async function submitRating() {
-            if (!canRate()) { showPaywall(); return; }
-
-            var description = document.getElementById('descriptionInput').value.trim();
-            if (!uploadedImage && !description) { showToast('Upload a photo or write a description'); return; }
-
-            document.getElementById('ratingInterface').classList.add('hidden');
-            document.getElementById('loadingState').classList.add('active');
-            document.getElementById('rateButtonContainer').style.display = 'none';
-            startLoadingMessages();
-
+        async function doSignup() {
+            var username = document.getElementById('usernameInput').value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'');
+            if(!username||username.length<2){showToast('Enter a username (2+ chars)');return;}
             try {
-                var response = await fetch('/api/rate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        image: uploadedImage || null,
-                        text: description || null,
-                        mode: currentMode,
-                        category: currentCategory.toLowerCase()
-                    })
-                });
-
-                if (!response.ok) {
-                    var err = await response.json().catch(function() { return {}; });
-                    throw new Error(err.error || 'Rating failed');
-                }
-
-                var data = await response.json();
-                setRatingsUsed(getRatingsUsed() + 1);
-
-                displayResults({
-                    score: data.score,
-                    category: currentCategory,
-                    commentary: data.commentary,
-                    vibe: data.vibe,
-                    mode: currentMode,
-                    image: uploadedImage
-                });
-            } catch (error) {
-                console.error('Rating error:', error);
-                stopLoadingMessages();
-                showToast('Something went wrong: ' + error.message);
-                document.getElementById('loadingState').classList.remove('active');
-                document.getElementById('ratingInterface').classList.remove('hidden');
-                document.getElementById('rateButtonContainer').style.display = 'block';
-            }
+                var res = await fetch('/api/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:username})});
+                var data = await res.json();
+                if(data.error){showToast(data.error);return;}
+                currentUserId=data.userId;currentUsername=data.username;currentFriendCode=data.friendCode;
+                saveUserState();
+                document.getElementById('profileBtn').style.display='flex';
+                document.getElementById('profileBtn').textContent=currentUsername[0].toUpperCase();
+                showToast('Welcome, @'+currentUsername+'!');
+                startRating();
+            } catch(e) { showToast('Signup failed'); }
         }
+        function skipSignup() { startRating(); }
 
-        // ===== BATTLE SUBMISSION =====
-        async function submitBattle() {
-            if (!canRate()) { showPaywall(); return; }
-            if (!battleImage1 || !battleImage2) { showToast('Upload both images for battle!'); return; }
-
-            document.getElementById('battleInterface').classList.add('hidden');
-            document.getElementById('battleButtonContainer').style.display = 'none';
-            document.getElementById('loadingState').classList.add('active');
-            startLoadingMessages();
-
+        // ===== DAILY CHALLENGE =====
+        async function loadDailyChallenge() {
             try {
-                var response = await fetch('/api/battle', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        image1: battleImage1,
-                        image2: battleImage2,
-                        text: document.getElementById('battleDescInput').value.trim() || null,
-                        mode: currentMode,
-                        category: currentCategory.toLowerCase()
-                    })
-                });
-
-                if (!response.ok) {
-                    var err = await response.json().catch(function() { return {}; });
-                    throw new Error(err.error || 'Battle failed');
-                }
-
-                var data = await response.json();
-                setRatingsUsed(getRatingsUsed() + 1);
-                displayBattleResults(data);
-            } catch (error) {
-                console.error('Battle error:', error);
-                stopLoadingMessages();
-                showToast('Battle failed: ' + error.message);
-                document.getElementById('loadingState').classList.remove('active');
-                document.getElementById('battleInterface').classList.remove('hidden');
-                document.getElementById('battleButtonContainer').style.display = 'block';
-            }
-        }
-
-        // ===== BATTLE RESULTS DISPLAY =====
-        function displayBattleResults(data) {
-            currentBattleResult = data;
-            stopLoadingMessages();
-
-            var modeColors = {
-                roast: '#ff2d55', hype: '#30d5c8', honest: '#ff9f0a',
-                unhinged: '#bf5af2', rizz: '#ffd60a'
-            };
-            var color = modeColors[currentMode] || '#ff2d55';
-
-            // Images
-            document.getElementById('battleResultImg1').src = battleImage1;
-            document.getElementById('battleResultImg2').src = battleImage2;
-
-            // Scores
-            var s1 = parseFloat(data.score1);
-            var s2 = parseFloat(data.score2);
-            var el1 = document.getElementById('battleScore1');
-            var el2 = document.getElementById('battleScore2');
-            el1.textContent = '0.0'; el2.textContent = '0.0';
-            el1.style.color = color; el2.style.color = color;
-
-            // Vibes
-            var v1 = document.getElementById('battleVibe1');
-            var v2 = document.getElementById('battleVibe2');
-            v1.textContent = (data.vibe1 || '').toUpperCase();
-            v2.textContent = (data.vibe2 || '').toUpperCase();
-            v1.style.background = color + '22'; v1.style.color = color;
-            v2.style.background = color + '22'; v2.style.color = color;
-
-            // Commentary
-            document.getElementById('battleComm1').textContent = data.commentary1 || '';
-            document.getElementById('battleComm2').textContent = data.commentary2 || '';
-
-            // Winner
-            var winner = parseInt(data.winner);
-            var card1 = document.getElementById('battleResult1');
-            var card2 = document.getElementById('battleResult2');
-            card1.classList.remove('winner'); card2.classList.remove('winner');
-            if (winner === 1) card1.classList.add('winner');
-            else card2.classList.add('winner');
-
-            // Verdict
-            document.getElementById('battleVerdict').textContent = data.verdict || 'And the winner is...';
-
-            document.getElementById('loadingState').classList.remove('active');
-            document.getElementById('battleResultsPage').classList.add('active');
-
-            // Animate scores after delay
-            setTimeout(function() {
-                animateScore(s1, el1);
-                animateScore(s2, el2);
-                playBattleSound();
-            }, 200);
-
-            // Confetti for winner
-            setTimeout(launchConfetti, 700);
-
-            currentRatingCount++;
-            document.getElementById('ratingCounter').textContent = currentRatingCount.toLocaleString();
-        }
-
-        // Loading message rotation
-        var loadingMessages = [
-            'Analyzing every detail...',
-            'Calculating your score...',
-            'Preparing the verdict...',
-            'Almost ready...',
-            'This is going to be good...',
-            'Judging intensifies...',
-            'No mercy mode activated...',
-            'Processing your fate...'
-        ];
-        var loadingInterval = null;
-
-        function startLoadingMessages() {
-            var i = 0;
-            var el = document.getElementById('loadingMsg');
-            var titles = {
-                roast: ['Roasting in progress...', 'Preparing the destruction...', 'Loading savage commentary...'],
-                hype: ['Generating good vibes...', 'Charging hype levels...', 'Maximizing positivity...'],
-                honest: ['Removing all filters...', 'Activating truth mode...', 'No sugar coating...'],
-                unhinged: ['Entering chaos mode...', 'Brain cells disconnecting...', 'Reality bending...'],
-                rizz: ['Scanning for rizz...', 'Evaluating the aura...', 'Detecting main character energy...']
-            };
-            var modeTitle = titles[currentMode] || titles.roast;
-            document.getElementById('loadingTitle').textContent = isBattleMode ? 'Judging the battle...' : modeTitle[0];
-            loadingInterval = setInterval(function() {
-                i = (i + 1) % loadingMessages.length;
-                el.style.opacity = '0';
-                setTimeout(function() {
-                    el.textContent = loadingMessages[i];
-                    el.style.opacity = '1';
-                    if (i % 3 === 0) {
-                        var ti = Math.floor(Math.random() * modeTitle.length);
-                        document.getElementById('loadingTitle').textContent = isBattleMode ? 'Comparing the contenders...' : modeTitle[ti];
+                var res = await fetch('/api/daily');
+                var data = await res.json();
+                dailyChallenge = data.challenge;
+                var banner = document.getElementById('dailyBanner');
+                banner.style.display = 'block';
+                document.getElementById('dailyEmoji').textContent = dailyChallenge.emoji;
+                document.getElementById('dailyTitle').textContent = dailyChallenge.title;
+                document.getElementById('dailyPrompt').textContent = dailyChallenge.prompt;
+                // Check if already done
+                if(currentUserId) {
+                    var dashRes = await fetch('/api/dashboard/'+currentUserId);
+                    var dashData = await dashRes.json();
+                    if(dashData.didDailyChallenge) {
+                        document.getElementById('dailyDoneBadge').style.display='inline-block';
+                    } else {
+                        document.getElementById('dailyDoneBadge').style.display='none';
                     }
-                }, 200);
-            }, 2000);
+                }
+            } catch(e) {}
         }
-
-        function stopLoadingMessages() {
-            if (loadingInterval) { clearInterval(loadingInterval); loadingInterval = null; }
-        }
-
-        // Confetti effect for high scores
-        function launchConfetti() {
-            var container = document.createElement('div');
-            container.className = 'confetti-container';
-            document.body.appendChild(container);
-            var colors = ['#ff2d55','#af52de','#30d5c8','#34c759','#ff9f0a','#ffd60a','#bf5af2','#ff6723'];
-            for (var i = 0; i < 40; i++) {
-                var piece = document.createElement('div');
-                piece.className = 'confetti-piece';
-                piece.style.left = Math.random() * 100 + '%';
-                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-                piece.style.animationDelay = Math.random() * 1 + 's';
-                piece.style.animationDuration = (2 + Math.random() * 2) + 's';
-                piece.style.width = (5 + Math.random() * 8) + 'px';
-                piece.style.height = (5 + Math.random() * 8) + 'px';
-                container.appendChild(piece);
+        function startDailyChallenge() {
+            isDailyChallenge = true;
+            if(dailyChallenge && dailyChallenge.category) {
+                currentCategory = dailyChallenge.category.charAt(0).toUpperCase() + dailyChallenge.category.slice(1);
             }
-            setTimeout(function() { container.remove(); }, 4000);
+            showToast('Daily challenge: ' + (dailyChallenge ? dailyChallenge.prompt : 'Rate something!'));
         }
 
-        // Animated score counter
-        function animateScore(target, el) {
-            var start = 0;
-            var duration = 800;
-            var startTime = null;
-            function step(timestamp) {
-                if (!startTime) startTime = timestamp;
-                var progress = Math.min((timestamp - startTime) / duration, 1);
-                var eased = 1 - Math.pow(1 - progress, 3);
-                var current = start + (target - start) * eased;
-                el.textContent = current.toFixed(1);
-                if (progress < 1) requestAnimationFrame(step);
+        // ===== SUBMIT RATING =====
+        async function submitRating() {
+            if(!canRate()){showPaywall();return;}
+            var description=document.getElementById('descriptionInput').value.trim();
+            if(!uploadedImage&&!description){showToast('Upload a photo or write a description');return;}
+            // Prompt signup after 2nd rating
+            if(!currentUserId && getRatingsUsed()>=1) { promptSignup(); return; }
+            document.getElementById('ratingInterface').classList.add('hidden');
+            document.getElementById('loadingState').classList.add('active');document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('rateButtonContainer').style.display='none';
+            startLoadingMessages();
+            try {
+                var response=await fetch('/api/rate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:uploadedImage||null,text:description||null,mode:currentMode,category:currentCategory.toLowerCase()})});
+                if(!response.ok){var err=await response.json().catch(function(){return{};});throw new Error(err.error||'Rating failed');}
+                var data=await response.json();
+                setRatingsUsed(getRatingsUsed()+1);
+                // Save to server if logged in
+                if(currentUserId) {
+                    fetch('/api/save-rating',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:currentUserId,score:data.score,commentary:data.commentary,vibe:data.vibe,mode:currentMode,category:currentCategory.toLowerCase(),isDaily:isDailyChallenge})}).catch(function(){});
+                }
+                displayResults({score:data.score,category:currentCategory,commentary:data.commentary,vibe:data.vibe,mode:currentMode,image:uploadedImage});
+            } catch(error) {
+                console.error('Rating error:',error);stopLoadingMessages();showToast('Something went wrong: '+error.message);
+                document.getElementById('loadingState').classList.remove('active');document.getElementById('ratingInterface').classList.remove('hidden');document.getElementById('rateButtonContainer').style.display='block';
             }
-            requestAnimationFrame(step);
         }
+
+        async function submitBattle() {
+            if(!canRate()){showPaywall();return;}
+            if(!battleImage1||!battleImage2){showToast('Upload both images for battle!');return;}
+            document.getElementById('battleInterface').classList.add('hidden');document.getElementById('battleButtonContainer').style.display='none';
+            document.getElementById('loadingState').classList.add('active');document.getElementById('loadingState').classList.remove('hidden');
+            startLoadingMessages();
+            try {
+                var response=await fetch('/api/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image1:battleImage1,image2:battleImage2,text:document.getElementById('battleDescInput').value.trim()||null,mode:currentMode,category:currentCategory.toLowerCase()})});
+                if(!response.ok){var err=await response.json().catch(function(){return{};});throw new Error(err.error||'Battle failed');}
+                var data=await response.json();
+                setRatingsUsed(getRatingsUsed()+1);
+                displayBattleResults(data);
+            } catch(error) {
+                console.error('Battle error:',error);stopLoadingMessages();showToast('Battle failed: '+error.message);
+                document.getElementById('loadingState').classList.remove('active');document.getElementById('battleInterface').classList.remove('hidden');document.getElementById('battleButtonContainer').style.display='block';
+            }
+        }
+
+        function displayBattleResults(data) {
+            currentBattleResult=data;stopLoadingMessages();
+            var modeColors={roast:'#ff2d55',hype:'#30d5c8',honest:'#ff9f0a',unhinged:'#bf5af2',rizz:'#ffd60a'};
+            var color=modeColors[currentMode]||'#ff2d55';
+            document.getElementById('battleResultImg1').src=battleImage1;document.getElementById('battleResultImg2').src=battleImage2;
+            var s1=parseFloat(data.score1),s2=parseFloat(data.score2);
+            var el1=document.getElementById('battleScore1'),el2=document.getElementById('battleScore2');
+            el1.textContent='0.0';el2.textContent='0.0';el1.style.color=color;el2.style.color=color;
+            document.getElementById('battleVibe1').textContent=(data.vibe1||'').toUpperCase();
+            document.getElementById('battleVibe2').textContent=(data.vibe2||'').toUpperCase();
+            document.getElementById('battleVibe1').style.background=color+'22';document.getElementById('battleVibe1').style.color=color;
+            document.getElementById('battleVibe2').style.background=color+'22';document.getElementById('battleVibe2').style.color=color;
+            document.getElementById('battleComm1').textContent=data.commentary1||'';
+            document.getElementById('battleComm2').textContent=data.commentary2||'';
+            var winner=parseInt(data.winner);
+            document.getElementById('battleResult1').classList.remove('winner');document.getElementById('battleResult2').classList.remove('winner');
+            if(winner===1)document.getElementById('battleResult1').classList.add('winner');else document.getElementById('battleResult2').classList.add('winner');
+            document.getElementById('battleVerdict').textContent=data.verdict||'';
+            document.getElementById('loadingState').classList.remove('active');
+            document.getElementById('battleResultsPage').classList.remove('hidden');document.getElementById('battleResultsPage').classList.add('active');
+            setTimeout(function(){animateScore(s1,el1);animateScore(s2,el2);playBattleSound();},200);
+            setTimeout(launchConfetti,700);
+            currentRatingCount++;document.getElementById('ratingCounter').textContent=currentRatingCount.toLocaleString();
+        }
+
+        // Loading messages
+        var loadingMessages=['Analyzing every detail...','Calculating your score...','Preparing the verdict...','Almost ready...','This is going to be good...','Judging intensifies...','No mercy mode activated...','Processing your fate...'];
+        var loadingInterval=null;
+        function startLoadingMessages() {
+            var i=0;var el=document.getElementById('loadingMsg');
+            var titles={roast:['Roasting in progress...','Preparing the destruction...'],hype:['Generating good vibes...','Charging hype levels...'],honest:['Removing all filters...','Activating truth mode...'],unhinged:['Entering chaos mode...','Brain cells disconnecting...'],rizz:['Scanning for rizz...','Evaluating the aura...']};
+            var mt=titles[currentMode]||titles.roast;document.getElementById('loadingTitle').textContent=isBattleMode?'Judging the battle...':mt[0];
+            loadingInterval=setInterval(function(){i=(i+1)%loadingMessages.length;el.style.opacity='0';setTimeout(function(){el.textContent=loadingMessages[i];el.style.opacity='1';if(i%3===0)document.getElementById('loadingTitle').textContent=isBattleMode?'Comparing contenders...':mt[Math.floor(Math.random()*mt.length)];},200);},2000);
+        }
+        function stopLoadingMessages() { if(loadingInterval){clearInterval(loadingInterval);loadingInterval=null;} }
+        function launchConfetti() { var c=document.createElement('div');c.className='confetti-container';document.body.appendChild(c);var colors=['#ff2d55','#af52de','#30d5c8','#34c759','#ff9f0a','#ffd60a','#bf5af2','#ff6723'];for(var i=0;i<40;i++){var p=document.createElement('div');p.className='confetti-piece';p.style.left=Math.random()*100+'%';p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDelay=Math.random()*1+'s';p.style.animationDuration=(2+Math.random()*2)+'s';p.style.width=(5+Math.random()*8)+'px';p.style.height=(5+Math.random()*8)+'px';c.appendChild(p);}setTimeout(function(){c.remove();},4000); }
+        function animateScore(target,el) { var start=0,duration=800,startTime=null;function step(ts){if(!startTime)startTime=ts;var p=Math.min((ts-startTime)/duration,1);var eased=1-Math.pow(1-p,3);el.textContent=(start+(target-start)*eased).toFixed(1);if(p<1)requestAnimationFrame(step);}requestAnimationFrame(step); }
 
         function displayResults(rating) {
-            currentRating = rating;
-            stopLoadingMessages();
-
-            var scoreCard = document.getElementById('scoreCard');
-            scoreCard.className = 'score-card ' + rating.mode;
-
-            var imgContainer = document.getElementById('resultImageThumbnail');
-            imgContainer.innerHTML = rating.image
-                ? '<img src="' + rating.image + '" class="result-thumb" alt="Rated">'
-                : '';
-
-            var s = parseFloat(rating.score);
-            var scoreEl = document.getElementById('scoreNumber');
-            scoreEl.textContent = '0.0';
-            document.getElementById('scoreGaugeFill').style.setProperty('--pct', (s / 10 * 100) + '%');
-            document.getElementById('scoreCategoryLabel').textContent = rating.category;
-
-            var labels = { roast:'🔥 Roast Mode', hype:'✨ Hype Mode', honest:'😐 Brutally Honest', unhinged:'🤪 Unhinged', rizz:'💀 Rizz Check' };
-            document.getElementById('modeBadge').textContent = labels[rating.mode] || rating.mode;
-
-            // Vibe badge
-            var vibe = rating.vibe || '';
-            document.getElementById('vibeBadge').textContent = vibe.toUpperCase();
-            document.getElementById('vibeBadge').style.display = vibe ? 'inline-block' : 'none';
-
-            document.getElementById('commentary').innerHTML = rating.commentary.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-
+            currentRating=rating;stopLoadingMessages();isDailyChallenge=false;
+            document.getElementById('scoreCard').className='score-card '+rating.mode;
+            document.getElementById('resultImageThumbnail').innerHTML=rating.image?'<img src="'+rating.image+'" class="result-thumb" alt="Rated">':'';
+            var s=parseFloat(rating.score);var scoreEl=document.getElementById('scoreNumber');scoreEl.textContent='0.0';
+            document.getElementById('scoreGaugeFill').style.setProperty('--pct',(s/10*100)+'%');
+            document.getElementById('scoreCategoryLabel').textContent=rating.category;
+            var labels={roast:'🔥 Roast Mode',hype:'✨ Hype Mode',honest:'😐 Brutally Honest',unhinged:'🤪 Unhinged',rizz:'💀 Rizz Check'};
+            document.getElementById('modeBadge').textContent=labels[rating.mode]||rating.mode;
+            var vibe=rating.vibe||'';document.getElementById('vibeBadge').textContent=vibe.toUpperCase();document.getElementById('vibeBadge').style.display=vibe?'inline-block':'none';
+            document.getElementById('commentary').innerHTML=rating.commentary.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
             document.getElementById('loadingState').classList.remove('active');
-            document.getElementById('resultsPage').classList.add('active');
-
-            // Animate score counter + play sound
-            setTimeout(function() {
-                animateScore(s, scoreEl);
-                playScoreSound(s);
-            }, 200);
-
-            // Confetti for high scores (8+) or unhinged mode
-            if (s >= 8 || rating.mode === 'unhinged') {
-                setTimeout(launchConfetti, 600);
-            }
-
-            // Generate shareable card
-            setTimeout(function() { generateShareCard(rating, s); }, 1000);
-
-            currentRatingCount++;
-            document.getElementById('ratingCounter').textContent = currentRatingCount.toLocaleString();
+            document.getElementById('resultsPage').classList.remove('hidden');document.getElementById('resultsPage').classList.add('active');
+            setTimeout(function(){animateScore(s,scoreEl);playScoreSound(s);},200);
+            if(s>=8||rating.mode==='unhinged') setTimeout(launchConfetti,600);
+            setTimeout(function(){generateShareCard(rating,s);},1000);
+            currentRatingCount++;document.getElementById('ratingCounter').textContent=currentRatingCount.toLocaleString();
             addToHistory(rating);
         }
 
-        // ===== SHAREABLE SCORE CARD (Canvas-based) =====
-        function generateShareCard(rating, score) {
-            var canvas = document.getElementById('shareCanvas');
-            var ctx = canvas.getContext('2d');
-            canvas.width = 600;
-            canvas.height = 400;
-
-            // Background gradient
-            var grad = ctx.createLinearGradient(0, 0, 600, 400);
-            grad.addColorStop(0, '#0a0a0a');
-            grad.addColorStop(1, '#1a1a2e');
-            ctx.fillStyle = grad;
-            ctx.fillRect(0, 0, 600, 400);
-
-            // Mode accent colors
-            var modeColors = {
-                roast: ['#ff2d55', '#af52de'],
-                hype: ['#30d5c8', '#34c759'],
-                honest: ['#ff9f0a', '#ff6723'],
-                unhinged: ['#bf5af2', '#30d5c8'],
-                rizz: ['#ff2d55', '#ffd60a']
-            };
-            var colors = modeColors[rating.mode] || modeColors.roast;
-
-            // Accent glow
-            var glow = ctx.createRadialGradient(300, 160, 0, 300, 160, 250);
-            glow.addColorStop(0, colors[0] + '25');
-            glow.addColorStop(1, 'transparent');
-            ctx.fillStyle = glow;
-            ctx.fillRect(0, 0, 600, 400);
-
-            // Border
-            ctx.strokeStyle = colors[0] + '40';
-            ctx.lineWidth = 2;
-            ctx.roundRect(10, 10, 580, 380, 20);
-            ctx.stroke();
-
-            // Site name
-            ctx.fillStyle = '#8e8e93';
-            ctx.font = '600 12px Inter, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('RATEMYANYTHING.AI', 300, 45);
-
-            // Category
-            ctx.fillStyle = '#636366';
-            ctx.font = '700 11px Inter, sans-serif';
-            ctx.fillText(rating.category.toUpperCase(), 300, 70);
-
-            // Score
-            ctx.fillStyle = colors[0];
-            ctx.font = '900 96px Inter, sans-serif';
-            ctx.fillText(score.toFixed(1), 300, 175);
-
-            // /10
-            ctx.fillStyle = '#636366';
-            ctx.font = '600 20px Inter, sans-serif';
-            ctx.fillText('/ 10', 300, 205);
-
-            // Vibe badge
-            if (rating.vibe) {
-                ctx.fillStyle = colors[0] + '30';
-                var vibeText = rating.vibe.toUpperCase();
-                var vibeW = ctx.measureText(vibeText).width + 24;
-                ctx.beginPath();
-                ctx.roundRect(300 - vibeW/2, 220, vibeW, 30, 15);
-                ctx.fill();
-                ctx.fillStyle = colors[0];
-                ctx.font = '800 13px Inter, sans-serif';
-                ctx.fillText(vibeText, 300, 240);
-            }
-
-            // Mode label
-            var modeLabels = { roast:'🔥 ROAST MODE', hype:'✨ HYPE MODE', honest:'😐 BRUTALLY HONEST', unhinged:'🤪 UNHINGED', rizz:'💀 RIZZ CHECK' };
-            ctx.fillStyle = colors[0];
-            ctx.font = '700 11px Inter, sans-serif';
-            ctx.fillText(modeLabels[rating.mode] || '', 300, 275);
-
-            // Commentary (truncated)
-            ctx.fillStyle = '#8e8e93';
-            ctx.font = '500 13px Inter, sans-serif';
-            var comm = rating.commentary;
-            if (comm.length > 120) comm = comm.substring(0, 117) + '...';
-            // Word wrap
-            var words = comm.split(' ');
-            var lines = []; var line = '';
-            words.forEach(function(word) {
-                var test = line + word + ' ';
-                if (ctx.measureText(test).width > 480) {
-                    lines.push(line.trim());
-                    line = word + ' ';
-                } else { line = test; }
-            });
-            lines.push(line.trim());
-            lines.slice(0, 3).forEach(function(l, i) {
-                ctx.fillText(l, 300, 305 + i * 20);
-            });
-
-            // Watermark
-            ctx.fillStyle = '#3a3a3c';
-            ctx.font = '600 10px Inter, sans-serif';
-            ctx.fillText('ratemyanything.net', 300, 380);
-
-            // Convert to image
-            var imgEl = document.getElementById('shareCardImage');
-            imgEl.src = canvas.toDataURL('image/png');
-            document.getElementById('shareCardContainer').classList.add('active');
+        // Share card
+        function generateShareCard(rating,score) {
+            var canvas=document.getElementById('shareCanvas');var ctx=canvas.getContext('2d');canvas.width=600;canvas.height=400;
+            var grad=ctx.createLinearGradient(0,0,600,400);grad.addColorStop(0,'#0a0a0a');grad.addColorStop(1,'#1a1a2e');ctx.fillStyle=grad;ctx.fillRect(0,0,600,400);
+            var mc={roast:['#ff2d55','#af52de'],hype:['#30d5c8','#34c759'],honest:['#ff9f0a','#ff6723'],unhinged:['#bf5af2','#30d5c8'],rizz:['#ff2d55','#ffd60a']};var colors=mc[rating.mode]||mc.roast;
+            var glow=ctx.createRadialGradient(300,160,0,300,160,250);glow.addColorStop(0,colors[0]+'25');glow.addColorStop(1,'transparent');ctx.fillStyle=glow;ctx.fillRect(0,0,600,400);
+            ctx.strokeStyle=colors[0]+'40';ctx.lineWidth=2;ctx.roundRect(10,10,580,380,20);ctx.stroke();
+            ctx.fillStyle='#8e8e93';ctx.font='600 12px Inter,sans-serif';ctx.textAlign='center';ctx.fillText('RATEMYANYTHING.AI',300,45);
+            ctx.fillStyle='#636366';ctx.font='700 11px Inter,sans-serif';ctx.fillText(rating.category.toUpperCase(),300,70);
+            ctx.fillStyle=colors[0];ctx.font='900 96px Inter,sans-serif';ctx.fillText(score.toFixed(1),300,175);
+            ctx.fillStyle='#636366';ctx.font='600 20px Inter,sans-serif';ctx.fillText('/ 10',300,205);
+            if(rating.vibe){ctx.fillStyle=colors[0]+'30';var vt=rating.vibe.toUpperCase();var vw=ctx.measureText(vt).width+24;ctx.beginPath();ctx.roundRect(300-vw/2,220,vw,30,15);ctx.fill();ctx.fillStyle=colors[0];ctx.font='800 13px Inter,sans-serif';ctx.fillText(vt,300,240);}
+            var ml={roast:'🔥 ROAST MODE',hype:'✨ HYPE MODE',honest:'😐 BRUTALLY HONEST',unhinged:'🤪 UNHINGED',rizz:'💀 RIZZ CHECK'};ctx.fillStyle=colors[0];ctx.font='700 11px Inter,sans-serif';ctx.fillText(ml[rating.mode]||'',300,275);
+            ctx.fillStyle='#8e8e93';ctx.font='500 13px Inter,sans-serif';var comm=rating.commentary;if(comm.length>120)comm=comm.substring(0,117)+'...';
+            var words=comm.split(' ');var lines=[];var line='';words.forEach(function(w){var t=line+w+' ';if(ctx.measureText(t).width>480){lines.push(line.trim());line=w+' ';}else{line=t;}});lines.push(line.trim());
+            lines.slice(0,3).forEach(function(l,i){ctx.fillText(l,300,305+i*20);});
+            ctx.fillStyle='#3a3a3c';ctx.font='600 10px Inter,sans-serif';ctx.fillText('ratemyanything.net',300,380);
+            document.getElementById('shareCardImage').src=canvas.toDataURL('image/png');document.getElementById('shareCardContainer').classList.add('active');
         }
+        function saveShareCard() { var c=document.getElementById('shareCanvas');var l=document.createElement('a');l.download='ratemyanything-score.png';l.href=c.toDataURL('image/png');l.click();showToast('Score card saved!'); }
 
-        function saveShareCard() {
-            var canvas = document.getElementById('shareCanvas');
-            var link = document.createElement('a');
-            link.download = 'ratemyanything-score.png';
-            link.href = canvas.toDataURL('image/png');
-            link.click();
-            showToast('Score card saved! Share it on TikTok!');
-        }
+        // Sharing
+        function shareToClipboard() { var m={roast:'🔥 Roast',hype:'✨ Hype',honest:'😐 Honest',unhinged:'🤪 Unhinged',rizz:'💀 Rizz'};var text='I got '+currentRating.score+'/10 in '+(m[currentRating.mode]||currentRating.mode)+' Mode on RateMyAnything.ai!\n\n"'+currentRating.commentary+'"\n\nTry it: ratemyanything.net';navigator.clipboard.writeText(text).then(function(){showToast('Copied!');}); }
+        function shareToTwitter() { var m={roast:'🔥 Roast',hype:'✨ Hype',honest:'😐 Honest',unhinged:'🤪 Unhinged',rizz:'💀 Rizz'};var text='I got '+currentRating.score+'/10 in '+(m[currentRating.mode]||currentRating.mode)+' Mode on RateMyAnything.ai! Try it: ';window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(text)+'&url=https://ratemyanything.net','_blank'); }
+        function shareBattleToClipboard() { if(!currentBattleResult)return;var d=currentBattleResult;navigator.clipboard.writeText('⚔️ BATTLE on RateMyAnything.ai!\nItem 1: '+d.score1+'/10\nItem 2: '+d.score2+'/10\n'+d.verdict+'\nTry it: ratemyanything.net').then(function(){showToast('Copied!');}); }
+        function shareBattleToTwitter() { if(!currentBattleResult)return;var d=currentBattleResult;window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent('⚔️ Battle on RateMyAnything.ai! '+d.score1+' vs '+d.score2+' — '+d.verdict)+'&url=https://ratemyanything.net','_blank'); }
 
-        // ===== SHARING =====
-        function shareToClipboard() {
-            var m = { roast:'🔥 Roast', hype:'✨ Hype', honest:'😐 Honest', unhinged:'🤪 Unhinged', rizz:'💀 Rizz' };
-            var text = 'I got ' + currentRating.score + '/10 in ' + (m[currentRating.mode]||currentRating.mode) + ' Mode on RateMyAnything.ai!\n\n"' + currentRating.commentary + '"\n\nTry it: ratemyanything.net';
-            navigator.clipboard.writeText(text).then(function() { showToast('Copied to clipboard!'); });
-        }
+        // Payments
+        async function buyMoreRatings() { var btn=event.target;var orig=btn.textContent;btn.textContent='Loading...';btn.disabled=true;try{var r=await fetch('/api/create-checkout',{method:'POST',headers:{'Content-Type':'application/json'}});var d=await r.json();if(d.url){window.location.href=d.url;}else{alert('Error: '+(d.error||'Unknown'));btn.textContent=orig;btn.disabled=false;}}catch(e){alert('Failed: '+e.message);btn.textContent=orig;btn.disabled=false;} }
 
-        function shareToTwitter() {
-            var m = { roast:'🔥 Roast', hype:'✨ Hype', honest:'😐 Honest', unhinged:'🤪 Unhinged', rizz:'💀 Rizz' };
-            var text = 'I got ' + currentRating.score + '/10 in ' + (m[currentRating.mode]||currentRating.mode) + ' Mode on RateMyAnything.ai! Try it: ';
-            window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=https://ratemyanything.net', '_blank');
-        }
-
-        function shareBattleToClipboard() {
-            if (!currentBattleResult) return;
-            var d = currentBattleResult;
-            var text = '⚔️ BATTLE RESULTS on RateMyAnything.ai!\n\nItem 1: ' + d.score1 + '/10\nItem 2: ' + d.score2 + '/10\n\n' + d.verdict + '\n\nTry it: ratemyanything.net';
-            navigator.clipboard.writeText(text).then(function() { showToast('Copied to clipboard!'); });
-        }
-
-        function shareBattleToTwitter() {
-            if (!currentBattleResult) return;
-            var d = currentBattleResult;
-            var text = '⚔️ Head-to-Head Battle on RateMyAnything.ai!\n\n' + d.score1 + ' vs ' + d.score2 + '\n\n' + d.verdict + '\n\nTry it: ';
-            window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=https://ratemyanything.net', '_blank');
-        }
-
-        // ===== PAYMENTS =====
-        async function buyMoreRatings() {
-            var btn = event.target;
-            var origText = btn.textContent;
-            btn.textContent = 'Loading...';
-            btn.disabled = true;
+        // ===== DASHBOARD =====
+        async function showDashboard() {
+            if(!currentUserId){promptSignup();return;}
+            hideAllPages();
+            document.getElementById('bottomNav').classList.add('show');
+            document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
+            document.getElementById('nav-dashboard').classList.add('active');
+            document.getElementById('dashboardPage').classList.remove('hidden');document.getElementById('dashboardPage').classList.add('active');
             try {
-                var response = await fetch('/api/create-checkout', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                var data = await response.json();
-                console.log('Checkout response:', data);
-                if (data.url) {
-                    window.location.href = data.url;
-                } else {
-                    alert('Checkout error: ' + (data.error || 'Unknown error'));
-                    btn.textContent = origText;
-                    btn.disabled = false;
+                var res = await fetch('/api/dashboard/'+currentUserId);
+                var data = await res.json();
+                document.getElementById('dashUsername').textContent='@'+data.username;
+                document.getElementById('dashCode').textContent=data.friendCode;
+                document.getElementById('dashAvg').textContent=(data.avgScore||0).toFixed(1);
+                document.getElementById('dashTotal').textContent=data.totalRatings||0;
+                document.getElementById('dashFriends').textContent=data.friendCount||0;
+                document.getElementById('dashToday').textContent=data.todayCount||0;
+                // Leaderboard
+                var lb=document.getElementById('leaderboardList');
+                if(data.leaderboard&&data.leaderboard.length>0){
+                    lb.innerHTML=data.leaderboard.map(function(item,i){
+                        var rc=i===0?'gold':i===1?'silver':i===2?'bronze':'';
+                        var tag=item.isYou?' <span class="you-tag">(you)</span>':'';
+                        return '<div class="leaderboard-item"><div class="leaderboard-rank '+rc+'">#'+(i+1)+'</div><div class="leaderboard-name">@'+item.username+tag+'</div><div class="leaderboard-score">'+((item.avgScore||0).toFixed(1))+'</div></div>';
+                    }).join('');
+                } else { lb.innerHTML='<div style="color:var(--text-muted);font-size:13px;padding:12px">Add friends to see leaderboard!</div>'; }
+                // Recent ratings
+                var rl=document.getElementById('dashRecentList');
+                if(data.recentRatings&&data.recentRatings.length>0) {
+                    var emojis={roast:'🔥',hype:'✨',honest:'😐',unhinged:'🤪',rizz:'💀'};
+                    rl.innerHTML=data.recentRatings.map(function(r){
+                        return '<div class="leaderboard-item"><div style="font-size:20px;width:28px;text-align:center">'+(emojis[r.mode]||'🎯')+'</div><div class="leaderboard-name">'+r.category+(r.isDaily?' <span style="color:#ffd60a;font-size:10px">DAILY</span>':'')+'</div><div class="leaderboard-score">'+r.score+'</div></div>';
+                    }).join('');
+                } else { rl.innerHTML='<div style="color:var(--text-muted);font-size:13px;padding:12px">No ratings yet!</div>'; }
+            } catch(e) { console.error(e); }
+        }
+
+        // ===== FEED =====
+        async function showFeed() {
+            if(!currentUserId){promptSignup();return;}
+            hideAllPages();
+            document.getElementById('bottomNav').classList.add('show');
+            document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
+            document.getElementById('nav-feed').classList.add('active');
+            document.getElementById('feedPage').classList.remove('hidden');document.getElementById('feedPage').classList.add('active');
+            try {
+                var res = await fetch('/api/feed/'+currentUserId);
+                var data = await res.json();
+                var list = document.getElementById('feedList');
+                if(!data.feed||data.feed.length===0) {
+                    list.innerHTML='<div class="feed-empty">No ratings yet. Add friends or start rating to see your feed!</div>';
+                    return;
                 }
-            } catch (err) {
-                console.error('Checkout failed:', err);
-                alert('Checkout failed: ' + err.message);
-                btn.textContent = origText;
-                btn.disabled = false;
-            }
+                var modeColors={roast:'#ff2d55',hype:'#30d5c8',honest:'#ff9f0a',unhinged:'#bf5af2',rizz:'#ffd60a'};
+                var emojis={roast:'🔥',hype:'✨',honest:'😐',unhinged:'🤪',rizz:'💀'};
+                list.innerHTML=data.feed.map(function(item) {
+                    var color=modeColors[item.mode]||'#ff2d55';
+                    var timeAgo=getTimeAgo(item.timestamp);
+                    var initial=(item.username||'?')[0].toUpperCase();
+                    return '<div class="feed-item"><div class="feed-item-header"><div class="feed-avatar">'+initial+'</div><div class="feed-username">@'+item.username+'</div><div class="feed-time">'+timeAgo+'</div></div><div class="feed-content"><div class="feed-score" style="color:'+color+'">'+item.score+'</div><div class="feed-details"><div class="feed-cat">'+item.category+(item.isDaily?' ⭐ Daily':'')+'</div><div class="feed-comm">'+item.commentary+'</div><div class="feed-mode-badge" style="background:'+color+'22;color:'+color+'">'+(emojis[item.mode]||'')+' '+item.mode+'</div></div></div></div>';
+                }).join('');
+            } catch(e) { console.error(e); }
+        }
+
+        function getTimeAgo(ts) {
+            if(!ts) return '';
+            var diff=Date.now()-ts;var mins=Math.floor(diff/60000);
+            if(mins<1) return 'now';
+            if(mins<60) return mins+'m ago';
+            var hrs=Math.floor(mins/60);
+            if(hrs<24) return hrs+'h ago';
+            return Math.floor(hrs/24)+'d ago';
+        }
+
+        // ===== FRIENDS =====
+        async function showFriends() {
+            if(!currentUserId){promptSignup();return;}
+            hideAllPages();
+            document.getElementById('bottomNav').classList.add('show');
+            document.querySelectorAll('.nav-item').forEach(function(n){n.classList.remove('active');});
+            document.getElementById('nav-friends').classList.add('active');
+            document.getElementById('friendsPage').classList.remove('hidden');document.getElementById('friendsPage').classList.add('active');
+            document.getElementById('myCodeDisplay').textContent=currentFriendCode||'------';
+            try {
+                var res=await fetch('/api/friends/'+currentUserId);
+                var data=await res.json();
+                var list=document.getElementById('friendsList');
+                if(!data.friends||data.friends.length===0) {
+                    list.innerHTML='<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">No friends yet! Share your code to get started.</div>';
+                    return;
+                }
+                list.innerHTML=data.friends.map(function(f){
+                    var initial=(f.username||'?')[0].toUpperCase();
+                    var lastText=f.lastRating?f.lastRating.score+'/10 — '+f.lastRating.category:'No ratings yet';
+                    return '<div class="friend-card"><div class="friend-avatar">'+initial+'</div><div class="friend-info"><div class="friend-name">@'+f.username+'</div><div class="friend-stat">Avg: '+(f.avgScore||0).toFixed(1)+' · '+lastText+'</div></div></div>';
+                }).join('');
+            } catch(e) { console.error(e); }
+        }
+
+        async function addFriend() {
+            var code=document.getElementById('friendCodeInput').value.trim().toUpperCase();
+            if(!code||code.length<4){showToast('Enter a friend code');return;}
+            try {
+                var res=await fetch('/api/add-friend',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:currentUserId,friendCode:code})});
+                var data=await res.json();
+                if(data.error){showToast(data.error);return;}
+                showToast(data.message||'Friend added!');
+                document.getElementById('friendCodeInput').value='';
+                showFriends();
+            } catch(e) { showToast('Failed to add friend'); }
+        }
+
+        function copyFriendCode() {
+            if(currentFriendCode){navigator.clipboard.writeText(currentFriendCode).then(function(){showToast('Friend code copied!');});}
         }
 
         // ===== HISTORY =====
-        function addToHistory(rating) {
-            ratingHistory.unshift({ score: rating.score, category: rating.category, mode: rating.mode, image: rating.image, timestamp: new Date() });
-            if (ratingHistory.length > 10) ratingHistory.pop();
-            saveHistory(); loadHistory();
-        }
+        function addToHistory(rating) { ratingHistory.unshift({score:rating.score,category:rating.category,mode:rating.mode,image:rating.image,timestamp:new Date()});if(ratingHistory.length>10)ratingHistory.pop();saveHistory();loadHistory(); }
+        function loadHistory() { var s=document.getElementById('historySection');var items=document.getElementById('historyItems');if(ratingHistory.length===0){s.classList.remove('show');return;}s.classList.add('show');var emojis={roast:'🔥',hype:'✨',honest:'😐',unhinged:'🤪',rizz:'💀'};items.innerHTML=ratingHistory.map(function(item,i){var thumb=item.image?'<img src="'+item.image+'" class="hist-img" alt="">':'<div class="hist-img" style="background:var(--bg-elevated)"></div>';return '<div class="hist-item" onclick="openHistoryItem('+i+')">'+thumb+'<div class="hist-info"><div class="hist-cat">'+item.category+'</div><div class="hist-score">'+item.score+'/10 '+(emojis[item.mode]||'')+'</div></div></div>';}).join(''); }
+        function openHistoryItem(i) { var r=ratingHistory[i];displayResults({score:r.score,category:r.category,commentary:'Previously rated: '+r.category+' — '+r.score+'/10',mode:r.mode,image:r.image,vibe:''}); }
+        function saveHistory() { try{localStorage.setItem('ratingHistory',JSON.stringify(ratingHistory));}catch(e){} }
+        function loadHistoryFromStorage() { try{var s=localStorage.getItem('ratingHistory');if(s)ratingHistory=JSON.parse(s);}catch(e){} }
+        function updateRateButtonStyle() { document.getElementById('rateBtn').className='rate-btn '+currentMode; }
+        function showToast(msg) { var t=document.createElement('div');t.className='toast';t.textContent=msg;document.body.appendChild(t);setTimeout(function(){t.remove();},3000); }
 
-        function loadHistory() {
-            var section = document.getElementById('historySection');
-            var items = document.getElementById('historyItems');
-            if (ratingHistory.length === 0) { section.classList.remove('show'); return; }
-
-            section.classList.add('show');
-            var emojis = {roast:'🔥',hype:'✨',honest:'😐',unhinged:'🤪',rizz:'💀'};
-            items.innerHTML = ratingHistory.map(function(item, i) {
-                var thumb = item.image ? '<img src="'+item.image+'" class="hist-img" alt="">' : '<div class="hist-img" style="background:var(--bg-elevated);"></div>';
-                return '<div class="hist-item" onclick="openHistoryItem('+i+')">'+thumb+'<div class="hist-info"><div class="hist-cat">'+item.category+'</div><div class="hist-score">'+item.score+'/10 '+(emojis[item.mode]||'')+'</div></div></div>';
-            }).join('');
-        }
-
-        function openHistoryItem(index) {
-            var r = ratingHistory[index];
-            displayResults({ score:r.score, category:r.category, commentary:'Previously rated: '+r.category+' — '+r.score+'/10', mode:r.mode, image:r.image, vibe: '' });
-        }
-
-        function saveHistory() { try { localStorage.setItem('ratingHistory', JSON.stringify(ratingHistory)); } catch(e) {} }
-        function loadHistoryFromStorage() { try { var s = localStorage.getItem('ratingHistory'); if (s) ratingHistory = JSON.parse(s); } catch(e) {} }
-
-        // ===== UI HELPERS =====
-        function updateRateButtonStyle() { document.getElementById('rateBtn').className = 'rate-btn ' + currentMode; }
-
-        function showToast(msg) {
-            var t = document.createElement('div');
-            t.className = 'toast'; t.textContent = msg;
-            document.body.appendChild(t);
-            setTimeout(function() { t.remove(); }, 3000);
-        }
-
-        // ===== DRAG & DROP =====
-        var pc = document.getElementById('photoCard');
-        ['dragenter','dragover','dragleave','drop'].forEach(function(e) { pc.addEventListener(e, function(ev) { ev.preventDefault(); ev.stopPropagation(); }); });
-        pc.addEventListener('drop', function(e) { document.getElementById('photoInput').files = e.dataTransfer.files; handleImageUpload({ target: { files: e.dataTransfer.files } }); });
+        // Drag & drop
+        var pc=document.getElementById('photoCard');
+        ['dragenter','dragover','dragleave','drop'].forEach(function(e){pc.addEventListener(e,function(ev){ev.preventDefault();ev.stopPropagation();});});
+        pc.addEventListener('drop',function(e){document.getElementById('photoInput').files=e.dataTransfer.files;handleImageUpload({target:{files:e.dataTransfer.files}});});
 
         // ===== INIT =====
-        document.addEventListener('DOMContentLoaded', function() {
-            loadHistoryFromStorage();
-            updateRateButtonStyle();
-
-            var params = new URLSearchParams(window.location.search);
-            if (params.get('reset') === 'true') {
-                localStorage.removeItem('ratingsUsed');
-                localStorage.removeItem('paidRatings');
-                localStorage.removeItem('ratingHistory');
-                ratingHistory = [];
-                window.history.replaceState({}, '', '/');
-                showToast('Ratings reset!');
+        document.addEventListener('DOMContentLoaded',function(){
+            loadHistoryFromStorage();loadUserState();updateRateButtonStyle();
+            if(currentUserId&&currentUsername) {
+                document.getElementById('profileBtn').style.display='flex';
+                document.getElementById('profileBtn').textContent=currentUsername[0].toUpperCase();
             }
-            if (params.get('payment') === 'success') {
-                setPaidRatings(getPaidRatings() + PAID_RATINGS);
-                showToast('Payment successful! 5 more ratings unlocked');
-                window.history.replaceState({}, '', '/');
-                startRating();
-            } else if (params.get('payment') === 'cancel') {
-                showToast('Payment cancelled');
-                window.history.replaceState({}, '', '/');
-            }
+            var params=new URLSearchParams(window.location.search);
+            if(params.get('reset')==='true'){localStorage.removeItem('ratingsUsed');localStorage.removeItem('paidRatings');localStorage.removeItem('ratingHistory');localStorage.removeItem('userId');localStorage.removeItem('username');localStorage.removeItem('friendCode');ratingHistory=[];currentUserId=null;currentUsername=null;currentFriendCode=null;window.history.replaceState({},'','/');showToast('Everything reset!');}
+            if(params.get('payment')==='success'){setPaidRatings(getPaidRatings()+PAID_RATINGS);showToast('Payment successful! 5 more ratings unlocked');window.history.replaceState({},'','/');startRating();}
+            else if(params.get('payment')==='cancel'){showToast('Payment cancelled');window.history.replaceState({},'','/');}
         });
     </script>
 </body>
