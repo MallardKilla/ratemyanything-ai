@@ -729,14 +729,14 @@
         // ===== SHARING =====
         function shareToClipboard() {
             const m = { roast:'🔥 Roast', hype:'✨ Hype', honest:'😐 Honest', unhinged:'🤪 Unhinged', rizz:'💀 Rizz' };
-            const text = 'I got ' + currentRating.score + '/10 in ' + (m[currentRating.mode]||currentRating.mode) + ' Mode on RateMyAnything.ai!\n\n"' + currentRating.commentary + '"\n\nTry it: ratemyanything-ai-production.up.railway.app';
+            const text = 'I got ' + currentRating.score + '/10 in ' + (m[currentRating.mode]||currentRating.mode) + ' Mode on RateMyAnything.ai!\n\n"' + currentRating.commentary + '"\n\nTry it: ratemyanything.net';
             navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard!'));
         }
 
         function shareToTwitter() {
             const m = { roast:'🔥 Roast', hype:'✨ Hype', honest:'😐 Honest', unhinged:'🤪 Unhinged', rizz:'💀 Rizz' };
             const text = 'I got ' + currentRating.score + '/10 in ' + (m[currentRating.mode]||currentRating.mode) + ' Mode on RateMyAnything.ai! Try it: ';
-            window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=https://ratemyanything-ai-production.up.railway.app', '_blank');
+            window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent(text) + '&url=https://ratemyanything.net', '_blank');
         }
 
         function shareToInstagram() { showToast('Screenshot your score and share to your story!'); }
