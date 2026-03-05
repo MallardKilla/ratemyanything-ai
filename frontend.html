@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#0a0a0a">
     <meta property="og:title" content="RateMyAnything.ai - Rate Anything">
     <meta property="og:description" content="Upload a photo or describe anything and get an AI rating. 5 modes. Try it now!">
-    <meta property="og:url" content="https://ratemyanything.ai">
+    <meta property="og:url" content="https://ratemyanything.net">
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
     <title>RateMyAnything.ai</title>
@@ -223,14 +223,19 @@
         /* ===== LOADING ===== */
         .loading { display: none; padding: 80px 24px; text-align: center; }
         .loading.active { display: flex; flex-direction: column; align-items: center; gap: 24px; }
-        .spinner {
-            width: 48px; height: 48px; border-radius: 50%;
-            border: 3px solid var(--border);
-            border-top-color: #ff2d55; animation: spin 0.8s linear infinite;
+        .loading-ring {
+            width: 56px; height: 56px; position: relative;
         }
+        .loading-ring .ring {
+            position: absolute; width: 100%; height: 100%; border-radius: 50%;
+            border: 3px solid transparent;
+        }
+        .loading-ring .ring:nth-child(1) { border-top-color: #ff2d55; animation: spin 1s linear infinite; }
+        .loading-ring .ring:nth-child(2) { border-right-color: #af52de; animation: spin 1.5s linear infinite reverse; }
+        .loading-ring .ring:nth-child(3) { border-bottom-color: #30d5c8; animation: spin 2s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         .loading h3 { font-size: 16px; font-weight: 700; }
-        .loading p { font-size: 13px; color: var(--text-muted); }
+        .loading-msg { font-size: 13px; color: var(--text-muted); transition: opacity 0.3s; min-height: 20px; }
 
         /* ===== RESULTS ===== */
         .results { display: none; padding: 16px; animation: fadeUp 0.5s var(--ease) both; }
@@ -257,7 +262,9 @@
         .score-num {
             font-size: 80px; font-weight: 900; line-height: 1; letter-spacing: -3px;
             position: relative; z-index: 1; margin: 8px 0;
+            animation: scoreReveal 0.6s var(--spring) both;
         }
+        @keyframes scoreReveal { from { opacity: 0; transform: scale(0.3) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
         .score-card.roast .score-num { background: var(--grad-roast); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .score-card.hype .score-num { background: var(--grad-hype); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .score-card.honest .score-num { background: var(--grad-honest); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
@@ -285,11 +292,35 @@
         .score-card.unhinged .mode-pill { background: rgba(191,90,242,0.15); color: #bf5af2; }
         .score-card.rizz .mode-pill { background: rgba(255,214,10,0.15); color: #ffd60a; }
 
+        .vibe-badge {
+            display: inline-block; font-size: 20px; font-weight: 900; padding: 6px 16px;
+            border-radius: 100px; margin: 12px 0 0; text-transform: uppercase; letter-spacing: 1px;
+            position: relative; z-index: 1; animation: vibeIn 0.5s var(--spring) 0.4s both;
+        }
+        @keyframes vibeIn { from { opacity: 0; transform: scale(0.5); } to { opacity: 1; transform: scale(1); } }
+        .score-card.roast .vibe-badge { background: rgba(255,45,85,0.12); color: #ff2d55; }
+        .score-card.hype .vibe-badge { background: rgba(48,213,200,0.12); color: #30d5c8; }
+        .score-card.honest .vibe-badge { background: rgba(255,159,10,0.12); color: #ff9f0a; }
+        .score-card.unhinged .vibe-badge { background: rgba(191,90,242,0.12); color: #bf5af2; }
+        .score-card.rizz .vibe-badge { background: rgba(255,214,10,0.12); color: #ffd60a; }
+
         .commentary {
             font-size: 16px; line-height: 1.65; color: var(--text-dim);
             margin: 20px 0 0; font-weight: 500; position: relative; z-index: 1;
+            animation: fadeUp 0.5s var(--ease) 0.6s both;
         }
         .commentary strong { color: var(--text); }
+
+        /* CONFETTI */
+        .confetti-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 999; overflow: hidden; }
+        .confetti-piece {
+            position: absolute; width: 8px; height: 8px; top: -10px;
+            border-radius: 2px; animation: confettiFall 2.5s ease-in forwards;
+        }
+        @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg) scale(0.3); opacity: 0; }
+        }
 
         /* ACTION BUTTONS */
         .actions { display: flex; gap: 8px; }
@@ -469,9 +500,13 @@
 
         <!-- LOADING -->
         <div class="loading" id="loadingState">
-            <div class="spinner"></div>
-            <h3>AI is judging you...</h3>
-            <p>This takes a few seconds</p>
+            <div class="loading-ring">
+                <div class="ring"></div>
+                <div class="ring"></div>
+                <div class="ring"></div>
+            </div>
+            <h3 id="loadingTitle">AI is judging you...</h3>
+            <div class="loading-msg" id="loadingMsg">Analyzing every detail</div>
         </div>
 
         <!-- RESULTS -->
@@ -483,6 +518,7 @@
                 <div class="score-out-of">/ 10</div>
                 <div class="gauge"><div class="gauge-fill" id="scoreGaugeFill" style="--pct: 0%"></div></div>
                 <div class="mode-pill" id="modeBadge"></div>
+                <div class="vibe-badge" id="vibeBadge"></div>
                 <div class="commentary" id="commentary"></div>
             </div>
 
@@ -500,10 +536,17 @@
         <div class="paywall" id="paywallScreen">
             <div class="paywall-card">
                 <div class="lock">🔒</div>
-                <h2>You're Out of Free Ratings</h2>
-                <p>You used all 3 free ratings.<br>Unlock 5 more for just $0.99</p>
-                <button class="paywall-cta" onclick="buyMoreRatings()">Unlock 5 More Ratings — $0.99</button>
-                <div class="paywall-fine">Instant access. Rate anything.</div>
+                <h2>You're Hooked, Aren't You?</h2>
+                <p>You used all 3 free ratings. Get 5 more for less than a dollar.</p>
+                <button class="paywall-cta" onclick="buyMoreRatings()">Unlock 5 More — $0.99</button>
+                <div class="paywall-fine">Instant access · All 5 modes · Rate anything</div>
+                <div style="display: flex; gap: 8px; justify-content: center; margin-top: 16px; flex-wrap: wrap;">
+                    <span style="font-size: 11px; color: var(--text-muted); background: var(--bg-elevated); padding: 4px 10px; border-radius: 100px;">🔥 Roast</span>
+                    <span style="font-size: 11px; color: var(--text-muted); background: var(--bg-elevated); padding: 4px 10px; border-radius: 100px;">✨ Hype</span>
+                    <span style="font-size: 11px; color: var(--text-muted); background: var(--bg-elevated); padding: 4px 10px; border-radius: 100px;">😐 Honest</span>
+                    <span style="font-size: 11px; color: var(--text-muted); background: var(--bg-elevated); padding: 4px 10px; border-radius: 100px;">🤪 Unhinged</span>
+                    <span style="font-size: 11px; color: var(--text-muted); background: var(--bg-elevated); padding: 4px 10px; border-radius: 100px;">💀 Rizz</span>
+                </div>
             </div>
         </div>
     </div>
@@ -661,6 +704,7 @@
             document.getElementById('ratingInterface').classList.add('hidden');
             document.getElementById('loadingState').classList.add('active');
             document.getElementById('rateButtonContainer').style.display = 'none';
+            startLoadingMessages();
 
             try {
                 const response = await fetch('/api/rate', {
@@ -692,6 +736,7 @@
                 });
             } catch (error) {
                 console.error('Rating error:', error);
+                stopLoadingMessages();
                 showToast('Something went wrong: ' + error.message);
                 document.getElementById('loadingState').classList.remove('active');
                 document.getElementById('ratingInterface').classList.remove('hidden');
@@ -699,8 +744,89 @@
             }
         }
 
+        // Loading message rotation
+        var loadingMessages = [
+            'Analyzing every detail...',
+            'Calculating your score...',
+            'Preparing the verdict...',
+            'Almost ready...',
+            'This is going to be good...',
+            'Judging intensifies...',
+            'No mercy mode activated...',
+            'Processing your fate...'
+        ];
+        var loadingInterval = null;
+
+        function startLoadingMessages() {
+            var i = 0;
+            var el = document.getElementById('loadingMsg');
+            var titles = {
+                roast: ['Roasting in progress...', 'Preparing the destruction...', 'Loading savage commentary...'],
+                hype: ['Generating good vibes...', 'Charging hype levels...', 'Maximizing positivity...'],
+                honest: ['Removing all filters...', 'Activating truth mode...', 'No sugar coating...'],
+                unhinged: ['Entering chaos mode...', 'Brain cells disconnecting...', 'Reality bending...'],
+                rizz: ['Scanning for rizz...', 'Evaluating the aura...', 'Detecting main character energy...']
+            };
+            var modeTitle = titles[currentMode] || titles.roast;
+            document.getElementById('loadingTitle').textContent = modeTitle[0];
+            loadingInterval = setInterval(function() {
+                i = (i + 1) % loadingMessages.length;
+                el.style.opacity = '0';
+                setTimeout(function() {
+                    el.textContent = loadingMessages[i];
+                    el.style.opacity = '1';
+                    if (i % 3 === 0) {
+                        var ti = Math.floor(Math.random() * modeTitle.length);
+                        document.getElementById('loadingTitle').textContent = modeTitle[ti];
+                    }
+                }, 200);
+            }, 2000);
+        }
+
+        function stopLoadingMessages() {
+            if (loadingInterval) { clearInterval(loadingInterval); loadingInterval = null; }
+        }
+
+        // Confetti effect for high scores
+        function launchConfetti() {
+            var container = document.createElement('div');
+            container.className = 'confetti-container';
+            document.body.appendChild(container);
+            var colors = ['#ff2d55','#af52de','#30d5c8','#34c759','#ff9f0a','#ffd60a','#bf5af2','#ff6723'];
+            for (var i = 0; i < 40; i++) {
+                var piece = document.createElement('div');
+                piece.className = 'confetti-piece';
+                piece.style.left = Math.random() * 100 + '%';
+                piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+                piece.style.animationDelay = Math.random() * 1 + 's';
+                piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+                piece.style.width = (5 + Math.random() * 8) + 'px';
+                piece.style.height = (5 + Math.random() * 8) + 'px';
+                container.appendChild(piece);
+            }
+            setTimeout(function() { container.remove(); }, 4000);
+        }
+
+        // Animated score counter
+        function animateScore(target, el) {
+            var start = 0;
+            var duration = 800;
+            var startTime = null;
+            function step(timestamp) {
+                if (!startTime) startTime = timestamp;
+                var progress = Math.min((timestamp - startTime) / duration, 1);
+                var eased = 1 - Math.pow(1 - progress, 3); // ease out cubic
+                var current = start + (target - start) * eased;
+                el.textContent = current.toFixed(1);
+                if (progress < 1) requestAnimationFrame(step);
+            }
+            requestAnimationFrame(step);
+        }
+
         function displayResults(rating) {
             currentRating = rating;
+            stopLoadingMessages();
+
             const scoreCard = document.getElementById('scoreCard');
             scoreCard.className = 'score-card ' + rating.mode;
 
@@ -710,16 +836,31 @@
                 : '';
 
             var s = parseFloat(rating.score);
-            document.getElementById('scoreNumber').textContent = Number.isInteger(s) ? s.toFixed(1) : s;
+            var scoreEl = document.getElementById('scoreNumber');
+            scoreEl.textContent = '0.0';
             document.getElementById('scoreGaugeFill').style.setProperty('--pct', (s / 10 * 100) + '%');
             document.getElementById('scoreCategoryLabel').textContent = rating.category;
 
             const labels = { roast:'🔥 Roast Mode', hype:'✨ Hype Mode', honest:'😐 Brutally Honest', unhinged:'🤪 Unhinged', rizz:'💀 Rizz Check' };
             document.getElementById('modeBadge').textContent = labels[rating.mode] || rating.mode;
+
+            // Vibe badge
+            var vibe = rating.vibe || '';
+            document.getElementById('vibeBadge').textContent = vibe.toUpperCase();
+            document.getElementById('vibeBadge').style.display = vibe ? 'inline-block' : 'none';
+
             document.getElementById('commentary').innerHTML = rating.commentary.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 
             document.getElementById('loadingState').classList.remove('active');
             document.getElementById('resultsPage').classList.add('active');
+
+            // Animate score counter after a tiny delay
+            setTimeout(function() { animateScore(s, scoreEl); }, 200);
+
+            // Confetti for high scores (8+) or unhinged mode
+            if (s >= 8 || rating.mode === 'unhinged') {
+                setTimeout(launchConfetti, 600);
+            }
 
             currentRatingCount++;
             document.getElementById('ratingCounter').textContent = currentRatingCount.toLocaleString();
