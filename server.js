@@ -288,10 +288,15 @@ Respond ONLY with this JSON:
 }
 
 // ===== REQUEST HANDLER =====
-function parseBody(req) {
+function parseBody(req, maxSize = 10 * 1024 * 1024) {
   return new Promise((resolve, reject) => {
     let data = '';
-    req.on('data', chunk => { data += chunk; });
+    let size = 0;
+    req.on('data', chunk => {
+      size += chunk.length;
+      if (size > maxSize) { reject(new Error('Body too large')); req.destroy(); return; }
+      data += chunk;
+    });
     req.on('end', () => {
       try { resolve(JSON.parse(data)); }
       catch (e) { reject(new Error('Invalid JSON')); }
@@ -330,7 +335,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // Health check
-  if (req.method === 'GET' && req.url === '/api/health') {
+  if (req.method === 'GET' && urlPath === '/api/health') {
     return sendJSON(res, 200, { status: 'ok' });
   }
 
@@ -345,8 +350,7 @@ const server = http.createServer(async (req, res) => {
       // Check if taken
       const existing = Object.values(db.users).find(u => u.username === username);
       if (existing) {
-        // Return existing user (no password, just claim your name)
-        return sendJSON(res, 200, { userId: existing.id, username: existing.username, friendCode: existing.friendCode });
+        return sendJSON(res, 409, { error: 'Username taken! Try another one.' });
       }
       // Create new user
       const userId = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
@@ -533,7 +537,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // Rate endpoint
-  if (req.method === 'POST' && (req.url === '/api/rate' || req.url === '/api/rate-detailed')) {
+  if (req.method === 'POST' && (urlPath === '/api/rate' || urlPath === '/api/rate-detailed')) {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     if (!checkRateLimit(ip)) {
       return sendJSON(res, 429, { error: 'Rate limit exceeded. Try again in an hour.' });
@@ -559,7 +563,7 @@ const server = http.createServer(async (req, res) => {
         if (mime) mediaType = mime[1];
       }
 
-      const detailed = req.url === '/api/rate-detailed';
+      const detailed = urlPath === '/api/rate-detailed';
       const prompt = createPrompt(text, category || 'other', !!image, mode, detailed);
       const result = await callClaude(prompt, imageBase64, mediaType);
       return sendJSON(res, 200, result);
@@ -570,7 +574,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // Battle endpoint
-  if (req.method === 'POST' && req.url === '/api/battle') {
+  if (req.method === 'POST' && urlPath === '/api/battle') {
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
     if (!checkRateLimit(ip)) {
       return sendJSON(res, 429, { error: 'Rate limit exceeded. Try again in an hour.' });
@@ -644,7 +648,7 @@ const server = http.createServer(async (req, res) => {
   }
 
   // Stripe Checkout
-  if (req.method === 'POST' && req.url === '/api/create-checkout') {
+  if (req.method === 'POST' && urlPath === '/api/create-checkout') {
     if (!STRIPE_SECRET_KEY || !STRIPE_PRICE_ID) {
       return sendJSON(res, 500, { error: 'Payments not configured' });
     }

@@ -697,6 +697,7 @@
 
         function goBack() {
             hideAllPages();
+            document.getElementById('bottomNav').classList.add('show');
             if(isBattleMode){ if(canRate()){document.getElementById('battleInterface').classList.remove('hidden');document.getElementById('battleButtonContainer').style.display='block';}else{showPaywall();}clearBattleForm(); }
             else { if(canRate()){document.getElementById('ratingInterface').classList.remove('hidden');document.getElementById('rateButtonContainer').style.display='block';updateRateButtonText();}else{showPaywall();}clearForm(); }
         }
@@ -754,6 +755,11 @@
             isDailyChallenge = true;
             if(dailyChallenge && dailyChallenge.category) {
                 currentCategory = dailyChallenge.category.charAt(0).toUpperCase() + dailyChallenge.category.slice(1);
+                // Visually select the matching category button
+                document.querySelectorAll('.cat-btn').forEach(function(b){
+                    b.classList.remove('selected');
+                    if(b.textContent.trim().toLowerCase() === dailyChallenge.category.toLowerCase()) b.classList.add('selected');
+                });
             }
             showToast('Daily challenge: ' + (dailyChallenge ? dailyChallenge.prompt : 'Rate something!'));
         }
@@ -763,8 +769,6 @@
             if(!canRate()){showPaywall();return;}
             var description=document.getElementById('descriptionInput').value.trim();
             if(!uploadedImage&&!description){showToast('Upload a photo or write a description');return;}
-            // Prompt signup after 2nd rating
-            if(!currentUserId && getRatingsUsed()>=1) { promptSignup(); return; }
             document.getElementById('ratingInterface').classList.add('hidden');
             document.getElementById('loadingState').classList.add('active');document.getElementById('loadingState').classList.remove('hidden');
             document.getElementById('rateButtonContainer').style.display='none';
@@ -781,7 +785,7 @@
                 displayResults({score:data.score,category:currentCategory,commentary:data.commentary,vibe:data.vibe,mode:currentMode,image:uploadedImage});
             } catch(error) {
                 console.error('Rating error:',error);stopLoadingMessages();showToast('Something went wrong: '+error.message);
-                document.getElementById('loadingState').classList.remove('active');document.getElementById('ratingInterface').classList.remove('hidden');document.getElementById('rateButtonContainer').style.display='block';
+                document.getElementById('loadingState').classList.remove('active');document.getElementById('loadingState').classList.add('hidden');document.getElementById('ratingInterface').classList.remove('hidden');document.getElementById('rateButtonContainer').style.display='block';
             }
         }
 
@@ -799,7 +803,7 @@
                 displayBattleResults(data);
             } catch(error) {
                 console.error('Battle error:',error);stopLoadingMessages();showToast('Battle failed: '+error.message);
-                document.getElementById('loadingState').classList.remove('active');document.getElementById('battleInterface').classList.remove('hidden');document.getElementById('battleButtonContainer').style.display='block';
+                document.getElementById('loadingState').classList.remove('active');document.getElementById('loadingState').classList.add('hidden');document.getElementById('battleInterface').classList.remove('hidden');document.getElementById('battleButtonContainer').style.display='block';
             }
         }
 
@@ -821,7 +825,7 @@
             document.getElementById('battleResult1').classList.remove('winner');document.getElementById('battleResult2').classList.remove('winner');
             if(winner===1)document.getElementById('battleResult1').classList.add('winner');else document.getElementById('battleResult2').classList.add('winner');
             document.getElementById('battleVerdict').textContent=data.verdict||'';
-            document.getElementById('loadingState').classList.remove('active');
+            document.getElementById('loadingState').classList.remove('active');document.getElementById('loadingState').classList.add('hidden');
             document.getElementById('battleResultsPage').classList.remove('hidden');document.getElementById('battleResultsPage').classList.add('active');
             setTimeout(function(){animateScore(s1,el1);animateScore(s2,el2);playBattleSound();},200);
             setTimeout(launchConfetti,700);
@@ -852,13 +856,15 @@
             document.getElementById('modeBadge').textContent=labels[rating.mode]||rating.mode;
             var vibe=rating.vibe||'';document.getElementById('vibeBadge').textContent=vibe.toUpperCase();document.getElementById('vibeBadge').style.display=vibe?'inline-block':'none';
             document.getElementById('commentary').innerHTML=rating.commentary.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
-            document.getElementById('loadingState').classList.remove('active');
+            document.getElementById('loadingState').classList.remove('active');document.getElementById('loadingState').classList.add('hidden');
             document.getElementById('resultsPage').classList.remove('hidden');document.getElementById('resultsPage').classList.add('active');
             setTimeout(function(){animateScore(s,scoreEl);playScoreSound(s);},200);
             if(s>=8||rating.mode==='unhinged') setTimeout(launchConfetti,600);
             setTimeout(function(){generateShareCard(rating,s);},1000);
             currentRatingCount++;document.getElementById('ratingCounter').textContent=currentRatingCount.toLocaleString();
             addToHistory(rating);
+            // Prompt signup after 2nd rating (post-results so we don't lose their upload)
+            if(!currentUserId && getRatingsUsed()>=2) { setTimeout(function(){ showToast('Sign up to save your ratings & see friends!'); },3000); }
         }
 
         // Share card
