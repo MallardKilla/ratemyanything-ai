@@ -25,6 +25,9 @@ function checkRateLimit(ip) {
   return true;
 }
 
+// ===== PAYMENT TOKENS =====
+const paymentTokens = new Set();
+
 // ===== SERVER-SIDE USAGE TRACKING =====
 const FREE_RATINGS = 3;
 const PAID_RATINGS_PER_PURCHASE = 5;
@@ -397,10 +400,16 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
-  // ===== RECORD PAYMENT (server-side) =====
+  // ===== RECORD PAYMENT (server-side, token-verified) =====
   if (req.method === 'POST' && urlPath === '/api/record-payment') {
     try {
       const body = await parseBody(req);
+      const token = body.token;
+      if (!token || !paymentTokens.has(token)) {
+        return sendJSON(res, 403, { error: 'Invalid or expired payment token' });
+      }
+      // Consume the token (one-time use)
+      paymentTokens.delete(token);
       const key = getUsageKey(req, body);
       addPaidRatings(key);
       return sendJSON(res, 200, {
@@ -439,6 +448,15 @@ const server = http.createServer(async (req, res) => {
         totalRatings: 0,
         createdAt: Date.now()
       };
+
+      // Transfer IP usage to user account so they can't double-dip free ratings
+      const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+      const ipKey = 'ip:' + ip;
+      const userKey = 'user:' + userId;
+      if (db.usage && db.usage[ipKey]) {
+        db.usage[userKey] = { ...db.usage[ipKey] };
+      }
+
       saveDB();
       return sendJSON(res, 200, { userId, username, friendCode });
     } catch (err) {
@@ -454,6 +472,17 @@ const server = http.createServer(async (req, res) => {
       if (!username) return sendJSON(res, 400, { error: 'Enter a username' });
       const user = Object.values(db.users).find(u => u.username === username);
       if (!user) return sendJSON(res, 404, { error: 'Username not found. Want to sign up?' });
+
+      // Merge any IP usage into user account (take the higher used count)
+      const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+      const ipKey = 'ip:' + ip;
+      const userKey = 'user:' + user.id;
+      if (!db.usage) db.usage = {};
+      const ipUsage = db.usage[ipKey] || { used: 0, paid: 0 };
+      const userUsage = db.usage[userKey] || { used: 0, paid: 0 };
+      db.usage[userKey] = { used: Math.max(ipUsage.used, userUsage.used), paid: Math.max(ipUsage.paid, userUsage.paid) };
+      saveDB();
+
       return sendJSON(res, 200, { userId: user.id, username: user.username, friendCode: user.friendCode });
     } catch (err) {
       return sendJSON(res, 500, { error: 'Login failed' });
@@ -766,12 +795,18 @@ const server = http.createServer(async (req, res) => {
 
     try {
       const origin = req.headers.origin || (req.headers.referer ? new URL(req.headers.referer).origin : null) || `http://localhost:${PORT}`;
+      // Generate a one-time payment token to prevent fake payment URLs
+      const payToken = Date.now().toString(36) + Math.random().toString(36).slice(2, 10);
+      paymentTokens.add(payToken);
+      // Auto-expire token after 30 minutes
+      setTimeout(() => paymentTokens.delete(payToken), 30 * 60 * 1000);
+
       const stripeBody = new URLSearchParams({
         'payment_method_types[]': 'card',
         'line_items[0][price]': STRIPE_PRICE_ID,
         'line_items[0][quantity]': '1',
         'mode': 'payment',
-        'success_url': origin + '/?payment=success',
+        'success_url': origin + '/?payment=success&token=' + payToken,
         'cancel_url': origin + '/?payment=cancel'
       }).toString();
 

@@ -742,7 +742,7 @@
                     document.getElementById('profileBtn').style.display='flex';
                     document.getElementById('profileBtn').textContent=currentUsername[0].toUpperCase();
                     showToast('Welcome back, @'+currentUsername+'!');
-                    startRating();
+                    syncUsage();startRating();
                     return;
                 }
                 if(data.error){showToast(data.error);return;}
@@ -751,7 +751,7 @@
                 document.getElementById('profileBtn').style.display='flex';
                 document.getElementById('profileBtn').textContent=currentUsername[0].toUpperCase();
                 showToast('Welcome, @'+currentUsername+'!');
-                startRating();
+                syncUsage();startRating();
             } catch(e) { showToast('Signup failed'); }
         }
         function skipSignup() { startRating(); }
@@ -1068,7 +1068,7 @@
             }
             var params=new URLSearchParams(window.location.search);
             if(params.get('reset')==='true'){localStorage.removeItem('ratingsUsed');localStorage.removeItem('paidRatings');localStorage.removeItem('ratingHistory');localStorage.removeItem('userId');localStorage.removeItem('username');localStorage.removeItem('friendCode');ratingHistory=[];currentUserId=null;currentUsername=null;currentFriendCode=null;window.history.replaceState({},'','/');showToast('Everything reset!');}
-            if(params.get('payment')==='success'){setPaidRatings(getPaidRatings()+PAID_RATINGS);fetch('/api/record-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:currentUserId||null})}).then(function(r){return r.json();}).then(function(d){if(typeof d.remaining==='number'){serverRemaining=d.remaining;serverCanRate=d.canRate;}}).catch(function(){});showToast('Payment successful! 5 more ratings unlocked');window.history.replaceState({},'','/');startRating();}
+            if(params.get('payment')==='success'){var payToken=params.get('token');if(payToken){setPaidRatings(getPaidRatings()+PAID_RATINGS);fetch('/api/record-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:currentUserId||null,token:payToken})}).then(function(r){return r.json();}).then(function(d){if(typeof d.remaining==='number'){serverRemaining=d.remaining;serverCanRate=d.canRate;}}).catch(function(){});showToast('Payment successful! 5 more ratings unlocked');}else{showToast('Payment verification failed');}window.history.replaceState({},'','/');startRating();}
             else if(params.get('payment')==='cancel'){showToast('Payment cancelled');window.history.replaceState({},'','/');}
         });
     </script>
