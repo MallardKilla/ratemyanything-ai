@@ -717,6 +717,19 @@
             try {
                 var res = await fetch('/api/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:username})});
                 var data = await res.json();
+                if(res.status===409) {
+                    // Username taken — try logging in
+                    var loginRes = await fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:username})});
+                    var loginData = await loginRes.json();
+                    if(loginData.error){showToast(loginData.error);return;}
+                    currentUserId=loginData.userId;currentUsername=loginData.username;currentFriendCode=loginData.friendCode;
+                    saveUserState();
+                    document.getElementById('profileBtn').style.display='flex';
+                    document.getElementById('profileBtn').textContent=currentUsername[0].toUpperCase();
+                    showToast('Welcome back, @'+currentUsername+'!');
+                    startRating();
+                    return;
+                }
                 if(data.error){showToast(data.error);return;}
                 currentUserId=data.userId;currentUsername=data.username;currentFriendCode=data.friendCode;
                 saveUserState();

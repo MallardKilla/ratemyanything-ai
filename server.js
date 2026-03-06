@@ -373,6 +373,20 @@ const server = http.createServer(async (req, res) => {
     }
   }
 
+  // ===== LOGIN (return to existing account) =====
+  if (req.method === 'POST' && urlPath === '/api/login') {
+    try {
+      const body = await parseBody(req);
+      const username = (body.username || '').trim().toLowerCase().replace(/[^a-z0-9_]/g, '');
+      if (!username) return sendJSON(res, 400, { error: 'Enter a username' });
+      const user = Object.values(db.users).find(u => u.username === username);
+      if (!user) return sendJSON(res, 404, { error: 'Username not found. Want to sign up?' });
+      return sendJSON(res, 200, { userId: user.id, username: user.username, friendCode: user.friendCode });
+    } catch (err) {
+      return sendJSON(res, 500, { error: 'Login failed' });
+    }
+  }
+
   // ===== GET USER PROFILE =====
   if (req.method === 'GET' && urlPath.startsWith('/api/user/')) {
     const userId = urlPath.split('/api/user/')[1];
