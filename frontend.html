@@ -591,13 +591,25 @@
         function playSadSound(ctx) { var now=ctx.currentTime;[392,370,349,233].forEach(function(f,i){var o=ctx.createOscillator();var g=ctx.createGain();o.type='sawtooth';o.frequency.setValueAtTime(f,now+i*0.25);g.gain.setValueAtTime(0,now+i*0.25);g.gain.linearRampToValueAtTime(0.12,now+i*0.25+0.03);g.gain.linearRampToValueAtTime(i===3?0.12:0.02,now+i*0.25+0.22);if(i===3)g.gain.linearRampToValueAtTime(0,now+1.4);o.connect(g);g.connect(ctx.destination);o.start(now+i*0.25);o.stop(now+1.5);}); }
         function playBattleSound() { try{var ctx=getAudioCtx();if(ctx.state==='suspended')ctx.resume();var now=ctx.currentTime;[261.63,329.63,392,523.25,659.25].forEach(function(f,i){var o=ctx.createOscillator();var g=ctx.createGain();o.type='square';o.frequency.value=f;g.gain.setValueAtTime(0,now+i*0.06);g.gain.linearRampToValueAtTime(0.12,now+i*0.06+0.03);g.gain.linearRampToValueAtTime(0,now+0.6);o.connect(g);g.connect(ctx.destination);o.start(now+i*0.06);o.stop(now+0.7);});}catch(e){} }
 
-        // ===== PAYWALL =====
+        // ===== PAYWALL (server-enforced) =====
+        var serverRemaining = FREE_RATINGS; // synced from server
+        var serverCanRate = true;
         function getRatingsUsed() { try{return parseInt(localStorage.getItem('ratingsUsed')||'0');}catch(e){return 0;} }
         function setRatingsUsed(n) { try{localStorage.setItem('ratingsUsed',n.toString());}catch(e){} }
         function getPaidRatings() { try{return parseInt(localStorage.getItem('paidRatings')||'0');}catch(e){return 0;} }
         function setPaidRatings(n) { try{localStorage.setItem('paidRatings',n.toString());}catch(e){} }
-        function canRate() { return getRatingsUsed() < FREE_RATINGS + getPaidRatings(); }
-        function getRatingsRemaining() { return Math.max(0,(FREE_RATINGS+getPaidRatings())-getRatingsUsed()); }
+        function canRate() { return serverCanRate; }
+        function getRatingsRemaining() { return serverRemaining; }
+        async function syncUsage() {
+            try {
+                var res = await fetch('/api/usage',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:currentUserId||null})});
+                var data = await res.json();
+                serverRemaining = data.remaining;
+                serverCanRate = data.canRate;
+                setRatingsUsed(data.used);
+                setPaidRatings(data.paid);
+            } catch(e) { /* fallback to localStorage */ serverCanRate = getRatingsUsed() < FREE_RATINGS + getPaidRatings(); serverRemaining = Math.max(0,(FREE_RATINGS+getPaidRatings())-getRatingsUsed()); }
+        }
         function showPaywall() {
             hideAllPages();
             document.getElementById('paywallScreen').classList.remove('hidden');
@@ -790,9 +802,11 @@
             document.getElementById('rateButtonContainer').style.display='none';
             startLoadingMessages();
             try {
-                var response=await fetch('/api/rate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:uploadedImage||null,text:description||null,mode:currentMode,category:currentCategory.toLowerCase()})});
+                var response=await fetch('/api/rate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:uploadedImage||null,text:description||null,mode:currentMode,category:currentCategory.toLowerCase(),userId:currentUserId||null})});
+                if(response.status===403){stopLoadingMessages();document.getElementById('loadingState').classList.remove('active');document.getElementById('loadingState').classList.add('hidden');serverCanRate=false;serverRemaining=0;showPaywall();return;}
                 if(!response.ok){var err=await response.json().catch(function(){return{};});throw new Error(err.error||'Rating failed');}
                 var data=await response.json();
+                if(typeof data.remaining==='number'){serverRemaining=data.remaining;serverCanRate=data.remaining>0;}
                 setRatingsUsed(getRatingsUsed()+1);
                 // Save to server if logged in
                 if(currentUserId) {
@@ -812,9 +826,11 @@
             document.getElementById('loadingState').classList.add('active');document.getElementById('loadingState').classList.remove('hidden');
             startLoadingMessages();
             try {
-                var response=await fetch('/api/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image1:battleImage1,image2:battleImage2,text:document.getElementById('battleDescInput').value.trim()||null,mode:currentMode,category:currentCategory.toLowerCase()})});
+                var response=await fetch('/api/battle',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image1:battleImage1,image2:battleImage2,text:document.getElementById('battleDescInput').value.trim()||null,mode:currentMode,category:currentCategory.toLowerCase(),userId:currentUserId||null})});
+                if(response.status===403){stopLoadingMessages();document.getElementById('loadingState').classList.remove('active');document.getElementById('loadingState').classList.add('hidden');serverCanRate=false;serverRemaining=0;showPaywall();return;}
                 if(!response.ok){var err=await response.json().catch(function(){return{};});throw new Error(err.error||'Battle failed');}
                 var data=await response.json();
+                if(typeof data.remaining==='number'){serverRemaining=data.remaining;serverCanRate=data.remaining>0;}
                 setRatingsUsed(getRatingsUsed()+1);
                 displayBattleResults(data);
             } catch(error) {
@@ -1045,14 +1061,14 @@
 
         // ===== INIT =====
         document.addEventListener('DOMContentLoaded',function(){
-            loadHistoryFromStorage();loadUserState();updateRateButtonStyle();
+            loadHistoryFromStorage();loadUserState();updateRateButtonStyle();syncUsage();
             if(currentUserId&&currentUsername) {
                 document.getElementById('profileBtn').style.display='flex';
                 document.getElementById('profileBtn').textContent=currentUsername[0].toUpperCase();
             }
             var params=new URLSearchParams(window.location.search);
             if(params.get('reset')==='true'){localStorage.removeItem('ratingsUsed');localStorage.removeItem('paidRatings');localStorage.removeItem('ratingHistory');localStorage.removeItem('userId');localStorage.removeItem('username');localStorage.removeItem('friendCode');ratingHistory=[];currentUserId=null;currentUsername=null;currentFriendCode=null;window.history.replaceState({},'','/');showToast('Everything reset!');}
-            if(params.get('payment')==='success'){setPaidRatings(getPaidRatings()+PAID_RATINGS);showToast('Payment successful! 5 more ratings unlocked');window.history.replaceState({},'','/');startRating();}
+            if(params.get('payment')==='success'){setPaidRatings(getPaidRatings()+PAID_RATINGS);fetch('/api/record-payment',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId:currentUserId||null})}).then(function(r){return r.json();}).then(function(d){if(typeof d.remaining==='number'){serverRemaining=d.remaining;serverCanRate=d.canRate;}}).catch(function(){});showToast('Payment successful! 5 more ratings unlocked');window.history.replaceState({},'','/');startRating();}
             else if(params.get('payment')==='cancel'){showToast('Payment cancelled');window.history.replaceState({},'','/');}
         });
     </script>

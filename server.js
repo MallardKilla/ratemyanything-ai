@@ -19,10 +19,49 @@ function checkRateLimit(ip) {
   const oneHourAgo = now - 3600000;
   if (!rateLimitStore.has(ip)) rateLimitStore.set(ip, []);
   const requests = rateLimitStore.get(ip).filter(t => t > oneHourAgo);
-  if (requests.length >= 30) return false;
+  if (requests.length >= 60) return false;
   requests.push(now);
   rateLimitStore.set(ip, requests);
   return true;
+}
+
+// ===== SERVER-SIDE USAGE TRACKING =====
+const FREE_RATINGS = 3;
+const PAID_RATINGS_PER_PURCHASE = 5;
+
+function getUsageKey(req, body) {
+  // Prefer userId if logged in, otherwise use IP
+  if (body && body.userId) return 'user:' + body.userId;
+  const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+  return 'ip:' + ip;
+}
+
+function getUsage(key) {
+  if (!db.usage) db.usage = {};
+  if (!db.usage[key]) db.usage[key] = { used: 0, paid: 0 };
+  return db.usage[key];
+}
+
+function canUserRate(key) {
+  const u = getUsage(key);
+  return u.used < FREE_RATINGS + u.paid;
+}
+
+function getRemainingRatings(key) {
+  const u = getUsage(key);
+  return Math.max(0, FREE_RATINGS + u.paid - u.used);
+}
+
+function incrementUsage(key) {
+  const u = getUsage(key);
+  u.used++;
+  saveDB();
+}
+
+function addPaidRatings(key) {
+  const u = getUsage(key);
+  u.paid += PAID_RATINGS_PER_PURCHASE;
+  saveDB();
 }
 
 // ===== DATABASE (JSON file-based) =====
@@ -34,6 +73,7 @@ function loadDB() {
     if (fs.existsSync(DB_PATH)) {
       db = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
       if (!db.users) db.users = {};
+      if (!db.usage) db.usage = {};
       console.log(`Database loaded: ${Object.keys(db.users).length} users`);
     }
   } catch (e) {
@@ -339,6 +379,39 @@ const server = http.createServer(async (req, res) => {
     return sendJSON(res, 200, { status: 'ok' });
   }
 
+  // ===== USAGE CHECK (server-side paywall) =====
+  if (req.method === 'POST' && urlPath === '/api/usage') {
+    try {
+      const body = await parseBody(req);
+      const key = getUsageKey(req, body);
+      const usage = getUsage(key);
+      return sendJSON(res, 200, {
+        used: usage.used,
+        paid: usage.paid,
+        free: FREE_RATINGS,
+        remaining: getRemainingRatings(key),
+        canRate: canUserRate(key)
+      });
+    } catch (err) {
+      return sendJSON(res, 500, { error: 'Usage check failed' });
+    }
+  }
+
+  // ===== RECORD PAYMENT (server-side) =====
+  if (req.method === 'POST' && urlPath === '/api/record-payment') {
+    try {
+      const body = await parseBody(req);
+      const key = getUsageKey(req, body);
+      addPaidRatings(key);
+      return sendJSON(res, 200, {
+        remaining: getRemainingRatings(key),
+        canRate: canUserRate(key)
+      });
+    } catch (err) {
+      return sendJSON(res, 500, { error: 'Payment record failed' });
+    }
+  }
+
   // ===== USER SIGNUP =====
   if (req.method === 'POST' && urlPath === '/api/signup') {
     try {
@@ -565,6 +638,12 @@ const server = http.createServer(async (req, res) => {
       const body = await parseBody(req);
       const { image, text, mode, category } = body;
 
+      // Server-side paywall enforcement
+      const usageKey = getUsageKey(req, body);
+      if (!canUserRate(usageKey)) {
+        return sendJSON(res, 403, { error: 'No ratings remaining. Purchase more to continue!', paywall: true, remaining: 0 });
+      }
+
       if (!image && !text) return sendJSON(res, 400, { error: 'Provide an image or text' });
       if (!['roast', 'hype', 'honest', 'unhinged', 'rizz'].includes(mode)) return sendJSON(res, 400, { error: 'Invalid mode' });
 
@@ -580,6 +659,11 @@ const server = http.createServer(async (req, res) => {
       const detailed = urlPath === '/api/rate-detailed';
       const prompt = createPrompt(text, category || 'other', !!image, mode, detailed);
       const result = await callClaude(prompt, imageBase64, mediaType);
+
+      // Increment usage on success
+      incrementUsage(usageKey);
+      result.remaining = getRemainingRatings(usageKey);
+
       return sendJSON(res, 200, result);
     } catch (err) {
       console.error('Error:', err.message);
@@ -600,6 +684,13 @@ const server = http.createServer(async (req, res) => {
     try {
       const body = await parseBody(req);
       const { image1, image2, text, mode, category } = body;
+
+      // Server-side paywall enforcement
+      const usageKey = getUsageKey(req, body);
+      if (!canUserRate(usageKey)) {
+        return sendJSON(res, 403, { error: 'No ratings remaining. Purchase more to continue!', paywall: true, remaining: 0 });
+      }
+
       if (!image1 || !image2) return sendJSON(res, 400, { error: 'Two images required for battle mode' });
       if (!['roast', 'hype', 'honest', 'unhinged', 'rizz'].includes(mode)) return sendJSON(res, 400, { error: 'Invalid mode' });
 
@@ -654,7 +745,13 @@ const server = http.createServer(async (req, res) => {
       const textResp = data.content[0]?.text || '';
       const jsonMatch = textResp.match(/\{[\s\S]*\}/);
       if (!jsonMatch) throw new Error('No JSON in response');
-      return sendJSON(res, 200, JSON.parse(jsonMatch[0]));
+
+      // Increment usage on success
+      incrementUsage(usageKey);
+      const battleResult = JSON.parse(jsonMatch[0]);
+      battleResult.remaining = getRemainingRatings(usageKey);
+
+      return sendJSON(res, 200, battleResult);
     } catch (err) {
       console.error('Battle error:', err.message);
       return sendJSON(res, 500, { error: err.message || 'Battle failed' });
