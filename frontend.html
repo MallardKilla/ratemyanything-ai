@@ -600,7 +600,9 @@
         function getRatingsRemaining() { return Math.max(0,(FREE_RATINGS+getPaidRatings())-getRatingsUsed()); }
         function showPaywall() {
             hideAllPages();
+            document.getElementById('paywallScreen').classList.remove('hidden');
             document.getElementById('paywallScreen').classList.add('active');
+            document.getElementById('bottomNav').classList.add('show');
         }
 
         // ===== NAVIGATION =====
@@ -708,6 +710,7 @@
         function promptSignup() {
             if(currentUserId) return;
             hideAllPages();
+            document.getElementById('bottomNav').classList.add('show');
             document.getElementById('signupScreen').classList.remove('hidden');
             document.getElementById('signupScreen').classList.add('active');
         }
